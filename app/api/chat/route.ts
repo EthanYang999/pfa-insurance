@@ -56,10 +56,8 @@ export async function POST(request: NextRequest) {
       console.error("N8N webhook failed:", response.status, response.statusText);
       
       // 尝试读取错误响应
-      let errorDetails = "";
       try {
         const errorData = await response.json();
-        errorDetails = errorData.message || errorData.hint || "";
         console.error("N8N error details:", errorData);
       } catch {
         console.error("Could not parse error response");
