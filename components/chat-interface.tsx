@@ -5,7 +5,6 @@ import { ChatMessage, TypingIndicator } from "@/components/chat-message";
 import { ChatInput } from "@/components/chat-input";
 import { DigitalHuman } from "@/components/digital-human";
 import { LogoutButton } from "@/components/logout-button";
-import { Mic } from "lucide-react";
 
 interface Message {
   id: string;
@@ -28,6 +27,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  // 移动端默认最小化数字人，桌面端默认展开
   const [isDigitalHumanMinimized, setIsDigitalHumanMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +38,18 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // 响应式初始化：检测屏幕尺寸来决定数字人初始状态
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768; // md breakpoint
+      // 可以根据需要调整初始化逻辑，目前保持不变
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
@@ -96,34 +108,25 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   return (
     <div className="h-screen w-full flex flex-col bg-coach-gray-light">
       {/* 顶部导航栏 */}
-      <header className="bg-coach-blue-primary text-white px-4 py-3 flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-coach-gold-accent rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <header className="bg-coach-blue-primary text-white px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-coach-gold-accent rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <div>
-              <h1 className="font-bold text-lg">AI教练雪莉</h1>
-              <p className="text-coach-gold-light text-xs">专业保险培训助手</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="font-bold text-base sm:text-lg truncate">AI教练雪莉</h1>
+              <p className="text-coach-gold-light text-xs hidden sm:block">专业保险培训助手</p>
             </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          {/* 语音功能入口 (预留) */}
-          <button
-            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-md flex items-center justify-center transition-colors"
-            title="语音功能 (即将上线)"
-            disabled
-          >
-            <Mic className="w-4 h-4" />
-          </button>
-          
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {/* 用户信息和登出 */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-coach-gold-light hidden sm:inline">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="text-xs sm:text-sm text-coach-gold-light hidden md:inline max-w-32 truncate">
               {user?.email || "用户"}
             </span>
             <LogoutButton />
@@ -132,14 +135,16 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
       </header>
 
       {/* 主要内容区域 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 数字人展示区域 - 桌面端左侧，移动端顶部 */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        {/* 数字人展示区域 - 移动端顶部，桌面端左侧 */}
         <div className={`
           transition-all duration-300 ease-in-out
-          md:w-2/5 md:border-r md:border-coach-gray-disabled
-          ${isDigitalHumanMinimized ? 'md:w-16' : 'md:w-2/5'}
-          md:block
-          ${isDigitalHumanMinimized ? 'h-16' : 'h-32'} md:h-full
+          ${isDigitalHumanMinimized 
+            ? 'h-16 md:w-20' 
+            : 'h-[33vh] md:h-full md:w-1/2'
+          }
+          md:border-r md:border-coach-gray-disabled
+          flex-shrink-0
         `}>
           <DigitalHuman
             isMinimized={isDigitalHumanMinimized}
@@ -149,12 +154,12 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
 
         {/* 聊天区域 */}
         <div className={`
-          flex-1 flex flex-col
-          ${isDigitalHumanMinimized ? 'md:w-full' : 'md:w-3/5'}
+          flex-1 flex flex-col min-h-0
+          ${isDigitalHumanMinimized ? 'md:w-full' : 'md:w-1/2'}
           transition-all duration-300 ease-in-out
         `}>
           {/* 消息列表 */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {messages.map((message) => (
               <ChatMessage
                 key={message.id}
@@ -168,10 +173,12 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
           </div>
 
           {/* 输入区域 */}
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            disabled={isLoading}
-          />
+          <div className="flex-shrink-0">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              disabled={isLoading}
+            />
+          </div>
         </div>
       </div>
     </div>

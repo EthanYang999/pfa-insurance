@@ -43,8 +43,8 @@ export function ChatInput({
   };
 
   return (
-    <div className={cn("bg-white border-t border-coach-gray-disabled p-4", className)}>
-      <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+    <div className={cn("bg-white border-t border-coach-gray-disabled p-3 sm:p-4", className)}>
+      <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3 items-end">
         <div className="flex-1">
           <Textarea
             value={message}
@@ -52,24 +52,24 @@ export function ChatInput({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
-            className="input-primary resize-none min-h-[44px] max-h-32"
+            className="input-primary resize-none min-h-[40px] sm:min-h-[44px] max-h-32 text-sm sm:text-base"
             rows={1}
           />
         </div>
         
-        {/* 语音按钮 (预留) */}
+        {/* 语音按钮 (预留) - 桌面端显示 */}
         <Button
           type="button"
           variant="outline"
           size="icon"
           onClick={toggleVoiceMode}
-          className="h-11 w-11 border-coach-gray-disabled hover:border-coach-blue-secondary hover:bg-coach-blue-secondary hover:text-white transition-colors"
+          className="h-10 w-10 sm:h-11 sm:w-11 border-coach-gray-disabled hover:border-coach-blue-secondary hover:bg-coach-blue-secondary hover:text-white transition-colors hidden sm:flex"
           title={isVoiceMode ? "关闭语音模式" : "开启语音模式"}
         >
           {isVoiceMode ? (
-            <MicOff className="w-4 h-4" />
+            <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           ) : (
-            <Mic className="w-4 h-4" />
+            <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           )}
         </Button>
         
@@ -77,15 +77,15 @@ export function ChatInput({
         <Button
           type="submit"
           disabled={!message.trim() || disabled}
-          className="btn-primary h-11 px-6 gap-2"
+          className="btn-primary h-10 sm:h-11 px-3 sm:px-6 gap-1 sm:gap-2 text-sm sm:text-base"
         >
-          <Send className="w-4 h-4" />
-          发送
+          <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">发送</span>
         </Button>
       </form>
       
-      {/* 提示文本 */}
-      <div className="mt-2 text-xs text-coach-gray-medium text-center">
+      {/* 提示文本 - 桌面端显示 */}
+      <div className="mt-2 text-xs text-coach-gray-medium text-center hidden sm:block">
         按 Enter 发送消息，Shift + Enter 换行
       </div>
     </div>
