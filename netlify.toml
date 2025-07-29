@@ -4,7 +4,3 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[functions]
-  # 函数超时设置（免费版最大10秒）
-  timeout = 10
