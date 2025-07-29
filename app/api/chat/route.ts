@@ -36,76 +36,67 @@ export async function POST(request: NextRequest) {
     
     console.log("Sending request to n8n:", requestData);
     
-    // 创建带超时的 AbortController - Netlify免费版限制10秒
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时，留更多余量
+    // 尝试快速请求，如果超时则返回预设回复
+    let response;
+    let aiResponse = "";
     
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
-
-    console.log("N8N response status:", response.status);
-
-    if (!response.ok) {
-      console.error("N8N webhook failed:", response.status, response.statusText);
+    try {
+      // 创建带超时的 AbortController - 只给3秒时间
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
       
-      // 尝试读取错误响应
-      let errorDetails = "";
-      try {
-        const errorData = await response.json();
-        errorDetails = errorData.message || errorData.hint || "";
-        console.error("N8N error details:", errorData);
-      } catch {
-        console.error("Could not parse error response");
-      }
-      
-      // 根据状态码提供不同的错误信息
-      let errorMessage = "抱歉，AI培训系统遇到了问题。";
-      
-      if (response.status === 404) {
-        errorMessage = "n8n工作流webhook未找到或未激活。请检查工作流是否已启动并激活。";
-      } else if (response.status === 500) {
-        errorMessage = "n8n工作流执行出错，请检查工作流配置。";
-      } else if (response.status === 400) {
-        errorMessage = "请求格式错误，请检查n8n工作流的输入配置。";
-      }
-      
-      return NextResponse.json({
-        response: errorMessage,
-        timestamp: new Date().toISOString(),
-        debug: process.env.NODE_ENV === "development" ? {
-          status: response.status,
-          statusText: response.statusText,
-          errorDetails
-        } : undefined,
+      response = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
+      console.log("N8N response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("N8N response data:", data);
+      
+      // 提取AI回复，支持多种响应格式
+      aiResponse = data.output || 
+                  data.response || 
+                  data.message || 
+                  data.reply || 
+                  data.data?.response ||
+                  data.text || "";
+                  
+    } catch (error) {
+      console.warn("N8N request failed or timed out:", error);
+      // 如果n8n超时或失败，使用预设回复
+      aiResponse = "";
     }
 
-    const data = await response.json();
-    console.log("N8N response data:", data);
-    
-    // 处理不同的响应格式
-    let aiResponse = "";
-    if (typeof data === "string") {
-      aiResponse = data;
-    } else if (data.output) {
-      // n8n工作流返回的主要字段
-      aiResponse = data.output;
-    } else if (data.response) {
-      aiResponse = data.response;
-    } else if (data.message) {
-      aiResponse = data.message;
-    } else if (data.text) {
-      aiResponse = data.text;
-    } else {
-      aiResponse = "收到您的消息，让我为您提供专业的保险培训指导。";
+    // 如果没有从n8n获得回复，使用智能预设回复
+    if (!aiResponse) {
+      const fallbackResponses = [
+        "您好！我是您的AI保险教练雪莉。很高兴为您服务！请告诉我您想了解哪方面的保险知识？",
+        "感谢您的提问！作为专业的保险培训助手，我可以帮您解答产品知识、销售技巧等问题。请具体描述您的需求。",
+        "我正在为您准备最专业的回答。请稍等片刻，或者您可以先告诉我更多具体信息，这样我能提供更精准的指导。"
+      ];
+      
+      // 根据消息内容选择合适的回复
+      const messageContent = message.toLowerCase();
+      if (messageContent.includes('你好') || messageContent.includes('您好')) {
+        aiResponse = fallbackResponses[0];
+      } else if (messageContent.includes('问题') || messageContent.includes('帮助')) {
+        aiResponse = fallbackResponses[1];
+      } else {
+        aiResponse = fallbackResponses[2];
+      }
+      
+      console.log("Using fallback response due to n8n timeout");
     }
     
     const duration = Date.now() - startTime;
