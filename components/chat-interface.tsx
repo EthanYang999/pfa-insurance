@@ -56,6 +56,89 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // 直接调用n8n webhook，参考index.html的成功实现
+  const sendMessageToN8N = async (message: string, retryCount = 0): Promise<string> => {
+    try {
+      console.log(`发送消息到N8N保险webhook (尝试 ${retryCount + 1}):`, { 
+        message, 
+        url: 'https://n8n.aifunbox.com/webhook/insurance',
+        timestamp: new Date().toISOString()
+      });
+
+      const requestBody = {
+        message: message,
+        userId: user?.sub || `user_${Date.now()}`,
+        sessionId: `chat_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        context: {
+          page: 'chat',
+          scenario: 'insurance_training'
+        }
+      };
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60秒超时
+
+      const response = await fetch('https://n8n.aifunbox.com/webhook/insurance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+      console.log('N8N保险工作流响应状态:', response.status);
+
+      // 处理不同的响应状态
+      if (!response.ok) {
+        if (response.status === 500 && retryCount < 2) {
+          console.log(`服务器错误，1000ms后重试...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return sendMessageToN8N(message, retryCount + 1);
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // 尝试解析响应
+      const responseData = await response.json();
+      console.log('N8N保险工作流响应数据:', responseData);
+
+      // 提取AI回复，支持多种响应格式
+      const aiReply = responseData.response || 
+                      responseData.message || 
+                      responseData.reply || 
+                      responseData.data?.response ||
+                      responseData.output ||
+                      responseData.text;
+
+      if (!aiReply) {
+        console.warn('N8N工作流返回了空的回复');
+        return '抱歉，我暂时无法理解您的问题。请您换个方式提问，我会尽力帮助您。';
+      }
+
+      return aiReply;
+
+    } catch (error) {
+      console.error(`N8N保险webhook调用失败 (尝试 ${retryCount + 1}):`, error);
+
+      // 处理不同类型的错误
+      if (error instanceof Error && error.name === 'AbortError') {
+        return '请求超时了，请重新发送您的消息。';
+      } else if (error instanceof Error && error.message.includes('Failed to fetch')) {
+        return '网络连接有问题，请检查网络后重试。';
+      } else if (retryCount >= 2) {
+        return '系统暂时不稳定，请稍后再试。';
+      } else {
+        // 继续重试
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return sendMessageToN8N(message, retryCount + 1);
+      }
+    }
+  };
+
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -68,26 +151,11 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: content,
-          userId: user?.sub,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      const data = await response.json();
+      const aiResponse = await sendMessageToN8N(content);
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response || "抱歉，我现在无法回复您的消息。请稍后再试。",
+        content: aiResponse,
         isUser: false,
         timestamp: new Date(),
       };
@@ -96,10 +164,9 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     } catch (error) {
       console.error("Error sending message:", error);
       
-      // 网络错误时的错误提示
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "抱歉，发送消息时出现了网络错误。请检查您的网络连接并重试。",
+        content: "抱歉，发送消息时出现了错误。请稍后再试。",
         isUser: false,
         timestamp: new Date(),
       };

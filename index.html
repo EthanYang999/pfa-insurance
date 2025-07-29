@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI教练 - 您的专属销售训练伙伴</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#3B82F6',secondary:'#10B981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
+.gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.digital-human-bg { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.chat-bubble-user { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+.chat-bubble-ai { background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%); }
+.progress-bar { background: linear-gradient(90deg, #10B981 0%, #059669 100%); }
+.break-words { word-break: break-word; overflow-wrap: break-word; }
+.word-wrap { white-space: pre-wrap; }
+#chatMessages { scrollbar-width: thin; scrollbar-color: #CBD5E0 #F7FAFC; }
+#chatMessages::-webkit-scrollbar { width: 6px; }
+#chatMessages::-webkit-scrollbar-track { background: #F7FAFC; border-radius: 3px; }
+#chatMessages::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 3px; }
+#chatMessages::-webkit-scrollbar-thumb:hover { background: #A0AEC0; }
+</style>
+</head>
+<body class="bg-gray-50 font-sans">
+<!-- 登录页 -->
+<div id="loginPage" class="min-h-screen flex">
+<!-- 左侧品牌区 -->
+<div class="w-2/5 gradient-bg flex flex-col justify-center items-center text-white p-12">
+<div class="text-center space-y-8">
+<div class="text-4xl font-['Pacifico'] mb-8">logo</div>
+<div class="space-y-4">
+<h1 class="text-3xl font-bold">欢迎回到您的专属 AI 教练</h1>
+<p class="text-xl opacity-90">我是教练雪莉</p>
+<p class="text-lg opacity-80">让我们一起提升您的销售技能</p>
+</div>
+<div class="mt-12">
+<img src="https://readdy.ai/api/search-image?query=Professional%20AI%20coach%20avatar%2C%20friendly%20female%20character%20with%20modern%20business%20attire%2C%20clean%20white%20background%2C%20minimalist%20design%2C%20technology%20theme%2C%20warm%20smile%2C%20professional%20lighting%2C%20high%20quality%203D%20render&width=400&height=300&seq=login_coach&orientation=landscape" alt="AI教练雪莉" class="w-80 h-60 object-cover object-top rounded-xl shadow-2xl">
+</div>
+</div>
+</div>
+<!-- 右侧登录区 -->
+<div class="w-3/5 flex items-center justify-center p-12">
+<div class="w-full max-w-md">
+<div class="glass-effect rounded-2xl p-8 shadow-xl">
+<div class="text-center mb-8">
+<h2 class="text-2xl font-bold text-gray-900 mb-2">登录您的账户</h2>
+<p class="text-gray-600">开始您的专业成长之旅</p>
+</div>
+<form class="space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">工号/邮箱</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-user-line text-gray-400"></i>
+</div>
+</div>
+<input type="text" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="请输入工号或邮箱">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-lock-line text-gray-400"></i>
+</div>
+</div>
+<input type="password" id="passwordInput" class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="请输入密码">
+<button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-eye-off-line text-gray-400"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<label class="flex items-center">
+<input type="checkbox" class="hidden" id="rememberMe">
+<div class="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center cursor-pointer" id="rememberCheckbox">
+<i class="ri-check-line text-white text-sm hidden"></i>
+</div>
+<span class="ml-2 text-sm text-gray-600">记住密码</span>
+</label>
+<a href="#" class="text-sm text-primary hover:text-blue-700">忘记密码？</a>
+</div>
+<button type="button" id="loginBtn" class="w-full bg-primary hover:bg-blue-700 text-white font-medium py-3 px-4 !rounded-button transition-colors whitespace-nowrap">
+立即登录
+</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+<!-- 主驾驶舱/仪表盘 -->
+<div id="dashboardPage" class="min-h-screen flex hidden">
+<!-- 左侧导航栏 -->
+<div class="w-64 bg-white shadow-lg flex flex-col">
+<div class="p-6 border-b border-gray-200">
+<div class="text-2xl font-['Pacifico'] text-primary">logo</div>
+</div>
+<nav class="flex-1 p-4">
+<ul class="space-y-2">
+<li>
+<a href="#" class="nav-item active flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-primary text-white">
+<div class="w-5 h-5 flex items-center justify-center mr-3">
+<i class="ri-dashboard-line"></i>
+</div>
+仪表盘
+</a>
+</li>
+<li>
+<a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg" id="navPracticeBtn">
+<div class="w-5 h-5 flex items-center justify-center mr-3">
+<i class="ri-mic-line"></i>
+</div>
+开始对练
+</a>
+</li>
+<li>
+<a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center mr-3">
+<i class="ri-line-chart-line"></i>
+</div>
+成长报告
+</a>
+</li>
+</ul>
+</nav>
+<div class="p-4 border-t border-gray-200">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="text-white font-medium">张</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900">张经理</p>
+<p class="text-xs text-gray-500">销售精英</p>
+</div>
+</div>
+<button class="w-full flex items-center justify-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-logout-box-line"></i>
+</div>
+退出登录
+</button>
+</div>
+</div>
+<!-- 中间主内容区 -->
+<div class="flex-1 p-8">
+<div class="max-w-6xl">
+<!-- 问候语 -->
+<div class="mb-8">
+<h1 class="text-3xl font-bold text-gray-900 mb-2">下午好，张经理！</h1>
+<p class="text-gray-600">今天也要加油哦，让我们一起提升销售技能</p>
+</div>
+<!-- 成长卡片 -->
+<div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-4">
+<div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-star-fill text-white text-xl"></i>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-gray-900">销售新秀</h3>
+<p class="text-gray-600">当前等级</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-primary">1,250</p>
+<p class="text-sm text-gray-600">经验值</p>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-gray-600">距离下一等级</span>
+<span class="text-gray-900 font-medium">750 / 2000</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div class="progress-bar h-2 rounded-full" style="width: 37.5%"></div>
+</div>
+</div>
+<div class="flex space-x-4 mt-4">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-medal-line text-blue-600"></i>
+</div>
+</div>
+<span class="text-sm text-gray-600">沟通达人</span>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-trophy-line text-green-600"></i>
+</div>
+</div>
+<span class="text-sm text-gray-600">快速学习者</span>
+</div>
+</div>
+</div>
+<!-- 功能入口 -->
+<div class="grid grid-cols-3 gap-6">
+<div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer" id="practiceCard">
+<div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-mic-line text-blue-600"></i>
+</div>
+</div>
+<h3 class="text-lg font-semibold text-gray-900 mb-2">模拟对练</h3>
+<p class="text-gray-600 text-sm mb-4">与 AI 进行销售实战演练，提升沟通技巧</p>
+<div class="flex items-center text-primary text-sm font-medium">
+开始练习
+<div class="w-4 h-4 flex items-center justify-center ml-1">
+<i class="ri-arrow-right-line"></i>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer">
+<div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-question-line text-purple-600"></i>
+</div>
+</div>
+<h3 class="text-lg font-semibold text-gray-900 mb-2">知识查询</h3>
+<p class="text-gray-600 text-sm mb-4">快速问答，获取专业销售知识</p>
+<div class="flex items-center text-primary text-sm font-medium">
+开始提问
+<div class="w-4 h-4 flex items-center justify-center ml-1">
+<i class="ri-arrow-right-line"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 右侧数字人面板 -->
+<div class="w-80 bg-white shadow-lg p-6">
+<div class="text-center mb-6">
+<h3 class="text-lg font-semibold text-gray-900 mb-2">教练雪莉</h3>
+<p class="text-sm text-gray-600">您的专属 AI 销售教练</p>
+</div>
+<!-- 数字人显示区域 -->
+<div class="digital-human-bg rounded-xl p-4 mb-6 h-64 flex items-center justify-center">
+<img src="https://readdy.ai/api/search-image?query=Professional%20AI%20coach%20avatar%2C%20friendly%20female%20character%20with%20modern%20business%20attire%2C%20clean%20gradient%20background%2C%20minimalist%20design%2C%20technology%20theme%2C%20warm%20smile%2C%20professional%20lighting%2C%20high%20quality%203D%20render%2C%20interactive%20digital%20assistant&width=280&height=200&seq=digital_human&orientation=landscape" alt="教练雪莉" class="w-full h-full object-cover object-top rounded-lg">
+</div>
+<!-- 交互控件 -->
+<div class="space-y-4">
+<button id="startPracticeFromDashboard" class="w-full bg-primary hover:bg-blue-700 text-white font-medium py-3 px-4 !rounded-button transition-colors whitespace-nowrap flex items-center justify-center">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-mic-line"></i>
+</div>
+点击与雪莉对话
+</button>
+<div class="relative">
+<input type="text" class="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="或者输入文字消息...">
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-send-plane-line text-primary"></i>
+</div>
+</button>
+</div>
+</div>
+<!-- 快捷功能 -->
+<div class="mt-6 space-y-2">
+<p class="text-sm font-medium text-gray-700">快捷功能</p>
+<div class="space-y-1">
+<button class="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">今日学习计划</button>
+<button class="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">销售技巧提醒</button>
+<button class="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">成长建议</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 模拟对练界面 -->
+<div id="practicePage" class="min-h-screen flex hidden">
+<!-- 左侧数字人区域 -->
+<div class="w-3/5 bg-gray-900 flex flex-col">
+<div class="flex-1 flex flex-col p-8">
+<div class="mb-4">
+<button id="backToPracticeHome" class="flex items-center text-white hover:text-gray-200 transition-colors">
+<div class="w-5 h-5 flex items-center justify-center mr-1">
+<i class="ri-arrow-left-line"></i>
+</div>
+<span>返回主页</span>
+</button>
+</div>
+<div class="flex-1 flex items-center justify-center">
+<div class="w-full max-w-2xl">
+<img src="https://readdy.ai/api/search-image?query=Professional%20AI%20coach%20avatar%20in%20conversation%20mode%2C%20friendly%20female%20character%20with%20modern%20business%20attire%2C%20dark%20professional%20background%2C%20technology%20theme%2C%20warm%20smile%2C%20professional%20lighting%2C%20high%20quality%203D%20render%2C%20interactive%20digital%20assistant%20speaking&width=600&height=400&seq=practice_human&orientation=landscape" alt="教练雪莉" class="w-full h-96 object-cover object-top rounded-xl">
+</div>
+</div>
+</div>
+<div class="p-6 bg-gray-800">
+<div class="flex items-center justify-center space-x-4">
+<div class="text-white text-sm">
+<span id="practiceTimer">00:00</span>
+</div>
+<div class="flex space-x-2">
+<button class="w-12 h-12 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-pause-line"></i>
+</div>
+</button>
+<button class="w-12 h-12 bg-yellow-600 hover:bg-yellow-700 rounded-full flex items-center justify-center text-white">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-lightbulb-line"></i>
+</div>
+</button>
+<button id="endPractice" class="w-12 h-12 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-stop-line"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 右侧对话区域 -->
+<div class="w-2/5 bg-white flex flex-col h-screen">
+<div class="p-6 border-b border-gray-200 flex-shrink-0">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-semibold text-gray-900">模拟对练</h2>
+<div class="text-sm text-gray-600">
+<span>新客户</span> · <span>保险产品</span>
+</div>
+</div>
+</div>
+<!-- 对话记录区 -->
+<div class="flex-1 p-6 overflow-y-auto" id="chatMessages">
+<div class="space-y-4">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-white text-xs font-medium">雪</span>
+</div>
+<div class="chat-bubble-ai text-gray-800 px-4 py-2 rounded-lg max-w-xs break-words">
+您好！我是教练雪莉，今天很高兴和您进行模拟对练。请随时向我提问或开始我们的销售演练吧！
+</div>
+</div>
+</div>
+</div>
+<!-- 输入区 -->
+<div class="p-6 border-t border-gray-200 flex-shrink-0">
+<div class="flex space-x-3">
+<button class="w-12 h-12 bg-primary hover:bg-blue-700 rounded-full flex items-center justify-center text-white">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-mic-line"></i>
+</div>
+</button>
+<div class="flex-1">
+<input type="text" id="messageInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="输入您的回复...">
+</div>
+<button id="sendButton" class="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-send-plane-line text-gray-600"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 表现评估报告 -->
+<div id="reportPage" class="min-h-screen bg-gray-50 hidden">
+<div class="max-w-6xl mx-auto p-8">
+<!-- 顶部评分展示 -->
+<div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+<div class="text-center">
+<div class="w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+<span class="text-3xl font-bold text-white">B+</span>
+</div>
+<h2 class="text-2xl font-bold text-gray-900 mb-2">本次对练综合评分</h2>
+<p class="text-gray-600">您在开场破冰和需求挖掘方面表现出色，继续保持！</p>
+</div>
+</div>
+<!-- 能力雷达图 -->
+<div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+<h3 class="text-lg font-semibold text-gray-900 mb-6">能力分析雷达图</h3>
+<div id="radarChart" class="w-full h-96"></div>
+</div>
+<!-- 交互式对话分析 -->
+<div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+<h3 class="text-lg font-semibold text-gray-900 mb-6">对话分析</h3>
+<div class="space-y-4">
+<div class="p-4 border-l-4 border-green-500 bg-green-50 rounded-r-lg">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-white text-xs font-medium">张</span>
+</div>
+<div class="flex-1">
+<p class="text-gray-800 mb-2">您好！很高兴认识您。我了解到您对保险产品有兴趣，能否先了解一下您目前的家庭情况和保障需求呢？</p>
+<div class="text-sm text-green-600 font-medium cursor-pointer hover:text-green-700">
+<div class="w-4 h-4 flex items-center justify-center inline-block mr-1">
+<i class="ri-thumb-up-line"></i>
+</div>
+亮点：开场自然，主动了解需求
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-white text-xs font-medium">雪</span>
+</div>
+<div class="flex-1">
+<p class="text-gray-800">我家里有老人和小孩，但是保险产品这么多，我不知道该选择哪种，而且担心理赔会很麻烦。</p>
+</div>
+</div>
+</div>
+<div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r-lg">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-white text-xs font-medium">张</span>
+</div>
+<div class="flex-1">
+<p class="text-gray-800 mb-2">我完全理解您的担心。其实我们的产品种类很全面，理赔流程也很简单...</p>
+<div class="text-sm text-yellow-600 font-medium cursor-pointer hover:text-yellow-700">
+<div class="w-4 h-4 flex items-center justify-center inline-block mr-1">
+<i class="ri-error-warning-line"></i>
+</div>
+待改进：应该先共情客户担忧，再介绍产品
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 成长建议 -->
+<div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+<h3 class="text-lg font-semibold text-gray-900 mb-6">雪莉的成长建议</h3>
+<div class="space-y-4">
+<div class="flex items-start space-x-4">
+<div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-lightbulb-line text-blue-600"></i>
+</div>
+</div>
+<div>
+<h4 class="font-medium text-gray-900 mb-1">加强共情能力</h4>
+<p class="text-gray-600 text-sm">在客户表达担忧时，先表示理解和共情，再提供解决方案。建议练习"我理解您的担心"等共情话术。</p>
+</div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-target-line text-green-600"></i>
+</div>
+</div>
+<div>
+<h4 class="font-medium text-gray-900 mb-1">精准需求挖掘</h4>
+<p class="text-gray-600 text-sm">继续保持主动了解客户需求的好习惯，可以准备更多开放性问题来深入了解客户情况。</p>
+</div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-book-line text-purple-600"></i>
+</div>
+</div>
+<div>
+<h4 class="font-medium text-gray-900 mb-1">产品知识强化</h4>
+<p class="text-gray-600 text-sm">建议学习更多产品特点和优势，能够用简单易懂的语言向客户解释复杂的保险条款。</p>
+</div>
+</div>
+</div>
+</div>
+<!-- 底部操作按钮 -->
+<div class="flex justify-center space-x-4">
+<button id="retryPractice" class="px-6 py-3 border border-gray-300 text-gray-700 font-medium !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap">
+再试一次
+</button>
+<button id="backToDashboard" class="px-6 py-3 bg-primary text-white font-medium !rounded-button hover:bg-blue-700 transition-colors whitespace-nowrap">
+返回仪表盘
+</button>
+</div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script id="loginScript">
+document.addEventListener('DOMContentLoaded', function() {
+const togglePassword = document.getElementById('togglePassword');
+const passwordInput = document.getElementById('passwordInput');
+const loginBtn = document.getElementById('loginBtn');
+const rememberCheckbox = document.getElementById('rememberCheckbox');
+const rememberMe = document.getElementById('rememberMe');
+togglePassword.addEventListener('click', function() {
+const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+passwordInput.setAttribute('type', type);
+const icon = this.querySelector('i');
+icon.className = type === 'password' ? 'ri-eye-off-line text-gray-400' : 'ri-eye-line text-gray-400';
+});
+rememberCheckbox.addEventListener('click', function() {
+rememberMe.checked = !rememberMe.checked;
+const icon = this.querySelector('i');
+if (rememberMe.checked) {
+this.classList.add('bg-primary', 'border-primary');
+this.classList.remove('border-gray-300');
+icon.classList.remove('hidden');
+} else {
+this.classList.remove('bg-primary', 'border-primary');
+this.classList.add('border-gray-300');
+icon.classList.add('hidden');
+}
+});
+loginBtn.addEventListener('click', function() {
+document.getElementById('loginPage').classList.add('hidden');
+document.getElementById('dashboardPage').classList.remove('hidden');
+});
+});
+</script>
+<script id="dashboardScript">
+document.addEventListener('DOMContentLoaded', function() {
+const practiceCard = document.getElementById('practiceCard');
+const navPracticeBtn = document.getElementById('navPracticeBtn');
+const startPracticeFromDashboard = document.getElementById('startPracticeFromDashboard');
+navPracticeBtn.addEventListener('click', function(e) {
+e.preventDefault();
+document.getElementById('dashboardPage').classList.add('hidden');
+document.getElementById('practicePage').classList.remove('hidden');
+startTimer();
+});
+practiceCard.addEventListener('click', function() {
+document.getElementById('dashboardPage').classList.add('hidden');
+document.getElementById('practicePage').classList.remove('hidden');
+startTimer();
+});
+startPracticeFromDashboard.addEventListener('click', function() {
+document.getElementById('dashboardPage').classList.add('hidden');
+document.getElementById('practicePage').classList.remove('hidden');
+startTimer();
+});
+});
+</script>
+<script id="practiceScript">
+let practiceTimer;
+let practiceTime = 0;
+function startTimer() {
+practiceTimer = setInterval(function() {
+practiceTime++;
+const minutes = Math.floor(practiceTime / 60);
+const seconds = practiceTime % 60;
+document.getElementById('practiceTimer').textContent =
+`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}, 1000);
+}
+document.addEventListener('DOMContentLoaded', function() {
+const endPractice = document.getElementById('endPractice');
+const backToPracticeHome = document.getElementById('backToPracticeHome');
+endPractice.addEventListener('click', function() {
+clearInterval(practiceTimer);
+document.getElementById('practicePage').classList.add('hidden');
+document.getElementById('reportPage').classList.remove('hidden');
+initRadarChart();
+});
+backToPracticeHome.addEventListener('click', function() {
+clearInterval(practiceTimer);
+document.getElementById('practicePage').classList.add('hidden');
+document.getElementById('dashboardPage').classList.remove('hidden');
+});
+
+// N8N工作流配置 - 使用指定的保险webhook
+window.ChatWidgetConfig = {
+    webhook: {
+        url: 'https://n8n.aifunbox.com/webhook/insurance',
+        route: 'insurance'
+    },
+    branding: {
+        name: 'AI教练雪莉',
+        welcomeText: '您好！我是教练雪莉，准备好开始模拟对练了吗？',
+        responseTimeText: '我会立即为您回复'
+    },
+    style: {
+        primaryColor: '#3B82F6',
+        secondaryColor: '#10B981',
+        backgroundColor: '#ffffff',
+        fontColor: '#333333'
+    },
+    settings: {
+        responseTimeout: 30000,
+        retryAttempts: 3,
+        retryDelay: 1000,
+        enableTypingIndicator: true,
+        enableTimestamp: false
+    }
+};
+
+// 聊天功能
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const chatMessages = document.getElementById('chatMessages');
+
+function addMessage(message, isUser = false, showTimestamp = false) {
+const messageDiv = document.createElement('div');
+messageDiv.className = 'flex items-start space-x-3';
+if (isUser) {
+messageDiv.classList.add('flex-row-reverse', 'space-x-reverse');
+}
+
+const avatarDiv = document.createElement('div');
+avatarDiv.className = `w-8 h-8 ${isUser ? 'bg-gray-300' : 'bg-primary'} rounded-full flex items-center justify-center flex-shrink-0`;
+const avatarSpan = document.createElement('span');
+avatarSpan.className = 'text-white text-xs font-medium';
+avatarSpan.textContent = isUser ? '张' : '雪';
+avatarDiv.appendChild(avatarSpan);
+
+const messageContent = document.createElement('div');
+messageContent.className = `${isUser ? 'chat-bubble-user text-white' : 'chat-bubble-ai text-gray-800'} px-4 py-2 rounded-lg max-w-xs break-words word-wrap`;
+
+// 支持HTML格式的消息
+if (message.includes('<') && message.includes('>')) {
+messageContent.innerHTML = message;
+} else {
+messageContent.textContent = message;
+}
+
+messageDiv.appendChild(avatarDiv);
+messageDiv.appendChild(messageContent);
+
+// 添加时间戳（可选）
+if (showTimestamp) {
+const timestampDiv = document.createElement('div');
+timestampDiv.className = 'text-xs text-gray-400 mt-1';
+timestampDiv.textContent = new Date().toLocaleTimeString();
+messageContent.appendChild(timestampDiv);
+}
+
+const messagesContainer = chatMessages.querySelector('.space-y-4');
+messagesContainer.appendChild(messageDiv);
+chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+// 移除已存在的打字指示器
+hideTypingIndicator();
+
+const typingDiv = document.createElement('div');
+typingDiv.id = 'typingIndicator';
+typingDiv.className = 'flex items-start space-x-3';
+typingDiv.innerHTML = `
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+<span class="text-white text-xs font-medium">雪</span>
+</div>
+<div class="chat-bubble-ai text-gray-800 px-4 py-2 rounded-lg max-w-xs">
+<div class="flex space-x-1">
+<div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+<div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+<div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+</div>
+</div>
+`;
+const messagesContainer = chatMessages.querySelector('.space-y-4');
+messagesContainer.appendChild(typingDiv);
+chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTypingIndicator() {
+const typingIndicator = document.getElementById('typingIndicator');
+if (typingIndicator) {
+typingIndicator.remove();
+}
+}
+
+// 优化的N8N webhook调用函数
+async function sendMessageToN8N(message, retryCount = 0) {
+try {
+console.log(`发送消息到N8N保险webhook (尝试 ${retryCount + 1}):`, { 
+message, 
+url: window.ChatWidgetConfig.webhook.url,
+timestamp: new Date().toISOString()
+});
+
+const requestBody = {
+message: message,
+userId: 'user_zhang_001',
+sessionId: `practice_${Date.now()}`,
+timestamp: new Date().toISOString(),
+context: {
+page: 'practice',
+practiceTime: practiceTime,
+scenario: 'insurance_sales'
+}
+};
+
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), window.ChatWidgetConfig.settings.responseTimeout);
+
+const response = await fetch(window.ChatWidgetConfig.webhook.url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'Accept': 'application/json',
+'User-Agent': 'AI-Coach-Insurance-Practice'
+},
+body: JSON.stringify(requestBody),
+signal: controller.signal
+});
+
+clearTimeout(timeoutId);
+
+console.log('N8N保险工作流响应状态:', response.status);
+
+// 处理不同的响应状态
+if (!response.ok) {
+if (response.status === 500 && retryCount < window.ChatWidgetConfig.settings.retryAttempts - 1) {
+console.log(`服务器错误，${window.ChatWidgetConfig.settings.retryDelay}ms后重试...`);
+await new Promise(resolve => setTimeout(resolve, window.ChatWidgetConfig.settings.retryDelay));
+return sendMessageToN8N(message, retryCount + 1);
+}
+throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+}
+
+// 尝试解析响应
+const responseData = await response.json();
+console.log('N8N保险工作流响应数据:', responseData);
+
+// 提取AI回复，支持多种响应格式
+const aiReply = responseData.response || 
+responseData.message || 
+responseData.reply || 
+responseData.data?.response ||
+responseData.output ||
+responseData.text;
+
+if (!aiReply) {
+console.warn('N8N工作流返回了空的回复，使用默认回复');
+return '抱歉，我暂时无法理解您的问题。作为您的保险销售教练，请您换个方式提问，我会尽力帮助您提升销售技巧。';
+}
+
+return aiReply;
+
+} catch (error) {
+console.error(`N8N保险webhook调用失败 (尝试 ${retryCount + 1}):`, error);
+
+// 处理不同类型的错误
+if (error.name === 'AbortError') {
+return '请求超时了，让我们继续对练吧。请重新发送您的消息。';
+} else if (error.message.includes('Failed to fetch')) {
+return '网络连接有点问题，不过这正好可以练习如何在困难情况下保持专业沟通。请继续我们的保险销售对练。';
+} else if (retryCount >= window.ChatWidgetConfig.settings.retryAttempts - 1) {
+return '系统暂时不稳定，但作为您的AI教练，我建议您继续练习。请告诉我您想讨论哪个保险销售场景？';
+} else {
+// 继续重试
+await new Promise(resolve => setTimeout(resolve, window.ChatWidgetConfig.settings.retryDelay));
+return sendMessageToN8N(message, retryCount + 1);
+}
+}
+}
+
+async function handleSendMessage() {
+const message = messageInput.value.trim();
+if (!message) return;
+
+// 添加用户消息
+addMessage(message, true, window.ChatWidgetConfig.settings.enableTimestamp);
+messageInput.value = '';
+sendButton.disabled = true;
+
+// 显示打字指示器
+if (window.ChatWidgetConfig.settings.enableTypingIndicator) {
+showTypingIndicator();
+}
+
+try {
+// 发送到N8N保险webhook并获取回复
+const response = await sendMessageToN8N(message);
+
+// 隐藏打字指示器
+hideTypingIndicator();
+
+// 添加AI回复
+addMessage(response, false, window.ChatWidgetConfig.settings.enableTimestamp);
+} catch (error) {
+hideTypingIndicator();
+const errorMessage = '很抱歉，我现在无法正常回复。不过这是一个很好的练习机会 - 在实际销售中遇到技术问题时，我们应该如何处理呢？';
+addMessage(errorMessage, false);
+console.error('聊天错误:', error);
+} finally {
+sendButton.disabled = false;
+messageInput.focus();
+}
+}
+
+sendButton.addEventListener('click', handleSendMessage);
+
+messageInput.addEventListener('keypress', function(e) {
+if (e.key === 'Enter') {
+handleSendMessage();
+}
+});
+});
+</script>
+<script id="reportScript">
+function initRadarChart() {
+const chartDom = document.getElementById('radarChart');
+const myChart = echarts.init(chartDom);
+const option = {
+animation: false,
+tooltip: {
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+textStyle: { color: '#1f2937' }
+},
+radar: {
+indicator: [
+{ name: '开场破冰', max: 100 },
+{ name: '需求挖掘', max: 100 },
+{ name: '产品介绍', max: 100 },
+{ name: '异议处理', max: 100 },
+{ name: '成交技巧', max: 100 },
+{ name: '客户关系', max: 100 }
+],
+splitArea: {
+areaStyle: {
+color: ['rgba(87, 181, 231, 0.1)', 'rgba(141, 211, 199, 0.1)',
+'rgba(251, 191, 114, 0.1)', 'rgba(252, 141, 98, 0.1)']
+}
+}
+},
+series: [{
+type: 'radar',
+data: [{
+value: [85, 90, 70, 65, 75, 80],
+name: '本次表现',
+areaStyle: {
+color: 'rgba(87, 181, 231, 0.1)'
+},
+lineStyle: {
+color: 'rgba(87, 181, 231, 1)'
+},
+itemStyle: {
+color: 'rgba(87, 181, 231, 1)'
+}
+}]
+}]
+};
+myChart.setOption(option);
+}
+document.addEventListener('DOMContentLoaded', function() {
+const retryPractice = document.getElementById('retryPractice');
+const backToDashboard = document.getElementById('backToDashboard');
+retryPractice.addEventListener('click', function() {
+practiceTime = 0;
+document.getElementById('reportPage').classList.add('hidden');
+document.getElementById('practicePage').classList.remove('hidden');
+startTimer();
+});
+backToDashboard.addEventListener('click', function() {
+document.getElementById('reportPage').classList.add('hidden');
+document.getElementById('dashboardPage').classList.remove('hidden');
+});
+});
+</script>
+</body>
+</html>
