@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     
     // 创建带超时的 AbortController - Netlify免费版限制10秒
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时，留2秒余量
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时，留更多余量
     
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
@@ -120,22 +120,30 @@ export async function POST(request: NextRequest) {
     const duration = Date.now() - startTime;
     console.error(`=== Chat API Error - Duration: ${duration}ms ===`);
     console.error("Error details:", error);
+    console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
     
     // 特殊处理不同类型的错误
     let errorMessage = "抱歉，我现在无法连接到培训系统。";
+    let statusCode = 500;
     
     if (error instanceof Error) {
       if (error.name === "AbortError") {
-        errorMessage = "请求超时了，n8n工作流可能没有响应。请检查n8n工作流是否正常运行，或稍后再试。";
+        errorMessage = "请求超时了，请稍后再试。";
+        statusCode = 408;
       } else if (error.message.includes("fetch")) {
-        errorMessage = "无法连接到n8n服务器，请检查网络连接和webhook地址是否正确。";
+        errorMessage = "网络连接问题，请稍后重试。";
+        statusCode = 502;
       }
     }
     
     return NextResponse.json({
       response: errorMessage,
       timestamp: new Date().toISOString(),
-      debug: process.env.NODE_ENV === "development" ? (error as Error).message : undefined,
-    });
+      error: "chat_api_error",
+      debug: process.env.NODE_ENV === "development" ? {
+        message: error instanceof Error ? error.message : String(error),
+        duration: `${duration}ms`
+      } : undefined,
+    }, { status: statusCode });
   }
 }
