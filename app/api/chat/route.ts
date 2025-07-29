@@ -16,8 +16,19 @@ export async function POST(request: NextRequest) {
     
     console.log("Using N8N webhook URL:", N8N_WEBHOOK_URL);
 
-    // 实际的n8n webhook调用
-    console.log("Sending request to n8n:", { message, userId });
+    // 准备发送数据 - 匹配HTML成功的格式
+    const requestData = {
+      message,
+      userId: userId || `user_${Date.now()}`,
+      sessionId: `chat_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      context: {
+        page: "chat",
+        scenario: "insurance_training"
+      }
+    };
+    
+    console.log("Sending request to n8n:", requestData);
     
     // 创建带超时的 AbortController
     const controller = new AbortController();
@@ -27,13 +38,8 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": "PFA-Insurance-Chat/1.0",
       },
-      body: JSON.stringify({
-        message,
-        userId,
-        timestamp: new Date().toISOString(),
-      }),
+      body: JSON.stringify(requestData),
       signal: controller.signal,
     });
     
@@ -83,12 +89,13 @@ export async function POST(request: NextRequest) {
     let aiResponse = "";
     if (typeof data === "string") {
       aiResponse = data;
+    } else if (data.output) {
+      // n8n工作流返回的主要字段
+      aiResponse = data.output;
     } else if (data.response) {
       aiResponse = data.response;
     } else if (data.message) {
       aiResponse = data.message;
-    } else if (data.output) {
-      aiResponse = data.output;
     } else if (data.text) {
       aiResponse = data.text;
     } else {
@@ -117,7 +124,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       response: errorMessage,
       timestamp: new Date().toISOString(),
-      debug: process.env.NODE_ENV === "development" ? error.message : undefined,
+      debug: process.env.NODE_ENV === "development" ? (error as Error).message : undefined,
     });
   }
 }
