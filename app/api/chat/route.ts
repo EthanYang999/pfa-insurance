@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  console.log("=== Chat API Request Started ===");
+  const startTime = Date.now();
+  
   try {
     const { message, userId } = await request.json();
+    console.log("Request payload received:", { messageLength: message?.length, userId });
 
     if (!message || typeof message !== "string") {
+      console.log("Invalid message format");
       return NextResponse.json(
         { error: "Message is required" },
         { status: 400 }
@@ -15,6 +20,7 @@ export async function POST(request: NextRequest) {
     const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "https://n8n.aifunbox.com/webhook/insurance";
     
     console.log("Using N8N webhook URL:", N8N_WEBHOOK_URL);
+    console.log("Environment check - NODE_ENV:", process.env.NODE_ENV);
 
     // 准备发送数据 - 匹配HTML成功的格式
     const requestData = {
@@ -30,9 +36,9 @@ export async function POST(request: NextRequest) {
     
     console.log("Sending request to n8n:", requestData);
     
-    // 创建带超时的 AbortController
+    // 创建带超时的 AbortController - Netlify免费版限制10秒
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时，留2秒余量
     
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
@@ -102,13 +108,18 @@ export async function POST(request: NextRequest) {
       aiResponse = "收到您的消息，让我为您提供专业的保险培训指导。";
     }
     
+    const duration = Date.now() - startTime;
+    console.log(`=== Chat API Success - Duration: ${duration}ms ===`);
+    
     return NextResponse.json({
       response: aiResponse,
       timestamp: new Date().toISOString(),
     });
 
   } catch (error) {
-    console.error("Chat API Error:", error);
+    const duration = Date.now() - startTime;
+    console.error(`=== Chat API Error - Duration: ${duration}ms ===`);
+    console.error("Error details:", error);
     
     // 特殊处理不同类型的错误
     let errorMessage = "抱歉，我现在无法连接到培训系统。";
