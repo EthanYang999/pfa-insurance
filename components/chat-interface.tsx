@@ -13,8 +13,13 @@ interface Message {
   timestamp: Date;
 }
 
+interface User {
+  email?: string;
+  sub?: string;
+}
+
 interface ChatInterfaceProps {
-  user: any;
+  user: User;
 }
 
 export function ChatInterface({ user }: ChatInterfaceProps) {
@@ -42,7 +47,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   // 响应式初始化：检测屏幕尺寸来决定数字人初始状态
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth < 768; // md breakpoint
+      // const isMobile = window.innerWidth < 768; // md breakpoint
       // 可以根据需要调整初始化逻辑，目前保持不变
     };
 

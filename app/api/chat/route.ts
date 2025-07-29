@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         const errorData = await response.json();
         errorDetails = errorData.message || errorData.hint || "";
         console.error("N8N error details:", errorData);
-      } catch (e) {
+      } catch {
         console.error("Could not parse error response");
       }
       

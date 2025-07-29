@@ -38,7 +38,7 @@ export default function TestWebhookPage() {
         setError(`Error: ${res.status} - ${data.error || data.response}`);
       }
     } catch (err) {
-      setError(`Network error: ${err.message}`);
+      setError(`Network error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
