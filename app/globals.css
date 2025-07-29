@@ -64,5 +64,64 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "PingFang SC", "Microsoft YaHei", "Geist", sans-serif;
+  }
+  
+  /* 自定义滚动条样式 */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-coach-gray-light;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-coach-gray-medium rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-coach-gray-dark;
+  }
+}
+
+@layer components {
+  /* 聊天消息样式 */
+  .message-bubble {
+    @apply rounded-lg px-4 py-2 max-w-[80%] md:max-w-[70%] break-words;
+  }
+  
+  .message-user {
+    @apply bg-coach-blue-secondary text-white ml-auto;
+  }
+  
+  .message-ai {
+    @apply bg-white text-coach-gray-dark mr-auto border border-coach-gray-disabled;
+  }
+  
+  /* 按钮样式 */
+  .btn-primary {
+    @apply bg-coach-gold-accent text-white px-4 py-2 rounded-md font-medium;
+    @apply hover:bg-coach-gold-hover focus:bg-coach-gold-active;
+    @apply transition-all duration-150 ease-in-out;
+    @apply disabled:bg-coach-gray-disabled disabled:text-coach-gray-placeholder;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-coach-blue-secondary border border-coach-blue-secondary px-4 py-2 rounded-md font-medium;
+    @apply hover:bg-coach-blue-secondary hover:text-white;
+    @apply transition-all duration-150 ease-in-out;
+  }
+  
+  /* 输入框样式 */
+  .input-primary {
+    @apply bg-white border border-coach-gray-disabled rounded-md px-3 py-2;
+    @apply focus:border-coach-blue-secondary focus:ring-2 focus:ring-coach-blue-secondary/20;
+    @apply transition-all duration-150 ease-in-out;
+  }
+  
+  /* 渐变背景 */
+  .gradient-blue {
+    background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
   }
 }

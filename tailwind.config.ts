@@ -11,6 +11,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Shadcn/UI Colors
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -50,6 +51,31 @@ export default {
           "3": "hsl(var(--chart-3))",
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
+        },
+        // Custom Design Colors - 商务专业科技风
+        'coach-blue': {
+          primary: '#1E3A8A',   // Primary Blue
+          secondary: '#3B82F6', // Secondary Blue
+          gradient: '#1E40AF',  // For gradients
+        },
+        'coach-gold': {
+          accent: '#F59E0B',    // Accent Gold
+          light: '#FDE68A',     // Light Gold
+          hover: '#D97706',     // Hover state
+          active: '#B45309',    // Active state
+        },
+        'coach-gray': {
+          dark: '#374151',      // Dark Gray - main text
+          medium: '#6B7280',    // Medium Gray - secondary text
+          light: '#F3F4F6',     // Light Gray - background
+          disabled: '#D1D5DB',  // Disabled elements
+          placeholder: '#9CA3AF', // Placeholder text
+        },
+        'coach-status': {
+          success: '#10B981',   // Success state
+          warning: '#F59E0B',   // Warning state
+          error: '#EF4444',     // Error state
+          info: '#3B82F6',      // Info state
         },
       },
       borderRadius: {

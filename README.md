@@ -1,105 +1,235 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# AI教练雪莉 - PFA保险培训助手
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+> PFA保险经纪人的AI智能培训助手，提供7x24小时产品知识和话术辅导
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## 🎯 项目概述
 
-## Features
+AI教练雪莉是一个基于Next.js和Supabase构建的智能保险培训系统，为PFA保险经纪人提供专业的AI辅导服务。系统采用商务专业科技风设计，支持实时聊天对话，并预留了UE5数字人集成接口。
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+## 🏗️ 技术架构
 
-## Demo
+### 前端技术栈
+- **框架**: Next.js 15 (App Router) + React 19 + TypeScript
+- **样式**: Tailwind CSS + CSS Variables + Tailwindcss-animate
+- **UI组件**: Radix UI + Shadcn/UI 组件系统
+- **图标**: Lucide React
+- **主题**: next-themes (支持暗色模式)
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+### 后端服务
+- **认证**: Supabase Authentication (SSR支持)
+- **数据库**: Supabase PostgreSQL
+- **AI工作流**: n8n webhook (预留集成)
+- **数字人**: UE5 + MetaHuman (预留集成)
 
-## Deploy to Vercel
+## 🎨 设计规范
 
-Vercel deployment will guide you through creating a Supabase account and project.
+### 色彩系统
+- **主色调**: 深蓝色 (#1E3A8A) - 传达稳定可靠
+- **辅助色**: 中蓝色 (#3B82F6) - 交互元素
+- **金色强调**: 金黄色 (#F59E0B) - 重要按钮和强调
+- **中性色**: 灰色系统 - 文字和背景
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### 字体规范
+- **中文字体**: PingFang SC, Microsoft YaHei
+- **英文字体**: Geist (备用字体)
+- **标题**: 20px-28px, font-weight: 500-600
+- **正文**: 14px-16px, line-height: 1.5-1.6
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+## 📱 响应式布局
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### 断点设置
+- **Mobile**: < 768px - 单列布局，数字人区域折叠
+- **Tablet**: 768px - 1024px - 30%-70% 分栏布局
+- **Desktop**: > 1024px - 40%-60% 分栏布局
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### 布局特性
+- 左侧：数字人展示区域（UE5集成预留）
+- 右侧：聊天对话区域
+- 移动端：数字人区域可折叠为顶部横条
 
-## Clone and run locally
+## 🚀 快速开始
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 环境要求
+- Node.js 18.17+ 
+- npm 或 yarn 或 pnpm
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### 安装依赖
+```bash
+npm install
+# 或
+yarn install
+# 或
+pnpm install
+```
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
+### 环境配置
+1. 复制 `.env.example` 为 `.env.local`
+2. 配置 Supabase 相关环境变量：
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   N8N_WEBHOOK_URL=your_n8n_webhook_url (可选)
    ```
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+### 运行开发服务器
+```bash
+npm run dev
+# 或
+yarn dev
+# 或
+pnpm dev
+```
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+访问 [http://localhost:3000](http://localhost:3000) 查看结果
 
-3. Use `cd` to change into the app's directory
+## 📋 功能特性
 
-   ```bash
-   cd with-supabase-app
-   ```
+### ✅ 已实现功能
+- [x] 用户认证系统（Supabase Auth）
+- [x] 商务专业风格登录页面
+- [x] 响应式聊天界面
+- [x] 实时消息对话
+- [x] n8n webhook集成
+- [x] 数字人展示区域预留
+- [x] 语音功能入口预留
+- [x] 移动端适配
+- [x] 自定义设计系统
 
-4. Rename `.env.example` to `.env.local` and update the following:
+### 🔄 开发中功能
+- [ ] UE5数字人集成
+- [ ] 语音对话功能
+- [ ] 消息历史存储
+- [ ] 用户等级系统
+- [ ] 对话历史导出
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+## 🗂️ 项目结构
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+```
+pfa-insurance/
+├── app/                          # Next.js App Router
+│   ├── api/chat/                # 聊天API路由
+│   ├── auth/                    # 认证相关页面
+│   ├── protected/               # 受保护的页面
+│   ├── globals.css              # 全局样式
+│   └── layout.tsx               # 根布局
+├── components/                   # React组件
+│   ├── ui/                      # 基础UI组件
+│   ├── chat-interface.tsx       # 聊天主界面
+│   ├── chat-message.tsx         # 聊天消息组件
+│   ├── chat-input.tsx           # 聊天输入组件
+│   ├── digital-human.tsx        # 数字人展示组件
+│   └── login-form.tsx           # 登录表单
+├── lib/                         # 工具库
+│   ├── supabase/               # Supabase客户端
+│   └── utils.ts                # 工具函数
+├── PRD.md                       # 产品需求文档
+├── DESIGN_SPEC.md              # 设计规范文档
+└── CLAUDE.md                   # 项目说明文档
+```
 
-5. You can now run the Next.js local development server:
+## 🔧 核心组件说明
 
-   ```bash
-   npm run dev
-   ```
+### ChatInterface
+聊天主界面组件，管理整个对话流程
+- 响应式布局控制
+- 消息状态管理
+- API调用处理
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+### ChatMessage & TypingIndicator
+消息显示组件，支持用户和AI消息区分
+- 消息气泡样式
+- 时间戳显示
+- 打字指示器动画
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+### DigitalHuman
+数字人展示组件，预留UE5集成接口
+- iframe/canvas容器预留
+- 状态指示器
+- 移动端折叠功能
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+### ChatInput
+聊天输入组件，支持多种输入方式
+- 文本输入和自动调整
+- Enter键快速发送
+- 语音功能入口预留
 
-## Feedback and issues
+## 🌐 API接口
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+### POST /api/chat
+聊天消息处理接口
+```typescript
+// 请求
+{
+  "message": "用户消息内容",
+  "userId": "用户ID"
+}
 
-## More Supabase examples
+// 响应  
+{
+  "response": "AI回复内容",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## 🔗 集成说明
+
+### Supabase认证
+- 支持邮箱密码登录
+- 自动会话管理
+- 受保护路由控制
+
+### n8n Webhook（已集成）
+- **默认地址**: `https://n8n.aifunbox.com/webhook/insurance`
+- **环境变量**: 可通过 `N8N_WEBHOOK_URL` 自定义webhook地址
+- **请求格式**: 
+  ```json
+  {
+    "message": "用户消息内容",
+    "userId": "用户ID",
+    "timestamp": "ISO时间戳"
+  }
+  ```
+- **响应处理**: 支持多种响应格式（response, message, output, text等）
+
+### UE5数字人（预留）
+在 `DigitalHuman` 组件中已预留 `#ue5-digital-human-container` 容器，支持iframe或canvas集成
+
+## 🎯 部署指南
+
+### Vercel部署（推荐）
+1. Fork 此仓库
+2. 在 Vercel 中导入项目
+3. 配置环境变量
+4. 自动部署完成
+
+### 其他平台
+支持部署到任何支持 Next.js 的平台：
+- Netlify
+- Railway
+- DigitalOcean App Platform
+
+## 🤝 开发贡献
+
+### 代码规范
+- 使用 TypeScript 进行类型检查
+- 遵循 ESLint 规则
+- 使用 Prettier 格式化代码
+
+### 提交规范
+- feat: 新功能
+- fix: 修复问题
+- docs: 文档更新
+- style: 样式调整
+- refactor: 代码重构
+
+## 📞 技术支持
+
+如有技术问题，请提交 Issue 或联系开发团队。
+
+## 📄 许可证
+
+© 2024 PFA保险公司. 保留所有权利.
+
+---
+
+**AI教练雪莉** - 让保险培训更智能，让专业成长更高效！ 🚀

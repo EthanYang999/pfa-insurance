@@ -48,63 +48,78 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
+    <div className={cn("", className)} {...props}>
+      <form onSubmit={handleLogin}>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="email" className="text-coach-gray-dark font-medium">
+              邮箱地址
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="请输入您的邮箱"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input-primary mt-1"
+            />
+          </div>
+          <div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-coach-gray-dark font-medium">
+                密码
+              </Label>
               <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
+                href="/auth/forgot-password"
+                className="text-sm text-coach-blue-secondary hover:text-coach-blue-primary transition-colors"
               >
-                Sign up
+                忘记密码？
               </Link>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+            <Input
+              id="password"
+              type="password"
+              placeholder="请输入您的密码"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-primary mt-1"
+            />
+          </div>
+          
+          {error && (
+            <div className="p-3 bg-coach-status-error/10 border border-coach-status-error/30 rounded-md">
+              <p className="text-sm text-coach-status-error">{error}</p>
+            </div>
+          )}
+          
+          <Button 
+            type="submit" 
+            className="btn-primary w-full h-11 text-base"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                登录中...
+              </div>
+            ) : (
+              "登录"
+            )}
+          </Button>
+        </div>
+        
+        <div className="mt-6 text-center text-sm text-coach-gray-medium">
+          还没有账户？{" "}
+          <Link
+            href="/auth/sign-up"
+            className="text-coach-blue-secondary hover:text-coach-blue-primary font-medium transition-colors"
+          >
+            立即注册
+          </Link>
+        </div>
+      </form>
     </div>
   );
 }
