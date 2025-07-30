@@ -5,8 +5,9 @@ import { ChatMessage, TypingIndicator } from "@/components/chat-message";
 import { ChatInput } from "@/components/chat-input";
 import { DigitalHuman } from "@/components/digital-human";
 import { LogoutButton } from "@/components/logout-button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Save, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ChatResponse, ChatError } from "@/types/chat";
 
 interface Message {
   id: string;
@@ -18,6 +19,7 @@ interface Message {
 interface User {
   email?: string;
   sub?: string;
+  id?: string;
 }
 
 interface ChatInterfaceProps {
@@ -37,8 +39,10 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   // 移动端默认最小化数字人，桌面端默认展开
   const [isDigitalHumanMinimized, setIsDigitalHumanMinimized] = useState(false);
-  // 为整个会话生成唯一且持久的sessionId
-  const [sessionId] = useState(() => `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  // 数据库会话ID（由API返回）
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  // 聊天记录保存状态
+  const [saveStatus, setSaveStatus] = useState<'saving' | 'saved' | 'error' | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -61,24 +65,27 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 直接调用n8n webhook，参考index.html的成功实现
-  const sendMessageToN8N = async (message: string, retryCount = 0): Promise<string> => {
+  // 通过API代理调用n8n webhook并保存聊天记录
+  const sendMessageWithHistory = async (message: string, retryCount = 0): Promise<string> => {
     try {
-      console.log(`发送消息到N8N保险webhook (尝试 ${retryCount + 1}):`, { 
+      setSaveStatus('saving');
+      console.log(`发送消息到聊天API (尝试 ${retryCount + 1}):`, { 
         message, 
-        url: 'https://n8n.aifunbox.com/webhook/insurance',
+        sessionId: sessionId,
+        userId: user.id,
         timestamp: new Date().toISOString()
       });
 
       const requestBody = {
-        text: message,
-        sessionId: sessionId
+        message: message,
+        sessionId: sessionId || undefined,
+        sessionType: 'general' as const
       };
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60秒超时
+      const timeoutId = setTimeout(() => controller.abort(), 65000); // 65秒超时（比API内部超时稍长）
 
-      const response = await fetch('https://n8n.aifunbox.com/webhook/insurance', {
+      const response = await fetch('/api/chat-with-history', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,52 +96,65 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
       });
 
       clearTimeout(timeoutId);
-      console.log('N8N保险工作流响应状态:', response.status);
+      console.log('聊天API响应状态:', response.status);
 
-      // 处理不同的响应状态
+      // 处理API响应
       if (!response.ok) {
+        const errorData: ChatError = await response.json().catch(() => ({ error: '未知错误' }));
+        
         if (response.status === 500 && retryCount < 2) {
           console.log(`服务器错误，1000ms后重试...`);
           await new Promise(resolve => setTimeout(resolve, 1000));
-          return sendMessageToN8N(message, retryCount + 1);
+          return sendMessageWithHistory(message, retryCount + 1);
         }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        
+        setSaveStatus('error');
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-      // 尝试解析响应
-      const responseData = await response.json();
-      console.log('N8N保险工作流响应数据:', responseData);
+      const responseData: ChatResponse = await response.json();
+      console.log('聊天API响应数据:', responseData);
 
-      // 提取AI回复，支持多种响应格式
-      const aiReply = responseData.response || 
-                      responseData.message || 
-                      responseData.reply || 
-                      responseData.data?.response ||
-                      responseData.output ||
-                      responseData.text;
-
-      if (!aiReply) {
-        console.warn('N8N工作流返回了空的回复');
-        return '抱歉，我暂时无法理解您的问题。请您换个方式提问，我会尽力帮助您。';
+      // 更新sessionId（如果是新会话）
+      if (responseData.sessionId && !sessionId) {
+        setSessionId(responseData.sessionId);
       }
 
-      return aiReply;
+      // 设置保存状态
+      if (responseData.metadata?.messagesSaved) {
+        setSaveStatus('saved');
+        // 2秒后隐藏保存状态提示
+        setTimeout(() => setSaveStatus(null), 2000);
+      } else {
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus(null), 3000);
+      }
+
+      console.log('AI回复:', responseData.response);
+      console.log('响应时间:', responseData.responseTime + 'ms');
+      
+      return responseData.response;
 
     } catch (error) {
-      console.error(`N8N保险webhook调用失败 (尝试 ${retryCount + 1}):`, error);
+      console.error(`聊天API调用失败 (尝试 ${retryCount + 1}):`, error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(null), 3000);
 
       // 处理不同类型的错误
       if (error instanceof Error && error.name === 'AbortError') {
         return '请求超时了，请重新发送您的消息。';
       } else if (error instanceof Error && error.message.includes('Failed to fetch')) {
         return '网络连接有问题，请检查网络后重试。';
+      } else if (error instanceof Error && error.message.includes('未授权')) {
+        return '登录已过期，请重新登录。';
       } else if (retryCount >= 2) {
         return '系统暂时不稳定，请稍后再试。';
-      } else {
-        // 继续重试
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return sendMessageToN8N(message, retryCount + 1);
       }
+
+      // 递归重试
+      console.log(`1500ms后进行第${retryCount + 2}次重试...`);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      return sendMessageWithHistory(message, retryCount + 1);
     }
   };
 
@@ -150,7 +170,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     setIsLoading(true);
 
     try {
-      const aiResponse = await sendMessageToN8N(content);
+      const aiResponse = await sendMessageWithHistory(content);
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -161,19 +181,40 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
 
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('处理消息失败:', error);
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "抱歉，发送消息时出现了错误。请稍后再试。",
+        content: "抱歉，出现了一些问题。请重新发送您的消息。",
         isUser: false,
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    setIsLoading(false);
+  // 保存状态指示器组件
+  const SaveStatusIndicator = () => {
+    if (!saveStatus) return null;
+
+    const statusConfig = {
+      saving: { icon: Save, text: '保存中...', className: 'text-blue-600' },
+      saved: { icon: CheckCircle, text: '已保存', className: 'text-green-600' },
+      error: { icon: AlertCircle, text: '保存失败', className: 'text-red-600' }
+    };
+
+    const config = statusConfig[saveStatus];
+    const Icon = config.icon;
+
+    return (
+      <div className={`flex items-center gap-1 text-xs ${config.className} animate-fade-in`}>
+        <Icon className="h-3 w-3" />
+        <span>{config.text}</span>
+      </div>
+    );
   };
 
   return (
@@ -192,58 +233,53 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 justify-center">
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-pfa-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
+              <span className="text-pfa-royal-blue font-bold text-sm sm:text-base">雪</span>
             </div>
-            <div className="min-w-0 flex-1">
-              <h1 className="font-bold text-base sm:text-lg truncate">AI教练雪莉</h1>
-              <p className="text-pfa-champagne-gold text-xs hidden sm:block">专业保险培训助手</p>
+            <div className="min-w-0">
+              <h1 className="font-bold text-sm sm:text-base text-white truncate">
+                金牌保险教练 - 雪梨 (Shirley)
+              </h1>
+              <div className="flex items-center gap-2">
+                <p className="text-pfa-champagne-gold text-xs">在线</p>
+                <SaveStatusIndicator />
+              </div>
             </div>
           </div>
         </div>
-        
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          {/* 用户信息和登出 */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs sm:text-sm text-pfa-champagne-gold hidden md:inline max-w-32 truncate">
-              {user?.email?.split('@')[0] || "会员"}
-            </span>
-            <LogoutButton />
-          </div>
+
+        {/* 用户信息和退出按钮 */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="text-pfa-champagne-gold text-xs sm:text-sm">
+            {user?.email?.split('@')[0] || '会员'}
+          </span>
+          <LogoutButton />
         </div>
       </header>
 
-      {/* 主要内容区域 */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* 数字人展示区域 - 移动端顶部，桌面端左侧 */}
-        <div className={`
-          transition-all duration-300 ease-in-out
-          ${isDigitalHumanMinimized 
-            ? 'h-16 md:w-20' 
-            : 'h-[33vh] md:h-full md:w-1/2'
-          }
-          md:border-r md:border-coach-gray-disabled
-          flex-shrink-0
-        `}>
-          <DigitalHuman
+      {/* 主要内容区域 - 使用flex布局 */}
+      <div className="flex-1 flex flex-col sm:flex-row min-h-0">
+        {/* 数字人区域 */}
+        <div 
+          className={`
+            ${isDigitalHumanMinimized ? 'h-[10vh] sm:w-16' : 'h-[33vh] sm:h-full sm:w-80'} 
+            sm:h-full border-b sm:border-b-0 sm:border-r border-gray-200 bg-gradient-to-br from-pfa-royal-blue/5 to-pfa-navy-blue/10 
+            transition-all duration-500 ease-in-out flex-shrink-0 relative overflow-hidden
+          `}
+        >
+          <DigitalHuman 
             isMinimized={isDigitalHumanMinimized}
             onToggleMinimize={() => setIsDigitalHumanMinimized(!isDigitalHumanMinimized)}
           />
         </div>
 
         {/* 聊天区域 */}
-        <div className={`
-          flex-1 flex flex-col min-h-0
-          ${isDigitalHumanMinimized ? 'md:w-full' : 'md:w-1/2'}
-          transition-all duration-300 ease-in-out
-        `}>
+        <div className="flex-1 flex flex-col min-h-0">
           {/* 消息列表 */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4">
             {messages.map((message) => (
-              <ChatMessage
-                key={message.id}
-                message={message.content}
+              <ChatMessage 
+                key={message.id} 
+                message={message.content} 
                 isUser={message.isUser}
                 timestamp={message.timestamp}
               />
@@ -253,11 +289,8 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
           </div>
 
           {/* 输入区域 */}
-          <div className="flex-shrink-0">
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              disabled={isLoading}
-            />
+          <div className="border-t bg-white p-3 sm:p-4">
+            <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
           </div>
         </div>
       </div>
