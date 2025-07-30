@@ -1,6 +1,7 @@
 // 管理员认证和权限管理工具
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { AdminUser, AdminPermissions, AdminAction } from "@/types/admin";
 
 // 检查用户是否为管理员
@@ -121,11 +122,14 @@ export async function logAdminAction(
 }
 
 // 管理员权限中间件
-export async function requireAdmin() {
+export async function requireAdmin(): Promise<{ isAdmin: boolean; adminUser?: AdminUser }> {
   const isAdminUser = await isAdmin();
   if (!isAdminUser) {
-    throw new Error('Admin permission required');
+    return { isAdmin: false };
   }
+  
+  const adminUser = await getAdminUser();
+  return { isAdmin: true, adminUser: adminUser || undefined };
 }
 
 // 特定权限中间件
@@ -196,12 +200,10 @@ export async function createAdminUser(
     
     const supabase = await createClient();
     
-    // 检查用户是否存在
-    const { data: existingUser } = await supabase
-      .from('auth.users')
-      .select('id')
-      .eq('email', userEmail)
-      .single();
+    // 使用 Supabase Auth Admin API 检查用户是否存在
+    const adminClient = createAdminClient();
+    const { data: users } = await adminClient.auth.admin.listUsers();
+    const existingUser = users.users?.find(user => user.email === userEmail);
 
     if (!existingUser) {
       return { success: false, error: '用户不存在，请先注册普通账户' };

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission, logAdminAction } from "@/lib/admin-auth";
 
@@ -7,6 +8,7 @@ export async function POST(request: NextRequest) {
     await requirePermission('update_user');
     
     const supabase = await createClient();
+    const adminClient = createAdminClient();
     const { userId, ban } = await request.json();
 
     if (!userId || typeof ban !== 'boolean') {
@@ -16,23 +18,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 获取用户信息
-    const { data: user, error: userError } = await supabase
-      .from('auth.users')
-      .select('email')
-      .eq('id', userId)
-      .single();
+    // 使用 Supabase Auth Admin API 获取用户信息
+    const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(userId);
 
-    if (userError || !user) {
+    if (userError || !userData.user) {
       return NextResponse.json(
         { error: "用户不存在" },
         { status: 404 }
       );
     }
 
-    // 暂时简化处理，仅记录日志
-    // TODO: 实现真正的用户禁用逻辑
-    const updateError = null;
+    const user = userData.user;
+
+    // 使用 Supabase Auth Admin API 更新用户状态
+    const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, {
+      ban_duration: ban ? '8760h' : 'none' // 8760小时 = 1年
+    });
 
     if (updateError) {
       console.error('更新用户状态失败:', updateError);
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
       ban ? 'ban_user' : 'unban_user',
       'user',
       userId,
-      { email: user.email, banned: ban }
+      { email: user.email!, banned: ban }
     );
 
     return NextResponse.json({

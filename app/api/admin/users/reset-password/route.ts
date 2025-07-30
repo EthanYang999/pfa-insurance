@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission, logAdminAction } from "@/lib/admin-auth";
 
@@ -7,6 +8,7 @@ export async function POST(request: NextRequest) {
     await requirePermission('reset_password');
     
     const supabase = await createClient();
+    const adminClient = createAdminClient();
     const { userId } = await request.json();
 
     if (!userId) {
@@ -16,23 +18,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 获取用户邮箱
-    const { data: user, error: userError } = await supabase
-      .from('auth.users')
-      .select('email')
-      .eq('id', userId)
-      .single();
+    // 使用 Supabase Auth Admin API 获取用户信息
+    const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(userId);
 
-    if (userError || !user) {
+    if (userError || !userData.user) {
       return NextResponse.json(
         { error: "用户不存在" },
         { status: 404 }
       );
     }
 
+    const user = userData.user;
+
     // 发送密码重置邮件
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      user.email,
+      user.email!,
       {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
       }
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     await logAdminAction('reset_password', 'user', userId, { 
-      email: user.email 
+      email: user.email! 
     });
 
     return NextResponse.json({

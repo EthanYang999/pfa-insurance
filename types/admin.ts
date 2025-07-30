@@ -145,7 +145,11 @@ export type AdminAction =
   | 'update_config'
   | 'view_logs'
   | 'view_dashboard'
-  | 'system_maintenance';
+  | 'system_maintenance'
+  | 'delete_session'
+  | 'archive_session'
+  | 'unarchive_session'
+  | 'view_system_health';
 
 export interface AdminPermissions {
   user_management: boolean;
