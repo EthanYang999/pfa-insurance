@@ -9,7 +9,7 @@ export default async function AdminPage() {
   const isAdminUser = await isAdmin();
   
   if (!isAdminUser) {
-    redirect("/auth/login?message=需要管理员权限");
+    redirect("/auth/login?message=" + encodeURIComponent("需要管理员权限"));
   }
 
   return <AdminDashboard />;

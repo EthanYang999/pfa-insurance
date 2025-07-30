@@ -99,9 +99,9 @@ export async function GET(request: NextRequest) {
     console.error('获取用户列表API失败:', error);
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : "获取用户列表失败" 
+        error: error instanceof Error ? error.message : "Failed to get user list" 
       },
-      { status: error instanceof Error && error.message.includes('权限') ? 403 : 500 }
+      { status: error instanceof Error && error.message.includes('permission') ? 403 : 500 }
     );
   }
 }

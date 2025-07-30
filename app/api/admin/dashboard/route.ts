@@ -32,9 +32,9 @@ export async function GET() {
     console.error('获取管理面板统计失败:', error);
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : "获取统计数据失败" 
+        error: error instanceof Error ? error.message : "Failed to get dashboard stats" 
       },
-      { status: error instanceof Error && error.message.includes('权限') ? 403 : 500 }
+      { status: error instanceof Error && error.message.includes('permission') ? 403 : 500 }
     );
   }
 }

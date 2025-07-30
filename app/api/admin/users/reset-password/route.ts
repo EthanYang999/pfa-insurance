@@ -59,9 +59,9 @@ export async function POST(request: NextRequest) {
     console.error('重置密码API失败:', error);
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : "重置密码失败" 
+        error: error instanceof Error ? error.message : "Failed to reset password" 
       },
-      { status: error instanceof Error && error.message.includes('权限') ? 403 : 500 }
+      { status: error instanceof Error && error.message.includes('permission') ? 403 : 500 }
     );
   }
 }

@@ -124,7 +124,7 @@ export async function logAdminAction(
 export async function requireAdmin() {
   const isAdminUser = await isAdmin();
   if (!isAdminUser) {
-    throw new Error('需要管理员权限');
+    throw new Error('Admin permission required');
   }
 }
 
@@ -132,7 +132,7 @@ export async function requireAdmin() {
 export async function requirePermission(action: AdminAction) {
   const hasRequiredPermission = await hasPermission(action);
   if (!hasRequiredPermission) {
-    throw new Error(`缺少权限: ${action}`);
+    throw new Error(`Permission required: ${action}`);
   }
 }
 
