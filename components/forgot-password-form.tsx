@@ -3,13 +3,6 @@
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -38,67 +31,84 @@ export function ForgotPasswordForm({
       if (error) throw error;
       setSuccess(true);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "发送失败，请重试");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("", className)} {...props}>
       {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+        <div className="text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-pfa-royal-blue mb-2">请检查您的邮箱</h3>
+            <p className="text-pfa-dark-gray text-sm">
+              密码重置邮件已发送。如果您使用邮箱和密码注册，您将收到重置密码的邮件。
             </p>
-          </CardContent>
-        </Card>
+          </div>
+          <Link
+            href="/auth/login"
+            className="text-pfa-champagne-gold hover:text-pfa-accent-gold font-medium transition-colors"
+          >
+            返回登录
+          </Link>
+        </div>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+        <form onSubmit={handleForgotPassword}>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="email" className="text-pfa-royal-blue font-medium">
+                邮箱地址
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="请输入您的邮箱"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 border-pfa-royal-blue/20 focus:border-pfa-royal-blue focus:ring-pfa-royal-blue/20"
+              />
+            </div>
+            
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+            
+            <Button 
+              type="submit" 
+              className="w-full h-11 text-base bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold transition-colors"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-pfa-royal-blue/30 border-t-pfa-royal-blue rounded-full animate-spin" />
+                  发送中...
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              ) : (
+                "发送重置邮件"
+              )}
+            </Button>
+          </div>
+          
+          <div className="mt-6 text-center text-sm text-pfa-dark-gray">
+            想起密码了？{" "}
+            <Link
+              href="/auth/login"
+              className="text-pfa-champagne-gold hover:text-pfa-accent-gold font-medium transition-colors"
+            >
+              立即登录
+            </Link>
+          </div>
+        </form>
       )}
     </div>
   );

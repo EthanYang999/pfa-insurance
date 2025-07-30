@@ -45,7 +45,7 @@ export function LoginForm({
       <form onSubmit={handleLogin}>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="email" className="text-coach-gray-dark font-medium">
+            <Label htmlFor="email" className="text-pfa-royal-blue font-medium">
               邮箱地址
             </Label>
             <Input
@@ -55,17 +55,17 @@ export function LoginForm({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input-primary mt-1"
+              className="mt-1 border-pfa-royal-blue/20 focus:border-pfa-royal-blue focus:ring-pfa-royal-blue/20"
             />
           </div>
           <div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-coach-gray-dark font-medium">
+              <Label htmlFor="password" className="text-pfa-royal-blue font-medium">
                 密码
               </Label>
               <Link
                 href="/auth/forgot-password"
-                className="text-sm text-coach-blue-secondary hover:text-coach-blue-primary transition-colors"
+                className="text-sm text-pfa-champagne-gold hover:text-pfa-accent-gold transition-colors"
               >
                 忘记密码？
               </Link>
@@ -77,24 +77,24 @@ export function LoginForm({
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-primary mt-1"
+              className="mt-1 border-pfa-royal-blue/20 focus:border-pfa-royal-blue focus:ring-pfa-royal-blue/20"
             />
           </div>
           
           {error && (
-            <div className="p-3 bg-coach-status-error/10 border border-coach-status-error/30 rounded-md">
-              <p className="text-sm text-coach-status-error">{error}</p>
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
           
           <Button 
             type="submit" 
-            className="btn-primary w-full h-11 text-base"
+            className="w-full h-11 text-base bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold transition-colors"
             disabled={isLoading}
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-pfa-royal-blue/30 border-t-pfa-royal-blue rounded-full animate-spin" />
                 登录中...
               </div>
             ) : (
@@ -103,11 +103,11 @@ export function LoginForm({
           </Button>
         </div>
         
-        <div className="mt-6 text-center text-sm text-coach-gray-medium">
+        <div className="mt-6 text-center text-sm text-pfa-dark-gray">
           还没有账户？{" "}
           <Link
             href="/auth/sign-up"
-            className="text-coach-blue-secondary hover:text-coach-blue-primary font-medium transition-colors"
+            className="text-pfa-champagne-gold hover:text-pfa-accent-gold font-medium transition-colors"
           >
             立即注册
           </Link>
