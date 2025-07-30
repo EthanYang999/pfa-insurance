@@ -17,7 +17,6 @@ import {
   FileDown
 } from "lucide-react";
 import { AuthNav } from "@/components/auth-nav";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { ChatExportModal } from "@/components/chat-export-modal";
 import { ChatSessionWithStats, ChatMessage } from "@/types/chat";
 import { User } from "@supabase/supabase-js";
@@ -204,7 +203,6 @@ export function ChatHistoryView({ }: ChatHistoryViewProps) {
                 <MessageCircle className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">新对话</span>
               </Button>
-              <LanguageSwitcher />
               <AuthNav />
             </div>
           </div>

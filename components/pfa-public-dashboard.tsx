@@ -25,13 +25,10 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AuthNav } from "@/components/auth-nav";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { useLanguage } from "@/contexts/language-context";
 
 export function PFAPublicDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
-  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pfa-light-gray to-white">
@@ -46,7 +43,7 @@ export function PFAPublicDashboard() {
                   <span className="text-pfa-royal-blue font-bold text-lg">P</span>
                 </div>
                 <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold text-white">{t('nav.home') === 'Home' ? 'PFA Insurance Alliance' : 'PFA 保险联盟'}</h1>
+                  <h1 className="text-xl font-bold text-white">PFA 保险联盟</h1>
                   <p className="text-pfa-champagne-gold text-xs">Premier Financial Alliance</p>
                 </div>
               </div>
@@ -54,14 +51,12 @@ export function PFAPublicDashboard() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#home" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.home')}</a>
-              <button onClick={() => router.push('/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.chat')}</button>
-              <button onClick={() => router.push('/chat-history')} className="text-white hover:text-pfa-champagne-gold transition-colors">聊天历史</button>
-              <a href="#about" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.about')}</a>
-              <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.concept')}</a>
-              <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.opportunity')}</a>
-              <a href="#success" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.success')}</a>
-              <LanguageSwitcher />
+              <a href="#home" className="text-white hover:text-pfa-champagne-gold transition-colors">首页</a>
+              <button onClick={() => router.push('/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">AI教练</button>
+              <a href="#about" className="text-white hover:text-pfa-champagne-gold transition-colors">关于我们</a>
+              <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">核心理念</a>
+              <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">事业机会</a>
+              <a href="#success" className="text-white hover:text-pfa-champagne-gold transition-colors">成功案例</a>
               <AuthNav />
             </div>
 
@@ -81,15 +76,13 @@ export function PFAPublicDashboard() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-pfa-navy-blue border-t border-pfa-champagne-gold/20">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#home" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.home')}</a>
-              <button onClick={() => router.push('/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">{t('nav.chat')}</button>
-              <button onClick={() => router.push('/chat-history')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">聊天历史</button>
-              <a href="#about" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.about')}</a>
-              <a href="#concept" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.concept')}</a>
-              <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.opportunity')}</a>
-              <a href="#success" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.success')}</a>
+              <a href="#home" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">首页</a>
+              <button onClick={() => router.push('/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">AI教练</button>
+              <a href="#about" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">关于我们</a>
+              <a href="#concept" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">核心理念</a>
+              <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">事业机会</a>
+              <a href="#success" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">成功案例</a>
               <div className="px-3 py-2 border-t border-pfa-champagne-gold/20 mt-2">
-                <LanguageSwitcher className="mb-2" />
                 <AuthNav className="w-full" />
               </div>
             </div>
@@ -104,12 +97,12 @@ export function PFAPublicDashboard() {
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-pfa-royal-blue leading-tight">
-                {t('hero.title.ai')}
-                <span className="text-pfa-champagne-gold">{t('hero.title.coach')}</span>
-                <br />{t('hero.title.excellence')}
+                AI保险
+                <span className="text-pfa-champagne-gold">教练</span>
+                <br />专业卓越
               </h1>
               <p className="mt-6 text-xl text-pfa-dark-gray leading-relaxed">
-                {t('hero.description')}
+                借助先进的AI技术，为保险经纪人提供24/7专业培训指导，提升销售技能，实现事业突破
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <Button 
@@ -117,14 +110,14 @@ export function PFAPublicDashboard() {
                   className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-6 text-lg"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  {t('hero.cta.experience')}
+                  立即体验
                 </Button>
                 <Button 
                   variant="outline"
                   className="border-pfa-royal-blue text-pfa-royal-blue hover:bg-pfa-royal-blue hover:text-white px-8 py-6 text-lg"
                 >
                   <Play className="mr-2 h-5 w-5" />
-                  {t('hero.cta.demo')}
+                  观看演示
                 </Button>
               </div>
             </div>
@@ -138,18 +131,18 @@ export function PFAPublicDashboard() {
                       <MessageCircle className="h-5 w-5 text-pfa-royal-blue" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-pfa-royal-blue">{t('hero.coach.name')}</h3>
-                      <p className="text-sm text-pfa-dark-gray">{t('hero.coach.status')}</p>
+                      <h3 className="font-semibold text-pfa-royal-blue">雪梨教练</h3>
+                      <p className="text-sm text-pfa-dark-gray">在线</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="bg-pfa-light-gray rounded-lg p-3">
-                      <p className="text-sm text-pfa-dark-gray">{t('hero.coach.intro')}</p>
+                      <p className="text-sm text-pfa-dark-gray">您好！我是您的AI保险培训助手，随时为您提供专业指导。</p>
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" className="text-xs">{t('hero.topics.product')}</Button>
-                      <Button size="sm" variant="outline" className="text-xs">{t('hero.topics.sales')}</Button>
-                      <Button size="sm" variant="outline" className="text-xs">{t('hero.topics.service')}</Button>
+                      <Button size="sm" variant="outline" className="text-xs">产品知识</Button>
+                      <Button size="sm" variant="outline" className="text-xs">销售技巧</Button>
+                      <Button size="sm" variant="outline" className="text-xs">客户服务</Button>
                     </div>
                   </div>
                 </div>
@@ -164,10 +157,10 @@ export function PFAPublicDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-pfa-royal-blue">
-              {t('features.title')}
+              核心功能
             </h2>
             <p className="mt-4 text-xl text-pfa-dark-gray">
-              {t('features.subtitle')}
+              专业AI教练助力您的保险事业发展
             </p>
           </div>
 
@@ -175,33 +168,33 @@ export function PFAPublicDashboard() {
             {[
               {
                 icon: <MessageCircle className="h-8 w-8" />,
-                titleKey: 'features.ai.title',
-                descKey: 'features.ai.desc'
+                title: 'AI智能对话',
+                desc: '24/7在线AI教练，随时解答您的专业问题，提供个性化指导建议'
               },
               {
                 icon: <BookOpen className="h-8 w-8" />,
-                titleKey: 'features.knowledge.title',
-                descKey: 'features.knowledge.desc'
+                title: '专业知识库',
+                desc: '涵盖产品知识、销售技巧、法规政策等全方位保险专业内容'
               },
               {
                 icon: <Target className="h-8 w-8" />,
-                titleKey: 'features.sales.title',
-                descKey: 'features.sales.desc'
+                title: '销售技能提升',
+                desc: '系统化的销售话术训练，客户沟通技巧，成单率显著提升'
               },
               {
                 icon: <Users className="h-8 w-8" />,
-                titleKey: 'features.team.title',
-                descKey: 'features.team.desc'
+                title: '团队协作',
+                desc: '资源共享平台，团队经验交流，共同成长共创佳绩'
               },
               {
                 icon: <TrendingUp className="h-8 w-8" />,
-                titleKey: 'features.analytics.title',
-                descKey: 'features.analytics.desc'
+                title: '业绩分析',
+                desc: '智能数据分析，业绩追踪，为您制定个性化的提升方案'
               },
               {
                 icon: <Award className="h-8 w-8" />,
-                titleKey: 'features.certification.title',
-                descKey: 'features.certification.desc'
+                title: '专业认证',
+                desc: '完整的培训认证体系，助您获得行业认可的专业资质'
               }
             ].map((feature, index) => (
               <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -211,10 +204,10 @@ export function PFAPublicDashboard() {
                       {feature.icon}
                     </div>
                   </div>
-                  <CardTitle className="text-xl text-pfa-royal-blue">{t(feature.titleKey)}</CardTitle>
+                  <CardTitle className="text-xl text-pfa-royal-blue">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-pfa-dark-gray text-center">{t(feature.descKey)}</p>
+                  <p className="text-pfa-dark-gray text-center">{feature.desc}</p>
                 </CardContent>
               </Card>
             ))}

@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/contexts/language-context";
 
 interface LogoutButtonProps {
   className?: string;
@@ -12,7 +11,6 @@ interface LogoutButtonProps {
 
 export function LogoutButton({ className }: LogoutButtonProps) {
   const router = useRouter();
-  const { t } = useLanguage();
 
   const logout = async () => {
     const supabase = createClient();
@@ -30,7 +28,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
         className
       )}
     >
-      {t('nav.logout')}
+      退出
     </Button>
   );
 }

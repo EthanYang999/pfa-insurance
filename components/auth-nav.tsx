@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 import { LogoutButton } from "@/components/logout-button";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
-import { useLanguage } from "@/contexts/language-context";
 
 interface AuthNavProps {
   className?: string;
@@ -16,7 +15,6 @@ export function AuthNav({ className }: AuthNavProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { t } = useLanguage();
 
   useEffect(() => {
     const supabase = createClient();
@@ -53,7 +51,7 @@ export function AuthNav({ className }: AuthNavProps) {
     return (
       <div className={`flex items-center space-x-3 ${className}`}>
         <span className="text-pfa-champagne-gold text-sm">
-          {user.email?.split('@')[0] || t('nav.member')}
+          {user.email?.split('@')[0] || '会员'}
         </span>
         <LogoutButton />
       </div>
@@ -68,7 +66,7 @@ export function AuthNav({ className }: AuthNavProps) {
         size="sm"
         className="border-pfa-champagne-gold text-pfa-champagne-gold hover:bg-pfa-champagne-gold hover:text-pfa-royal-blue transition-colors"
       >
-        {t('nav.login')}
+        登录
       </Button>
     </div>
   );
