@@ -13,10 +13,12 @@ import {
   Edit2,
   Trash2,
   Download,
-  Clock
+  Clock,
+  FileDown
 } from "lucide-react";
 import { AuthNav } from "@/components/auth-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ChatExportModal } from "@/components/chat-export-modal";
 import { ChatSessionWithStats, ChatMessage } from "@/types/chat";
 import { User } from "@supabase/supabase-js";
 
@@ -34,6 +36,7 @@ export function ChatHistoryView({ }: ChatHistoryViewProps) {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [editingSession, setEditingSession] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // 获取聊天会话列表
   const fetchSessions = async (search = "") => {
@@ -214,10 +217,22 @@ export function ChatHistoryView({ }: ChatHistoryViewProps) {
           <div className="lg:col-span-1">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5" />
-                  对话列表
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5" />
+                    对话列表
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowExportModal(true)}
+                    disabled={sessions.length === 0}
+                    className="text-xs"
+                  >
+                    <FileDown className="h-3 w-3 mr-1" />
+                    批量导出
+                  </Button>
+                </div>
                 {/* 搜索框 */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -362,10 +377,7 @@ export function ChatHistoryView({ }: ChatHistoryViewProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          // TODO: 实现导出功能
-                          alert('导出功能即将推出');
-                        }}
+                        onClick={() => setShowExportModal(true)}
                       >
                         <Download className="h-4 w-4 mr-1" />
                         导出
@@ -427,6 +439,14 @@ export function ChatHistoryView({ }: ChatHistoryViewProps) {
           </div>
         </div>
       </div>
+
+      {/* 导出模态框 */}
+      <ChatExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        sessions={sessions}
+        selectedSessionId={selectedSession}
+      />
     </div>
   );
 }
