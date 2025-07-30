@@ -5,6 +5,8 @@ import { ChatMessage, TypingIndicator } from "@/components/chat-message";
 import { ChatInput } from "@/components/chat-input";
 import { DigitalHuman } from "@/components/digital-human";
 import { LogoutButton } from "@/components/logout-button";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Message {
   id: string;
@@ -23,6 +25,7 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ user }: ChatInterfaceProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -178,19 +181,28 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-coach-gray-light">
+    <div className="h-screen w-full flex flex-col bg-gradient-to-br from-pfa-light-gray to-white">
       {/* 顶部导航栏 */}
-      <header className="bg-coach-blue-primary text-white px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+      <header className="bg-pfa-royal-blue text-white px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg">
+        {/* 返回按钮 */}
+        <button
+          onClick={() => router.push('/protected')}
+          className="flex items-center gap-2 text-white hover:text-pfa-champagne-gold transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="hidden sm:inline">返回首页</span>
+        </button>
+
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 justify-center">
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-coach-gold-accent rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-pfa-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="font-bold text-base sm:text-lg truncate">AI教练雪莉</h1>
-              <p className="text-coach-gold-light text-xs hidden sm:block">专业保险培训助手</p>
+              <p className="text-pfa-champagne-gold text-xs hidden sm:block">专业保险培训助手</p>
             </div>
           </div>
         </div>
@@ -198,7 +210,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {/* 用户信息和登出 */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs sm:text-sm text-coach-gold-light hidden md:inline max-w-32 truncate">
+            <span className="text-xs sm:text-sm text-pfa-champagne-gold hidden md:inline max-w-32 truncate">
               {user?.email || "用户"}
             </span>
             <LogoutButton />

@@ -27,7 +27,7 @@ export default function Page() {
         {/* 底部信息 */}
         <div className="text-center mt-6">
           <p className="text-coach-gold-light text-sm">
-            © 2024 PFA保险公司. 保留所有权利.
+            © 2025 PFA保险公司. 保留所有权利.
           </p>
         </div>
       </div>
