@@ -38,28 +38,26 @@
 ### **1. 执行聊天系统权限脚本**
 ```sql
 -- 在Supabase SQL Editor中执行
--- 文件: /database/chat_security_policies.sql
+-- 文件: /database/chat_security_policies_fixed.sql
 ```
 
-### **2. 执行管理系统数据库脚本**
+### **2. 执行管理系统基础脚本**
 ```sql
 -- 在Supabase SQL Editor中执行  
--- 文件: /database/admin_system.sql
+-- 文件: /database/admin_system_simple.sql
+-- 注意：将其中的UUID替换为你的实际用户ID
 ```
 
-### **3. 创建第一个管理员账户**
+### **3. [可选] 加强安全策略**
 ```sql
--- 首先确保目标用户已注册
--- 然后在Supabase SQL Editor中执行：
-
-INSERT INTO admin_users (user_id, role, permissions, is_active)
-VALUES (
-  '用户的UUID', -- 替换为实际的用户UUID
-  'super_admin',
-  '{"user_management": true, "system_config": true, "data_export": true, "log_access": true, "service_monitoring": true, "user_data_access": true}',
-  true
-);
+-- 在确认管理员功能正常后执行
+-- 文件: /database/admin_security_final.sql
 ```
+
+### **✅ 管理员账户已自动创建**
+- 用户ID: `677cd193-8947-4c38-942d-aa9a3e8f8a25`
+- 角色: `super_admin`
+- 状态: `active`
 
 ---
 
