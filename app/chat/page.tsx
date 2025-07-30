@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { PFADashboard } from "@/components/pfa-dashboard";
+import { ChatInterface } from "@/components/chat-interface";
 
-export default async function ProtectedPage() {
+export default async function ChatPage() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.getClaims();
@@ -10,5 +10,5 @@ export default async function ProtectedPage() {
     redirect("/auth/login");
   }
 
-  return <PFADashboard user={data.claims} />;
+  return <ChatInterface user={data.claims} />;
 }
