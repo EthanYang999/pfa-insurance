@@ -24,18 +24,9 @@ import {
   Quote
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { LogoutButton } from "@/components/logout-button";
+import { AuthNav } from "@/components/auth-nav";
 
-interface User {
-  email?: string;
-  sub?: string;
-}
-
-interface PFADashboardProps {
-  user: User;
-}
-
-export function PFADashboard({ user }: PFADashboardProps) {
+export function PFAPublicDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -66,12 +57,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
               <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">核心理念</a>
               <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">事业机会</a>
               <a href="#success" className="text-white hover:text-pfa-champagne-gold transition-colors">成功案例</a>
-              <div className="flex items-center space-x-3">
-                <span className="text-pfa-champagne-gold text-sm">
-                  {user?.email?.split('@')[0] || '会员'}
-                </span>
-                <LogoutButton />
-              </div>
+              <AuthNav />
             </div>
 
             {/* Mobile menu button */}
@@ -97,8 +83,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
               <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">事业机会</a>
               <a href="#success" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">成功案例</a>
               <div className="px-3 py-2 border-t border-pfa-champagne-gold/20 mt-2">
-                <p className="text-pfa-champagne-gold text-sm mb-2">{user?.email?.split('@')[0] || '会员'}</p>
-                <LogoutButton className="w-full" />
+                <AuthNav className="w-full" />
               </div>
             </div>
           </div>

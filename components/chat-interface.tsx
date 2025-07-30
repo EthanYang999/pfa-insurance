@@ -182,7 +182,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
       <header className="bg-pfa-royal-blue text-white px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg">
         {/* 返回按钮 */}
         <button
-          onClick={() => router.push('/protected')}
+          onClick={() => router.push('/')}
           className="flex items-center gap-2 text-white hover:text-pfa-champagne-gold transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -207,7 +207,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
           {/* 用户信息和登出 */}
           <div className="flex items-center gap-1 sm:gap-2">
             <span className="text-xs sm:text-sm text-pfa-champagne-gold hidden md:inline max-w-32 truncate">
-              {user?.email || "用户"}
+              {user?.email?.split('@')[0] || "会员"}
             </span>
             <LogoutButton />
           </div>

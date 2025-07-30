@@ -1,14 +1,62 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { ChatInterface } from "@/components/chat-interface";
+import { User } from "@supabase/supabase-js";
 
-export default async function ChatPage() {
-  const supabase = await createClient();
+export default function ChatPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims) {
-    redirect("/auth/login");
+  useEffect(() => {
+    const supabase = createClient();
+    
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        router.push("/auth/login");
+        return;
+      }
+      
+      setUser(user);
+      setLoading(false);
+    };
+
+    getUser();
+
+    // 监听认证状态变化
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!session?.user) {
+          router.push("/auth/login");
+        } else {
+          setUser(session.user);
+          setLoading(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pfa-light-gray to-white">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-pfa-champagne-gold/30 border-t-pfa-champagne-gold rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-pfa-dark-gray">正在验证登录状态...</p>
+        </div>
+      </div>
+    );
   }
 
-  return <ChatInterface user={data.claims} />;
+  if (!user) {
+    return null; // 用户未登录会被重定向
+  }
+
+  return <ChatInterface user={user} />;
 }

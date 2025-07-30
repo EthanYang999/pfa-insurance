@@ -3,8 +3,13 @@
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+  className?: string;
+}
+
+export function LogoutButton({ className }: LogoutButtonProps) {
   const router = useRouter();
 
   const logout = async () => {
@@ -13,5 +18,17 @@ export function LogoutButton() {
     router.push("/auth/login");
   };
 
-  return <Button onClick={logout}>Logout</Button>;
+  return (
+    <Button 
+      onClick={logout}
+      variant="outline" 
+      size="sm"
+      className={cn(
+        "border-pfa-champagne-gold text-pfa-champagne-gold hover:bg-pfa-champagne-gold hover:text-pfa-royal-blue transition-colors",
+        className
+      )}
+    >
+      退出
+    </Button>
+  );
 }
