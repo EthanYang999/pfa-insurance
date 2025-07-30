@@ -7,7 +7,7 @@ import { DigitalHuman } from "@/components/digital-human";
 import { LogoutButton } from "@/components/logout-button";
 import { ArrowLeft, Save, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChatResponse, ChatError } from "@/types/chat";
+import { ChatResponse, ChatError, ChatMessage as DBChatMessage } from "@/types/chat";
 
 interface Message {
   id: string;
@@ -39,10 +39,12 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   // 移动端默认最小化数字人，桌面端默认展开
   const [isDigitalHumanMinimized, setIsDigitalHumanMinimized] = useState(false);
-  // 数据库会话ID（由API返回）
+  // 数据库会话ID（由API返回或URL参数）
   const [sessionId, setSessionId] = useState<string | null>(null);
   // 聊天记录保存状态
   const [saveStatus, setSaveStatus] = useState<'saving' | 'saved' | 'error' | null>(null);
+  // 是否正在加载历史记录
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -52,6 +54,49 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // 检查URL参数中的sessionId并加载历史记录
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlSessionId = params.get('sessionId');
+    
+    if (urlSessionId) {
+      setSessionId(urlSessionId);
+      loadChatHistory(urlSessionId);
+    }
+  }, []);
+
+  // 加载聊天历史记录
+  const loadChatHistory = async (sessionIdToLoad: string) => {
+    try {
+      setLoadingHistory(true);
+      const response = await fetch(`/api/chat-history?sessionId=${sessionIdToLoad}`);
+      
+      if (!response.ok) {
+        throw new Error('加载聊天历史失败');
+      }
+      
+      const data = await response.json();
+      
+      if (data.messages && data.messages.length > 0) {
+        // 转换消息格式
+        const historyMessages: Message[] = data.messages.map((msg: DBChatMessage) => ({
+          id: msg.id,
+          content: msg.content,
+          isUser: msg.message_type === 'user',
+          timestamp: new Date(msg.created_at)
+        }));
+        
+        // 替换欢迎消息为历史记录
+        setMessages(historyMessages);
+      }
+    } catch (error) {
+      console.error('加载聊天历史失败:', error);
+      // 如果加载失败，保持默认欢迎消息
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
 
   // 响应式初始化：检测屏幕尺寸来决定数字人初始状态
   useEffect(() => {
@@ -249,6 +294,15 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
 
         {/* 用户信息和退出按钮 */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={() => router.push('/chat-history')}
+            className="text-white hover:text-pfa-champagne-gold transition-colors"
+            title="聊天历史"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
           <span className="text-pfa-champagne-gold text-xs sm:text-sm">
             {user?.email?.split('@')[0] || '会员'}
           </span>
@@ -276,15 +330,26 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
         <div className="flex-1 flex flex-col min-h-0">
           {/* 消息列表 */}
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4">
-            {messages.map((message) => (
-              <ChatMessage 
-                key={message.id} 
-                message={message.content} 
-                isUser={message.isUser}
-                timestamp={message.timestamp}
-              />
-            ))}
-            {isLoading && <TypingIndicator />}
+            {loadingHistory ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center">
+                  <div className="w-6 h-6 border-2 border-pfa-champagne-gold/30 border-t-pfa-champagne-gold rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-500">正在加载聊天历史...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((message) => (
+                  <ChatMessage 
+                    key={message.id} 
+                    message={message.content} 
+                    isUser={message.isUser}
+                    timestamp={message.timestamp}
+                  />
+                ))}
+                {isLoading && <TypingIndicator />}
+              </>
+            )}
             <div ref={messagesEndRef} />
           </div>
 

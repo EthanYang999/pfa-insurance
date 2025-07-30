@@ -56,6 +56,7 @@ export function PFAPublicDashboard() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#home" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.home')}</a>
               <button onClick={() => router.push('/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.chat')}</button>
+              <button onClick={() => router.push('/chat-history')} className="text-white hover:text-pfa-champagne-gold transition-colors">聊天历史</button>
               <a href="#about" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.about')}</a>
               <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.concept')}</a>
               <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">{t('nav.opportunity')}</a>
@@ -82,6 +83,7 @@ export function PFAPublicDashboard() {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a href="#home" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.home')}</a>
               <button onClick={() => router.push('/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">{t('nav.chat')}</button>
+              <button onClick={() => router.push('/chat-history')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">聊天历史</button>
               <a href="#about" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.about')}</a>
               <a href="#concept" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.concept')}</a>
               <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">{t('nav.opportunity')}</a>
