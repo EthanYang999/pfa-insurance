@@ -37,6 +37,8 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   // 移动端默认最小化数字人，桌面端默认展开
   const [isDigitalHumanMinimized, setIsDigitalHumanMinimized] = useState(false);
+  // 为整个会话生成唯一且持久的sessionId
+  const [sessionId] = useState(() => `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -69,14 +71,8 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
       });
 
       const requestBody = {
-        message: message,
-        userId: user?.sub || `user_${Date.now()}`,
-        sessionId: `chat_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        context: {
-          page: 'chat',
-          scenario: 'insurance_training'
-        }
+        text: message,
+        sessionId: sessionId
       };
 
       const controller = new AbortController();
