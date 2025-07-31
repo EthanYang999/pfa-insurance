@@ -124,7 +124,7 @@ export function UserManagement() {
   };
 
   const getUserStatus = (user: UserInfo) => {
-    if (user.banned_until) {
+    if (!user.is_active) {
       return { label: '已禁用', color: 'destructive' as const };
     }
     if (user.email_confirmed_at) {
@@ -265,12 +265,12 @@ export function UserManagement() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleBanUser(user.id, !user.banned_until)}
+                            onClick={() => handleBanUser(user.id, user.is_active)}
                           >
-                            {user.banned_until ? (
-                              <Activity className="h-4 w-4 text-green-600" />
-                            ) : (
+                            {user.is_active ? (
                               <Ban className="h-4 w-4 text-red-600" />
+                            ) : (
+                              <Activity className="h-4 w-4 text-green-600" />
                             )}
                           </Button>
                         </div>
@@ -346,7 +346,7 @@ function UserDetailView({ user }: { user: UserInfo }) {
         <div>
           <label className="text-sm font-medium text-gray-500">账户状态</label>
           <div className="mt-1 text-sm">
-            {user.banned_until ? '已禁用' : '正常'}
+            {user.is_active ? '正常' : '已禁用'}
           </div>
         </div>
       </div>

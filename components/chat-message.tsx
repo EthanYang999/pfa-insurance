@@ -60,7 +60,7 @@ export function TypingIndicator({ className }: TypingIndicatorProps) {
       </div>
       <div className="message-bubble message-ai text-sm sm:text-base">
         <div className="flex items-center gap-1">
-          <span className="text-coach-gray-medium">雪莉正在思考</span>
+          <span className="text-coach-gray-medium">PFA智能助手正在思考</span>
           <div className="flex gap-1">
             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-coach-gray-medium rounded-full animate-bounce [animation-delay:-0.3s]"></div>
             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-coach-gray-medium rounded-full animate-bounce [animation-delay:-0.15s]"></div>

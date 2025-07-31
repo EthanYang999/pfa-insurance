@@ -131,7 +131,7 @@ export function PFAPublicDashboard() {
                       <MessageCircle className="h-5 w-5 text-pfa-royal-blue" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-pfa-royal-blue">雪梨教练</h3>
+                      <h3 className="font-semibold text-pfa-royal-blue">PFA智能助手</h3>
                       <p className="text-sm text-pfa-dark-gray">在线</p>
                     </div>
                   </div>
@@ -531,7 +531,7 @@ export function PFAPublicDashboard() {
             准备开始您的专业成长之旅？
           </h2>
           <p className="mt-6 text-xl text-pfa-champagne-gold">
-            立即体验AI教练雪莉，获得个性化的专业指导，让您的保险事业更上一层楼
+            立即体验PFA智能助手，获得个性化的专业指导，让您的保险事业更上一层楼
           </p>
           <div className="mt-8">
             <Button 
@@ -614,7 +614,7 @@ export function PFAPublicDashboard() {
                       <MessageCircle className="h-12 w-12 text-pfa-champagne-gold mx-auto mb-4" />
                       <h3 className="text-xl font-semibold text-pfa-royal-blue mb-3">AI智能咨询</h3>
                       <p className="text-pfa-dark-gray mb-4">
-                        与我们的AI教练雪莉对话，获得即时的专业解答和个性化建议
+                        与我们的PFA智能助手对话，获得即时的专业解答和个性化建议
                       </p>
                       <Button 
                         className="bg-pfa-royal-blue hover:bg-pfa-navy-blue text-white px-6 py-2"

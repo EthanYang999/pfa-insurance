@@ -117,7 +117,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                 <br />助您成就卓越
               </h1>
               <p className="mt-6 text-xl text-pfa-dark-gray leading-relaxed">
-                专为PFA保险经纪人打造的智能培训平台。24/7 AI教练雪莉，提供个性化指导，
+                专为PFA保险经纪人打造的智能培训平台。24/7 PFA智能助手，提供个性化指导，
                 助您掌握销售技巧、产品知识，实现事业突破。
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -147,13 +147,13 @@ export function PFADashboard({ user }: PFADashboardProps) {
                       <MessageCircle className="h-5 w-5 text-pfa-royal-blue" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-pfa-royal-blue">AI教练雪莉</h3>
+                      <h3 className="font-semibold text-pfa-royal-blue">PFA智能助手</h3>
                       <p className="text-sm text-pfa-dark-gray">在线 · 随时为您服务</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="bg-pfa-light-gray rounded-lg p-3">
-                      <p className="text-sm text-pfa-dark-gray">您好！我是雪莉，您的专属AI保险教练。我可以帮助您...</p>
+                      <p className="text-sm text-pfa-dark-gray">您好！我是PFA智能助手，您的专属AI保险培训助手。我可以帮助您...</p>
                     </div>
                     <div className="flex space-x-2">
                       <Button size="sm" variant="outline" className="text-xs">产品知识</Button>
@@ -547,7 +547,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
             准备开始您的专业成长之旅？
           </h2>
           <p className="mt-6 text-xl text-pfa-champagne-gold">
-            立即体验AI教练雪莉，获得个性化的专业指导，让您的保险事业更上一层楼
+            立即体验PFA智能助手，获得个性化的专业指导，让您的保险事业更上一层楼
           </p>
           <div className="mt-8">
             <Button 
@@ -630,7 +630,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                       <MessageCircle className="h-12 w-12 text-pfa-champagne-gold mx-auto mb-4" />
                       <h3 className="text-xl font-semibold text-pfa-royal-blue mb-3">AI智能咨询</h3>
                       <p className="text-pfa-dark-gray mb-4">
-                        与我们的AI教练雪莉对话，获得即时的专业解答和个性化建议
+                        与我们的PFA智能助手对话，获得即时的专业解答和个性化建议
                       </p>
                       <Button 
                         className="bg-pfa-royal-blue hover:bg-pfa-navy-blue text-white px-6 py-2"

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission, logAdminAction } from "@/lib/admin-auth";
 
@@ -14,46 +15,42 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const status = searchParams.get('status') || '';
     
-    const offset = (page - 1) * limit;
+    // 使用管理员客户端获取真实用户数据
+    const adminClient = createAdminClient();
+    const { data: authUsers, error: authError } = await adminClient.auth.admin.listUsers({
+      page,
+      perPage: limit
+    });
 
-    // 由于服务角色密钥问题，我们暂时从chat_sessions表中获取用户信息
-    // 这是一个临时解决方案，实际生产环境中应该配置正确的服务角色密钥
-    const query = supabase
-      .from('chat_sessions')
-      .select('user_id')
-      .order('created_at', { ascending: false });
-
-    const { data: sessionData, error: sessionError } = await query;
-
-    if (sessionError) {
-      console.error('获取会话数据失败:', sessionError);
+    if (authError) {
+      console.error('获取用户列表失败:', authError);
       return NextResponse.json(
-        { error: "获取用户数据失败" },
+        { error: "获取用户列表失败" },
         { status: 500 }
       );
     }
 
-    // 获取唯一的用户ID
-    const uniqueUserIds = [...new Set((sessionData || []).map(s => s.user_id))];
-    
-    // 为了演示，我们创建模拟用户数据
-    // 实际环境中应该使用正确的Auth Admin API
-    const mockUsers = uniqueUserIds.slice(offset, offset + limit).map(userId => ({
-      id: userId,
-      email: `user-${userId.slice(0, 8)}@example.com`, // 模拟邮箱
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      last_sign_in_at: new Date().toISOString(),
-      email_confirmed_at: new Date().toISOString(),
-      banned_until: null
-    }));
+    let filteredUsers = authUsers.users || [];
 
     // 应用搜索过滤
-    let filteredUsers = mockUsers;
     if (search) {
-      filteredUsers = mockUsers.filter(user => 
-        user.email.toLowerCase().includes(search.toLowerCase())
+      filteredUsers = filteredUsers.filter(user => 
+        user.email?.toLowerCase().includes(search.toLowerCase())
       );
+    }
+
+    // 应用状态过滤
+    if (status === 'banned') {
+      // 检查用户是否被禁用 - 使用 app_metadata 或其他可用字段
+      filteredUsers = filteredUsers.filter(user => 
+        user.app_metadata?.provider === 'email' && user.last_sign_in_at == null
+      );
+    } else if (status === 'active') {
+      filteredUsers = filteredUsers.filter(user => 
+        user.email_confirmed_at != null && user.last_sign_in_at != null
+      );
+    } else if (status === 'unverified') {
+      filteredUsers = filteredUsers.filter(user => user.email_confirmed_at == null);
     }
 
     // 获取用户统计信息
@@ -88,7 +85,7 @@ export async function GET(request: NextRequest) {
       updated_at: user.updated_at,
       last_sign_in_at: user.last_sign_in_at,
       email_confirmed_at: user.email_confirmed_at,
-      banned_until: user.banned_until,
+      is_active: user.email_confirmed_at != null,
       session_count: sessionCounts[user.id] || 0,
       message_count: messageCounts[user.id] || 0
     }));
@@ -100,7 +97,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       users: usersWithStats,
-      total: uniqueUserIds.length, // 使用总的唯一用户数
+      total: authUsers.total || filteredUsers.length, // 使用真实的用户总数
       page,
       limit
     });

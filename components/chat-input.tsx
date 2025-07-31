@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Mic, MicOff } from "lucide-react";
+import { Send } from "lucide-react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -20,7 +20,6 @@ export function ChatInput({
   className 
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
-  const [isVoiceMode, setIsVoiceMode] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,10 +36,6 @@ export function ChatInput({
     }
   };
 
-  const toggleVoiceMode = () => {
-    setIsVoiceMode(!isVoiceMode);
-    // TODO: 实现语音功能
-  };
 
   return (
     <div className={cn("bg-white border-t border-coach-gray-disabled p-3 sm:p-4", className)}>
@@ -56,22 +51,6 @@ export function ChatInput({
             rows={1}
           />
         </div>
-        
-        {/* 语音按钮 (预留) - 桌面端显示 */}
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={toggleVoiceMode}
-          className="h-10 w-10 sm:h-11 sm:w-11 border-coach-gray-disabled hover:border-coach-blue-secondary hover:bg-coach-blue-secondary hover:text-white transition-colors hidden sm:flex"
-          title={isVoiceMode ? "关闭语音模式" : "开启语音模式"}
-        >
-          {isVoiceMode ? (
-            <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          ) : (
-            <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          )}
-        </Button>
         
         {/* 发送按钮 */}
         <Button

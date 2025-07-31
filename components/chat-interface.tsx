@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatMessage, TypingIndicator } from "@/components/chat-message";
 import { ChatInput } from "@/components/chat-input";
-import { DigitalHuman } from "@/components/digital-human";
 import { LogoutButton } from "@/components/logout-button";
 import { ArrowLeft, Save, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -37,8 +36,6 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  // 移动端默认最小化数字人，桌面端默认展开
-  const [isDigitalHumanMinimized, setIsDigitalHumanMinimized] = useState(false);
   // 数据库会话ID（由API返回或URL参数）
   const [sessionId, setSessionId] = useState<string | null>(null);
   // 聊天记录保存状态
@@ -98,17 +95,6 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     }
   };
 
-  // 响应式初始化：检测屏幕尺寸来决定数字人初始状态
-  useEffect(() => {
-    const handleResize = () => {
-      // const isMobile = window.innerWidth < 768; // md breakpoint
-      // 可以根据需要调整初始化逻辑，目前保持不变
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // 通过API代理调用n8n webhook并保存聊天记录
   const sendMessageWithHistory = async (message: string, retryCount = 0): Promise<string> => {
@@ -278,11 +264,11 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 justify-center">
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-pfa-royal-blue font-bold text-sm sm:text-base">雪</span>
+              <span className="text-pfa-royal-blue font-bold text-sm sm:text-base">AI</span>
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-sm sm:text-base text-white truncate">
-                金牌保险教练 - 雪梨 (Shirley)
+PFA智能助手
               </h1>
               <div className="flex items-center gap-2">
                 <p className="text-pfa-champagne-gold text-xs">在线</p>
@@ -310,24 +296,8 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
         </div>
       </header>
 
-      {/* 主要内容区域 - 使用flex布局 */}
-      <div className="flex-1 flex flex-col sm:flex-row min-h-0">
-        {/* 数字人区域 */}
-        <div 
-          className={`
-            ${isDigitalHumanMinimized ? 'h-[10vh] sm:w-16' : 'h-[33vh] sm:h-full sm:w-80'} 
-            sm:h-full border-b sm:border-b-0 sm:border-r border-gray-200 bg-gradient-to-br from-pfa-royal-blue/5 to-pfa-navy-blue/10 
-            transition-all duration-500 ease-in-out flex-shrink-0 relative overflow-hidden
-          `}
-        >
-          <DigitalHuman 
-            isMinimized={isDigitalHumanMinimized}
-            onToggleMinimize={() => setIsDigitalHumanMinimized(!isDigitalHumanMinimized)}
-          />
-        </div>
-
-        {/* 聊天区域 */}
-        <div className="flex-1 flex flex-col min-h-0">
+      {/* 主要内容区域 - 聊天区域占满全屏 */}
+      <div className="flex-1 flex flex-col min-h-0">
           {/* 消息列表 */}
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4">
             {loadingHistory ? (
@@ -353,10 +323,9 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* 输入区域 */}
-          <div className="border-t bg-white p-3 sm:p-4">
-            <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
-          </div>
+        {/* 输入区域 */}
+        <div className="border-t bg-white p-3 sm:p-4">
+          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
         </div>
       </div>
     </div>

@@ -90,7 +90,7 @@ export interface UserInfo {
   updated_at: string;
   last_sign_in_at?: string;
   email_confirmed_at?: string;
-  banned_until?: string;
+  is_active: boolean;
   // 扩展信息
   session_count?: number;
   message_count?: number;
