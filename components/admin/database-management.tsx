@@ -23,6 +23,15 @@ interface ChatSession {
   user_email?: string;
 }
 
+interface ChatMessage {
+  id: string;
+  session_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+  metadata?: Record<string, unknown>;
+}
+
 
 export function DatabaseManagement() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
