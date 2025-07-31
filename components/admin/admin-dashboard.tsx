@@ -9,12 +9,10 @@ import {
   Database,
   Activity,
   Settings,
-  FileText,
   Shield,
   Server,
   CheckCircle,
   Clock,
-  UserPlus,
   MessageSquare
 } from "lucide-react";
 import { AdminDashboardStats } from "@/types/admin";
@@ -213,32 +211,6 @@ export function AdminDashboard() {
               </Card>
             </div>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>快速操作</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                    <UserPlus className="h-6 w-6 mb-2" />
-                    添加管理员
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                    <Database className="h-6 w-6 mb-2" />
-                    数据备份
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                    <FileText className="h-6 w-6 mb-2" />
-                    导出报表
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                    <Settings className="h-6 w-6 mb-2" />
-                    系统配置
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="users">
