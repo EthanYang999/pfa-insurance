@@ -36,7 +36,14 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
 
     // 构建请求体
-    const requestBody: any = {
+    const requestBody: {
+      inputs: Record<string, unknown>;
+      query: string;
+      response_mode: string;
+      user: string;
+      auto_generate_name: boolean;
+      conversation_id?: string;
+    } = {
       inputs: {},
       query: message.trim(),
       response_mode: 'streaming', // 使用流式模式

@@ -58,7 +58,11 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
     onComplete: (completeResponse: string, conversationId?: string) => void,
     onError: (error: string) => void
   ): Promise<void> => {
-    const requestBody: any = {
+    const requestBody: {
+      message: string;
+      user: string;
+      conversationId?: string;
+    } = {
       message,
       user: user.id || user.sub || `user_${Date.now()}`
     };

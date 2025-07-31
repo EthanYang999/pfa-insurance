@@ -10,7 +10,7 @@ interface DifyRequest {
 
 interface DifyStreamEvent {
   event: string;
-  data?: any;
+  data?: Record<string, unknown>;
   answer?: string;
   conversation_id?: string;
   message_id?: string;
@@ -52,7 +52,14 @@ export async function POST(request: NextRequest) {
     });
 
     // 构建请求体
-    const requestBody: any = {
+    const requestBody: {
+      inputs: Record<string, unknown>;
+      query: string;
+      response_mode: string;
+      user: string;
+      auto_generate_name: boolean;
+      conversation_id?: string;
+    } = {
       inputs: {},
       query: message.trim(),
       response_mode: 'streaming', // 流式模式
