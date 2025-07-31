@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // n8n webhook URL - 优先使用环境变量，否则使用提供的默认地址
-    const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "https://n8n.aifunbox.com/webhook/insurance";
+    const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "https://n8nprd.aifunbox.com/webhook/insurance";
     
     console.log("Using N8N webhook URL:", N8N_WEBHOOK_URL);
     console.log("Environment check - NODE_ENV:", process.env.NODE_ENV);

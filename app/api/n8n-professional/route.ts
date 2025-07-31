@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // N8N配置
-    const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "https://n8n.aifunbox.com/webhook/insurance";
+    const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "https://n8nprd.aifunbox.com/webhook/insurance";
 
     console.log("调用N8N专业API:", { 
       url: N8N_WEBHOOK_URL,

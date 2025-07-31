@@ -202,19 +202,29 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
       
       const data = await response.json();
       
-      // 替换消息内容为专业回答
+      // 隐藏快速回答的专业回答按钮和加载状态
       setMessages(prev => prev.map(msg => 
         msg.id === messageId 
           ? { 
               ...msg, 
-              content: data.response,
-              aiService: 'n8n',
-              answerType: 'professional',
               showProfessionalButton: false,
               isLoadingProfessional: false
             }
           : msg
       ));
+      
+      // 添加新的专业回答消息
+      const professionalMessage: Message = {
+        id: `professional_${Date.now()}`,
+        content: data.response,
+        isUser: false,
+        timestamp: new Date(),
+        aiService: 'n8n',
+        answerType: 'professional',
+        showProfessionalButton: false
+      };
+      
+      setMessages(prev => [...prev, professionalMessage]);
       
     } catch (error) {
       console.error('获取专业回答失败:', error);
@@ -376,7 +386,19 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
           
           <div className="flex-1">
             {/* 消息内容 */}
-            <div className="bg-gray-100 rounded-2xl px-4 py-2">
+            <div className={`rounded-2xl px-4 py-2 ${
+              message.aiService === 'n8n' 
+                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' 
+                : 'bg-gray-100'
+            }`}>
+              {/* 专业回答特殊标题 */}
+              {message.aiService === 'n8n' && (
+                <div className="flex items-center gap-2 mb-2 pb-2 border-b border-green-200">
+                  <Brain className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-700">AI专业教练深度分析</span>
+                </div>
+              )}
+              
               <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
                 {message.content}
                 {/* 流式输入指示器 */}
