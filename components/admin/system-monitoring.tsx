@@ -34,7 +34,7 @@ interface ServiceHealth {
 
 interface SystemMetrics {
   database: ServiceHealth;
-  n8n: ServiceHealth;
+  // n8n: ServiceHealth; // 预留 N8N 监控接口
 }
 
 export function SystemMonitoring() {
@@ -171,30 +171,23 @@ export function SystemMonitoring() {
               </CardContent>
             </Card>
 
-            {/* n8n工作流状态 */}
-            <Card>
+            {/* N8N工作流状态 - 预留位置 */}
+            <Card className="opacity-50">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Workflow className="h-4 w-4" />
-                  n8n工作流
+                  N8N工作流
                 </CardTitle>
-                {metrics?.n8n && getStatusIcon(metrics.n8n.status)}
+                <Clock className="h-4 w-4 text-gray-400" />
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <Badge className={getStatusColor(metrics?.n8n?.status || 'unknown')}>
-                    {getStatusText(metrics?.n8n?.status || 'unknown')}
+                  <Badge className="text-gray-600 bg-gray-50 border-gray-200">
+                    暂未配置
                   </Badge>
-                  {metrics?.n8n?.response_time && (
-                    <div className="text-sm text-gray-600">
-                      响应时间: {metrics.n8n.response_time}ms
-                    </div>
-                  )}
-                  {metrics?.n8n?.error_message && (
-                    <div className="text-xs text-red-600 mt-1">
-                      {metrics.n8n.error_message}
-                    </div>
-                  )}
+                  <div className="text-sm text-gray-500">
+                    预留监控位置
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -202,66 +195,23 @@ export function SystemMonitoring() {
           </div>
 
 
-          {/* n8n详细监控 */}
-          <Card>
+          {/* N8N详细监控 - 预留位置 */}
+          <Card className="opacity-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Workflow className="h-5 w-5" />
-                n8n工作流详细监控
+                N8N工作流详细监控
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-pfa-royal-blue">
-                      {metrics?.n8n?.metadata?.uptime ? 
-                        Math.round(metrics.n8n.metadata.uptime / 3600) : '--'
-                      }h
-                    </div>
-                    <div className="text-sm text-gray-500">运行时间</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {metrics?.n8n?.metadata?.active_connections || '--'}
-                    </div>
-                    <div className="text-sm text-gray-500">活跃连接</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">
-                      {metrics?.n8n?.metadata?.memory_usage || '--'}MB
-                    </div>
-                    <div className="text-sm text-gray-500">内存使用</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {metrics?.n8n?.metadata?.cpu_usage || '--'}%
-                    </div>
-                    <div className="text-sm text-gray-500">CPU使用</div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">webhook端点状态</h4>
-                  <div className="text-sm space-y-1">
-                    <div className="flex justify-between">
-                      <span>最后检查时间:</span>
-                      <span>
-                        {metrics?.n8n?.checked_at ? 
-                          format(new Date(metrics.n8n.checked_at), 'yyyy-MM-dd HH:mm:ss', { locale: zhCN }) :
-                          '未知'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>平均响应时间:</span>
-                      <span>{metrics?.n8n?.response_time || '--'}ms</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="text-center py-8">
+                <Workflow className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-500 mb-2">N8N监控预留位置</h3>
+                <p className="text-sm text-gray-400">
+                  此区域预留用于N8N工作流监控功能
+                  <br />
+                  包括webhook状态、响应时间等指标
+                </p>
               </div>
             </CardContent>
           </Card>
