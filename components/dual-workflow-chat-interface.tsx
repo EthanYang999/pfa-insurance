@@ -100,7 +100,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
       }
       
       let completeResponse = '';
-      let newConversationId = conversationId;
+      let newConversationId: string | undefined = conversationId || undefined;
       
       while (true) {
         const { done, value } = await reader.read();
