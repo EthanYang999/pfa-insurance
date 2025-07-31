@@ -9,7 +9,7 @@ import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Textarea } from '../ui/textarea';
-import { Database, Search, MessageSquare, Archive, Trash2, FileText, Eye, User } from 'lucide-react';
+import { Database, Search, MessageSquare, Archive, Trash2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 
@@ -24,27 +24,9 @@ interface ChatSession {
   user_email?: string;
 }
 
-interface ChatMessage {
-  id: string;
-  session_id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  created_at: string;
-  metadata?: Record<string, unknown>;
-}
-
-interface User {
-  id: string;
-  email: string;
-  created_at: string;
-  last_sign_in_at?: string;
-}
 
 export function DatabaseManagement() {
-  const [activeTab, setActiveTab] = useState<'sessions' | 'messages' | 'users'>('sessions');
   const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'archived'>('all');
@@ -79,53 +61,6 @@ export function DatabaseManagement() {
     }
   };
 
-  // 加载消息
-  const loadMessages = async (page = 1) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pageSize.toString(),
-        search: searchTerm
-      });
-
-      const response = await fetch(`/api/admin/database/messages?${params}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setMessages(data.messages);
-        setTotalRecords(data.total);
-      }
-    } catch (error) {
-      console.error('Failed to load messages:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 加载用户
-  const loadUsers = async (page = 1) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pageSize.toString(),
-        search: searchTerm
-      });
-
-      const response = await fetch(`/api/admin/users?${params}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setUsers(data.users);
-        setTotalRecords(data.total);
-      }
-    } catch (error) {
-      console.error('Failed to load users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 加载会话消息
   const loadSessionMessages = async (sessionId: string) => {
@@ -178,16 +113,10 @@ export function DatabaseManagement() {
   };
 
   useEffect(() => {
-    if (activeTab === 'sessions') {
-      loadSessions(currentPage);
-    } else if (activeTab === 'messages') {
-      loadMessages(currentPage);
-    } else if (activeTab === 'users') {
-      loadUsers(currentPage);
-    }
+    loadSessions(currentPage);
     // ESLint disable next line to avoid circular dependency
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, searchTerm, filterStatus, currentPage]);
+  }, [searchTerm, filterStatus, currentPage]);
 
   const totalPages = Math.ceil(totalRecords / pageSize);
 
@@ -200,27 +129,6 @@ export function DatabaseManagement() {
         </h2>
       </div>
 
-      {/* 标签页导航 */}
-      <div className="flex space-x-1">
-        {[
-          { key: 'sessions', label: '聊天会话', icon: MessageSquare },
-          { key: 'messages', label: '消息内容', icon: FileText },
-          { key: 'users', label: '用户数据', icon: User }
-        ].map(({ key, label, icon: Icon }) => (
-          <Button
-            key={key}
-            variant={activeTab === key ? 'default' : 'outline'}
-            onClick={() => {
-              setActiveTab(key as 'sessions' | 'messages' | 'users');
-              setCurrentPage(1);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </Button>
-        ))}
-      </div>
 
       {/* 搜索和筛选 */}
       <Card>
@@ -231,28 +139,22 @@ export function DatabaseManagement() {
           <div className="flex gap-4">
             <div className="flex-1">
               <Input
-                placeholder={
-                  activeTab === 'sessions' ? '搜索会话标题...' :
-                  activeTab === 'messages' ? '搜索消息内容...' :
-                  '搜索用户邮箱...'
-                }
+                placeholder="搜索会话标题..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full"
               />
             </div>
-            {activeTab === 'sessions' && (
-              <Select value={filterStatus} onValueChange={(value: 'all' | 'active' | 'archived') => setFilterStatus(value)}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部</SelectItem>
-                  <SelectItem value="active">活跃</SelectItem>
-                  <SelectItem value="archived">已归档</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
+            <Select value={filterStatus} onValueChange={(value: 'all' | 'active' | 'archived') => setFilterStatus(value)}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部</SelectItem>
+                <SelectItem value="active">活跃</SelectItem>
+                <SelectItem value="archived">已归档</SelectItem>
+              </SelectContent>
+            </Select>
             <Button onClick={() => setCurrentPage(1)} disabled={loading}>
               <Search className="h-4 w-4 mr-2" />
               搜索
@@ -265,10 +167,7 @@ export function DatabaseManagement() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
-            {activeTab === 'sessions' && '聊天会话'}
-            {activeTab === 'messages' && '消息内容'}
-            {activeTab === 'users' && '用户数据'}
-            ({totalRecords} 条记录)
+            聊天会话管理 ({totalRecords} 条记录)
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -277,8 +176,7 @@ export function DatabaseManagement() {
           ) : (
             <>
               {/* 会话表格 */}
-              {activeTab === 'sessions' && (
-                <Table>
+              <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>会话ID</TableHead>
@@ -384,134 +282,7 @@ export function DatabaseManagement() {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
-              )}
-
-              {/* 消息表格 */}
-              {activeTab === 'messages' && (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>消息ID</TableHead>
-                      <TableHead>会话</TableHead>
-                      <TableHead>角色</TableHead>
-                      <TableHead>内容预览</TableHead>
-                      <TableHead>创建时间</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {messages.map((message) => (
-                      <TableRow key={message.id}>
-                        <TableCell className="font-mono text-xs">
-                          {message.id.slice(0, 8)}...
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {message.session_id.slice(0, 8)}...
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={message.role === 'user' ? 'default' : 'secondary'}>
-                            {message.role === 'user' ? '用户' : 'AI助手'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-md truncate">
-                          {message.content.slice(0, 100)}
-                          {message.content.length > 100 && '...'}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {format(new Date(message.created_at), 'yyyy-MM-dd HH:mm', { locale: zhCN })}
-                        </TableCell>
-                        <TableCell>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                              <DialogHeader>
-                                <DialogTitle>消息详情</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="text-sm font-medium">角色</label>
-                                    <Badge variant={message.role === 'user' ? 'default' : 'secondary'}>
-                                      {message.role === 'user' ? '用户' : 'AI助手'}
-                                    </Badge>
-                                  </div>
-                                  <div>
-                                    <label className="text-sm font-medium">时间</label>
-                                    <p className="text-sm">
-                                      {format(new Date(message.created_at), 'yyyy-MM-dd HH:mm:ss', { locale: zhCN })}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium">消息内容</label>
-                                  <Textarea
-                                    value={message.content}
-                                    readOnly
-                                    rows={10}
-                                    className="mt-1"
-                                  />
-                                </div>
-                                {message.metadata && (
-                                  <div>
-                                    <label className="text-sm font-medium">元数据</label>
-                                    <pre className="text-xs bg-gray-100 p-2 rounded mt-1">
-                                      {JSON.stringify(message.metadata, null, 2)}
-                                    </pre>
-                                  </div>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-
-              {/* 用户表格 */}
-              {activeTab === 'users' && (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>用户ID</TableHead>
-                      <TableHead>邮箱</TableHead>
-                      <TableHead>注册时间</TableHead>
-                      <TableHead>最后登录</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-mono text-xs">
-                          {user.id.slice(0, 8)}...
-                        </TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell className="text-sm">
-                          {format(new Date(user.created_at), 'yyyy-MM-dd HH:mm', { locale: zhCN })}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {user.last_sign_in_at 
-                            ? format(new Date(user.last_sign_in_at), 'yyyy-MM-dd HH:mm', { locale: zhCN })
-                            : '从未登录'
-                          }
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+              </Table>
 
               {/* 分页 */}
               {totalPages > 1 && (

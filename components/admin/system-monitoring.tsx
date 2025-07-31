@@ -7,15 +7,13 @@ import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 import { 
   Activity, 
-  Server, 
   Database, 
   Workflow, 
   AlertTriangle, 
   CheckCircle, 
   XCircle,
   RefreshCw,
-  Clock,
-  Zap
+  Clock
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
@@ -37,12 +35,6 @@ interface ServiceHealth {
 interface SystemMetrics {
   database: ServiceHealth;
   n8n: ServiceHealth;
-  api: ServiceHealth;
-  system_load: {
-    cpu: number;
-    memory: number;
-    disk: number;
-  };
 }
 
 export function SystemMonitoring() {
@@ -150,7 +142,7 @@ export function SystemMonitoring() {
       ) : (
         <>
           {/* 服务状态概览 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 数据库状态 */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -207,77 +199,8 @@ export function SystemMonitoring() {
               </CardContent>
             </Card>
 
-            {/* API服务状态 */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Server className="h-4 w-4" />
-                  API服务
-                </CardTitle>
-                {metrics?.api && getStatusIcon(metrics.api.status)}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Badge className={getStatusColor(metrics?.api?.status || 'unknown')}>
-                    {getStatusText(metrics?.api?.status || 'unknown')}
-                  </Badge>
-                  {metrics?.api?.response_time && (
-                    <div className="text-sm text-gray-600">
-                      响应时间: {metrics.api.response_time}ms
-                    </div>
-                  )}
-                  {metrics?.api?.error_message && (
-                    <div className="text-xs text-red-600 mt-1">
-                      {metrics.api.error_message}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
-          {/* 系统资源使用情况 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                系统资源使用情况
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">CPU使用率</span>
-                    <span className="text-sm text-gray-600">
-                      {metrics?.system_load?.cpu || 0}%
-                    </span>
-                  </div>
-                  <Progress value={metrics?.system_load?.cpu || 0} className="h-2" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">内存使用率</span>
-                    <span className="text-sm text-gray-600">
-                      {metrics?.system_load?.memory || 0}%
-                    </span>
-                  </div>
-                  <Progress value={metrics?.system_load?.memory || 0} className="h-2" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">磁盘使用率</span>
-                    <span className="text-sm text-gray-600">
-                      {metrics?.system_load?.disk || 0}%
-                    </span>
-                  </div>
-                  <Progress value={metrics?.system_load?.disk || 0} className="h-2" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* n8n详细监控 */}
           <Card>
