@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission, logAdminAction } from "@/lib/admin-auth";
@@ -7,7 +6,6 @@ export async function POST(request: NextRequest) {
   try {
     await requirePermission('update_user');
     
-    const supabase = await createClient();
     const adminClient = createAdminClient();
     const { userId, ban } = await request.json();
 

@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission, logAdminAction } from "@/lib/admin-auth";
 
@@ -19,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // 由于服务角色密钥问题，我们暂时从chat_sessions表中获取用户信息
     // 这是一个临时解决方案，实际生产环境中应该配置正确的服务角色密钥
-    let query = supabase
+    const query = supabase
       .from('chat_sessions')
       .select('user_id')
       .order('created_at', { ascending: false });
