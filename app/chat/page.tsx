@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { ChatInterface } from "@/components/chat-interface";
+import { DualWorkflowChatInterface } from "@/components/dual-workflow-chat-interface";
 import { User } from "@supabase/supabase-js";
 
 export default function ChatPage() {
@@ -58,5 +58,5 @@ export default function ChatPage() {
     return null; // 用户未登录会被重定向
   }
 
-  return <ChatInterface user={user} />;
+  return <DualWorkflowChatInterface user={user} />;
 }
