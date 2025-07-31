@@ -182,29 +182,41 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
           content: msg.content
         }));
 
-      console.log('发送专业回答请求:', {
-        conversationHistory: conversationHistory.length,
-        messageId,
-        conversationId
+      // 获取最后一个用户消息
+      const lastUserMessage = conversationHistory
+        .filter(msg => msg.role === 'user')
+        .pop();
+
+      if (!lastUserMessage) {
+        throw new Error('未找到用户消息');
+      }
+
+      console.log('直接调用N8N webhook:', {
+        message: lastUserMessage.content.substring(0, 50) + "...",
+        conversationId,
+        historyLength: conversationHistory.length
       });
 
-      const response = await fetch('/api/n8n-professional', {
+      // 直接调用N8N webhook（前端调用，避免Netlify函数超时）
+      const response = await fetch('https://n8nprd.aifunbox.com/webhook/insurance', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
-          conversationHistory,
-          messageId,
-          conversationId
+          text: lastUserMessage.content,
+          sessionId: `professional_${conversationId}`
         })
       });
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}错误` }));
-        console.error('N8N专业API前端错误:', errorData);
-        throw new Error(errorData.error || errorData.details || '获取专业回答失败');
+        console.error('N8N直接调用错误:', response.status, response.statusText);
+        throw new Error(`N8N响应错误: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('N8N直接调用响应:', data);
       
       // 隐藏快速回答的专业回答按钮和加载状态
       setMessages(prev => prev.map(msg => 
@@ -220,7 +232,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
       // 添加新的专业回答消息
       const professionalMessage: Message = {
         id: `professional_${Date.now()}`,
-        content: data.response,
+        content: data.output || data.response || "抱歉，专业AI教练暂时无法处理您的请求。",
         isUser: false,
         timestamp: new Date(),
         aiService: 'n8n',
