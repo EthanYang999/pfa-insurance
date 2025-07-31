@@ -37,7 +37,7 @@ export function DigitalHuman({
             "text-coach-gold-light font-medium truncate",
             isMinimized ? "text-xs md:text-sm" : "text-sm"
           )}>
-            雪莉教练
+            AI助手
           </span>
         </div>
         
@@ -103,13 +103,10 @@ export function DigitalHuman({
                 </div>
               </div>
               
-              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-1 sm:mb-2">雪莉教练</h3>
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-1 sm:mb-2">PFA智能助手</h3>
               <p className="text-coach-gold-light text-xs sm:text-sm opacity-80">
-                AI保险培训专家
+                AI保险培训助手
               </p>
-              <div className="mt-2 sm:mt-4 text-xs text-white/60 hidden sm:block">
-                UE5数字人集成预备中...
-              </div>
             </div>
           </div>
           

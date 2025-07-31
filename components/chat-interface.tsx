@@ -31,7 +31,7 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "您好！我是雪莉教练，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。请告诉我您想了解什么？",
+      content: "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。请告诉我您想了解什么？",
       isUser: false,
       timestamp: new Date(),
     },
