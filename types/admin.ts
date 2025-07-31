@@ -91,6 +91,9 @@ export interface UserInfo {
   last_sign_in_at?: string;
   email_confirmed_at?: string;
   is_active: boolean;
+  // 管理员角色信息
+  admin_role: 'user' | 'admin' | 'super_admin';
+  is_admin_active?: boolean;
   // 扩展信息
   session_count?: number;
   message_count?: number;
