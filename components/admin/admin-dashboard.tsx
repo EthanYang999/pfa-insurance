@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users,
-  Database,
   Activity,
-  Settings,
   Shield,
   Server,
   CheckCircle,
