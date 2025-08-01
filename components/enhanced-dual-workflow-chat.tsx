@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatInput } from "@/components/chat-input";
 import { LogoutButton } from "@/components/logout-button";
-import { ArrowLeft, Bot, User, Brain, Zap, Loader, Check, Clock, BookOpen, Target, TrendingUp, Award } from "lucide-react";
+import { ArrowLeft, Bot, User, Brain, Zap, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // 原有的Message接口
@@ -18,23 +18,6 @@ interface Message {
   isLoadingProfessional?: boolean;
 }
 
-// 学习进度接口
-interface LearningModule {
-  id: string;
-  title: string;
-  description: string;
-  status: "completed" | "in_progress" | "pending";
-  category: string;
-  progress?: number;
-}
-
-// 学习统计接口
-interface LearningStats {
-  questionsAsked: number;
-  learningTime: number;
-  modulesCompleted: number;
-  totalModules: number;
-}
 
 interface User {
   email?: string;
@@ -60,66 +43,6 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // 学习模块数据
-  const [learningModules, setLearningModules] = useState<LearningModule[]>([
-    {
-      id: "basic_insurance",
-      title: "保险基础知识",
-      description: "保险原理、分类、基本概念",
-      status: "completed",
-      category: "基础知识",
-      progress: 100
-    },
-    {
-      id: "life_insurance",
-      title: "人寿保险产品",
-      description: "定期、终身、两全保险",
-      status: "in_progress",
-      category: "产品知识",
-      progress: 65
-    },
-    {
-      id: "health_insurance",
-      title: "健康保险产品",
-      description: "医疗、重疾、意外保险",
-      status: "in_progress",
-      category: "产品知识",
-      progress: 30
-    },
-    {
-      id: "sales_skills",
-      title: "销售技巧训练",
-      description: "客户沟通、需求分析、异议处理",
-      status: "pending",
-      category: "销售技能",
-      progress: 0
-    },
-    {
-      id: "regulations",
-      title: "保险法规",
-      description: "相关法律法规、合规要求",
-      status: "pending",
-      category: "法规知识",
-      progress: 0
-    },
-    {
-      id: "case_studies",
-      title: "实战案例分析",
-      description: "真实案例学习和分析",
-      status: "pending",
-      category: "实战应用",
-      progress: 0
-    }
-  ]);
-
-  // 学习统计
-  const [learningStats, setLearningStats] = useState<LearningStats>({
-    questionsAsked: 23,
-    learningTime: 145,
-    modulesCompleted: 1,
-    totalModules: 6
-  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -381,13 +304,6 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // 更新学习统计
-    setLearningStats(prev => ({
-      ...prev,
-      questionsAsked: prev.questionsAsked + 1,
-      learningTime: prev.learningTime + Math.floor(Math.random() * 5) + 1
-    }));
-
     const aiMessageId = `ai_${Date.now()}`;
     const aiMessage: Message = {
       id: aiMessageId,
@@ -593,221 +509,53 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     );
   };
 
-  // 计算进度统计
-  const completedModules = learningModules.filter(module => module.status === "completed").length;
-  const totalModules = learningModules.length;
-  const overallProgress = (completedModules / totalModules) * 100;
-
-  // 按类别分组模块
-  const modulesByCategory = learningModules.reduce(
-    (acc, module) => {
-      if (!acc[module.category]) {
-        acc[module.category] = [];
-      }
-      acc[module.category].push(module);
-      return acc;
-    },
-    {} as Record<string, LearningModule[]>
-  );
-
   return (
-    <div className="h-screen w-full flex bg-gradient-to-br from-pfa-light-gray to-white">
-      {/* 左侧聊天界面 */}
-      <div className="flex-1 flex flex-col">
-        {/* 聊天头部 */}
-        <header className="bg-pfa-royal-blue text-white px-4 py-3 flex items-center justify-between shadow-lg">
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-white hover:text-pfa-champagne-gold transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="hidden sm:inline">返回首页</span>
-          </button>
+    <div className="h-screen w-full flex flex-col bg-gradient-to-br from-pfa-light-gray to-white">
+      {/* 顶部导航栏 */}
+      <header className="bg-pfa-royal-blue text-white px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg">
+        <button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 text-white hover:text-pfa-champagne-gold transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="hidden sm:inline">返回首页</span>
+        </button>
 
-          <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-pfa-royal-blue font-bold text-base">AI</span>
-              </div>
-              <div className="min-w-0">
-                <h1 className="font-bold text-base text-white truncate">
-                  PFA智能助手
-                </h1>
-                <p className="text-pfa-champagne-gold text-xs">AI保险培训教练 • 智能学习指导</p>
-              </div>
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 justify-center">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-pfa-royal-blue font-bold text-sm sm:text-base">AI</span>
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-bold text-sm sm:text-base text-white truncate">
+                PFA智能助手
+              </h1>
+              <p className="text-pfa-champagne-gold text-xs">快速+专业回答</p>
             </div>
           </div>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-pfa-champagne-gold text-sm">
-              {user?.email?.split('@')[0] || '会员'}
-            </span>
-            <LogoutButton />
-          </div>
-        </header>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="text-pfa-champagne-gold text-xs sm:text-sm">
+            {user?.email?.split('@')[0] || '会员'}
+          </span>
+          <LogoutButton />
+        </div>
+      </header>
 
+      {/* 主要内容区域 - 聊天区域占满全屏 */}
+      <div className="flex-1 flex flex-col min-h-0">
         {/* 消息列表 */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {messages.map((message) => (
-              <MessageComponent key={message.id} message={message} />
-            ))}
-          </div>
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4">
+          {messages.map((message) => (
+            <MessageComponent key={message.id} message={message} />
+          ))}
           <div ref={messagesEndRef} />
         </div>
 
         {/* 输入区域 */}
-        <div className="border-t bg-white/50 backdrop-blur-sm p-4">
-          <div className="max-w-4xl mx-auto">
-            <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
-          </div>
-        </div>
-      </div>
-
-      {/* 右侧学习进度侧边栏 */}
-      <div className="w-96 bg-pfa-royal-blue/5 border-l border-pfa-royal-blue/10 flex flex-col">
-        {/* 侧边栏头部 */}
-        <div className="p-6 border-b border-pfa-royal-blue/10">
-          <h2 className="text-lg font-semibold text-pfa-royal-blue mb-3 flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            学习进度跟踪
-          </h2>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>整体进度</span>
-              <span className="text-pfa-royal-blue font-medium">
-                {completedModules}/{totalModules} 模块
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-gradient-to-r from-pfa-royal-blue to-pfa-champagne-gold h-2 rounded-full transition-all duration-500"
-                style={{ width: `${overallProgress}%` }}
-              />
-            </div>
-            
-            {/* 学习统计 */}
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <div className="bg-white/50 rounded-lg p-3 text-center">
-                <div className="text-lg font-bold text-pfa-royal-blue">{learningStats.questionsAsked}</div>
-                <div className="text-xs text-gray-600">提问次数</div>
-              </div>
-              <div className="bg-white/50 rounded-lg p-3 text-center">
-                <div className="text-lg font-bold text-pfa-champagne-gold">{learningStats.learningTime}min</div>
-                <div className="text-xs text-gray-600">学习时长</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 学习模块列表 */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-6">
-            {Object.entries(modulesByCategory).map(([category, modules]) => (
-              <div key={category}>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                  {category}
-                </h3>
-                <div className="space-y-2">
-                  {modules.map((module) => (
-                    <div
-                      key={module.id}
-                      className={`transition-all duration-200 rounded-lg border ${
-                        module.status === "completed"
-                          ? "bg-gradient-to-r from-pfa-champagne-gold/10 to-pfa-champagne-gold/5 border-pfa-champagne-gold/20"
-                          : module.status === "in_progress"
-                          ? "bg-gradient-to-r from-pfa-royal-blue/10 to-pfa-royal-blue/5 border-pfa-royal-blue/20"
-                          : "bg-white/50 border-gray-200 hover:bg-white/80"
-                      }`}
-                    >
-                      <div className="p-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3">
-                              <div
-                                className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                                  module.status === "completed" 
-                                    ? "bg-pfa-champagne-gold" 
-                                    : module.status === "in_progress"
-                                    ? "bg-pfa-royal-blue"
-                                    : "bg-gray-300 border border-gray-400"
-                                }`}
-                              >
-                                {module.status === "completed" ? (
-                                  <Check className="w-2.5 h-2.5 text-white" />
-                                ) : module.status === "in_progress" ? (
-                                  <TrendingUp className="w-2.5 h-2.5 text-white" />
-                                ) : (
-                                  <Clock className="w-2.5 h-2.5 text-gray-500" />
-                                )}
-                              </div>
-                              <h4 className="font-medium text-sm text-gray-800">{module.title}</h4>
-                            </div>
-                            {module.description && (
-                              <p className="text-xs text-gray-500 mt-1 ml-7">{module.description}</p>
-                            )}
-                            {module.status === "in_progress" && module.progress !== undefined && (
-                              <div className="ml-7 mt-2">
-                                <div className="flex justify-between text-xs mb-1">
-                                  <span className="text-gray-500">进度</span>
-                                  <span className="text-pfa-royal-blue font-medium">{module.progress}%</span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-1">
-                                  <div
-                                    className="bg-pfa-royal-blue h-1 rounded-full transition-all duration-300"
-                                    style={{ width: `${module.progress}%` }}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className={`text-xs px-2 py-1 rounded-full ml-2 ${
-                            module.status === "completed"
-                              ? "bg-pfa-champagne-gold/20 text-pfa-champagne-gold"
-                              : module.status === "in_progress"
-                              ? "bg-pfa-royal-blue/20 text-pfa-royal-blue"
-                              : "bg-gray-200 text-gray-500"
-                          }`}>
-                            {module.status === "completed" ? (
-                              <Award className="w-3 h-3 inline" />
-                            ) : module.status === "in_progress" ? (
-                              <Target className="w-3 h-3 inline" />
-                            ) : (
-                              "○"
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 侧边栏底部 */}
-        <div className="p-4 border-t border-pfa-royal-blue/10">
-          <button
-            className={`w-full transition-all duration-200 py-3 rounded-lg font-medium ${
-              overallProgress > 80
-                ? "bg-gradient-to-r from-pfa-royal-blue to-pfa-champagne-gold hover:shadow-lg text-white"
-                : "bg-gray-200 text-gray-500 border border-gray-300"
-            }`}
-            disabled={overallProgress <= 80}
-          >
-            {overallProgress > 80 ? (
-              <div className="flex items-center justify-center space-x-2">
-                <Award className="w-4 h-4" />
-                <span>获取学习证书</span>
-              </div>
-            ) : (
-              `继续学习 (${(80 - overallProgress).toFixed(0)}% 待完成)`
-            )}
-          </button>
-          {overallProgress > 80 && (
-            <p className="text-xs text-gray-500 text-center mt-2">恭喜！您已达到认证要求</p>
-          )}
+        <div className="border-t bg-white p-3 sm:p-4">
+          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
         </div>
       </div>
     </div>
