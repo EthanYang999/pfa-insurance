@@ -144,19 +144,25 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
               const jsonStr = line.slice(6).trim();
               if (!jsonStr || jsonStr === '[DONE]') continue;
               
+              console.log('解析Dify流式数据:', jsonStr); // 调试：查看原始数据
               const eventData = JSON.parse(jsonStr);
+              console.log('Dify事件数据:', eventData); // 调试：查看解析后的数据
               
-              if (eventData.event === 'message_chunk') {
-                // 接收到消息块
-                const chunkText = eventData.chunk || '';
-                completeResponse += chunkText;
-                onChunk(chunkText);
+              // 检查多种可能的事件类型和数据字段
+              if (eventData.event === 'message' || eventData.event === 'message_chunk') {
+                // 尝试多种可能的文本字段
+                const chunkText = eventData.answer || eventData.chunk || eventData.delta || eventData.content || '';
+                if (chunkText) {
+                  console.log('接收到文本块:', chunkText);
+                  completeResponse += chunkText;
+                  onChunk(chunkText);
+                }
                 
                 // 更新会话ID
                 if (eventData.conversation_id && eventData.conversation_id !== newConversationId) {
                   newConversationId = eventData.conversation_id;
                 }
-              } else if (eventData.event === 'message_complete') {
+              } else if (eventData.event === 'message_end' || eventData.event === 'message_complete') {
                 // 消息完成
                 console.log('流式消息完成:', {
                   completeResponse: completeResponse.length,
@@ -173,6 +179,9 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
                 // 错误事件
                 onError(eventData.error || '流式处理出错');
                 return;
+              } else {
+                // 记录未知事件类型
+                console.log('未知的Dify事件类型:', eventData.event, eventData);
               }
             } catch (parseError) {
               console.error('解析流式数据失败:', parseError, 'Raw line:', line);
@@ -183,6 +192,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
       
       // 处理缓冲区中剩余的数据
       if (buffer.trim()) {
+        console.log('处理剩余缓冲区数据:', buffer);
         const finalLines = buffer.split('\n');
         for (const line of finalLines) {
           if (line.startsWith('data: ')) {
@@ -190,7 +200,8 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
               const jsonStr = line.slice(6).trim();
               if (jsonStr && jsonStr !== '[DONE]') {
                 const eventData = JSON.parse(jsonStr);
-                if (eventData.event === 'message_end') {
+                console.log('缓冲区事件数据:', eventData);
+                if (eventData.event === 'message_end' || eventData.event === 'message_complete') {
                   console.log('处理最终消息结束事件');
                   onComplete(completeResponse, eventData.conversation_id || newConversationId);
                   return;
