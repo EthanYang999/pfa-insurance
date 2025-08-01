@@ -72,22 +72,45 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
       requestBody.conversationId = conversationId;
     }
     
-    console.log('发送Dify流式请求:', { ...requestBody, conversationId: conversationId || 'NEW_CONVERSATION' });
+    console.log('直接调用Dify API:', { ...requestBody, conversationId: conversationId || 'NEW_CONVERSATION' });
     
     try {
-      const response = await fetch('/api/dify-chat-stream', {
+      // 构建Dify请求体
+      const difyRequestBody: {
+        inputs: Record<string, unknown>;
+        query: string;
+        response_mode: string;
+        user: string;
+        auto_generate_name: boolean;
+        conversation_id?: string;
+      } = {
+        inputs: {},
+        query: requestBody.message.trim(),
+        response_mode: 'streaming',
+        user: requestBody.user,
+        auto_generate_name: true
+      };
+
+      // 如果有会话ID，添加到请求中
+      if (requestBody.conversationId) {
+        difyRequestBody.conversation_id = requestBody.conversationId;
+      }
+
+      // 直接调用Dify API（前端调用，避免Netlify服务器问题）
+      const response = await fetch('https://pro.aifunbox.com/v1/chat-messages', {
         method: 'POST',
         headers: { 
+          'Authorization': 'Bearer app-34ZpXbLsWBJlqyNMhSJDFlLS',
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(difyRequestBody)
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Dify流式API错误:', errorData);
-        onError(errorData.error || errorData.details || '调用Dify流式API失败');
+        const errorText = await response.text().catch(() => `HTTP ${response.status} 错误`);
+        console.error('Dify直接调用错误:', response.status, response.statusText, errorText);
+        onError(`Dify API错误: ${response.status} ${response.statusText}`);
         return;
       }
       
