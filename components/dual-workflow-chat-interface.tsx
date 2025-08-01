@@ -124,6 +124,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
       
       let completeResponse = '';
       let newConversationId: string | undefined = conversationId || undefined;
+      let buffer = ''; // 添加缓冲区处理分块数据
       
       while (true) {
         const { done, value } = await reader.read();
@@ -131,13 +132,17 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
         if (done) break;
         
         const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
+        buffer += chunk; // 将新数据添加到缓冲区
+        
+        // 按行分割，但保留最后一个不完整的行
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // 保存可能不完整的最后一行
         
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             try {
               const jsonStr = line.slice(6).trim();
-              if (!jsonStr) continue;
+              if (!jsonStr || jsonStr === '[DONE]') continue;
               
               const eventData = JSON.parse(jsonStr);
               
@@ -171,6 +176,28 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
               }
             } catch (parseError) {
               console.error('解析流式数据失败:', parseError, 'Raw line:', line);
+            }
+          }
+        }
+      }
+      
+      // 处理缓冲区中剩余的数据
+      if (buffer.trim()) {
+        const finalLines = buffer.split('\n');
+        for (const line of finalLines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const jsonStr = line.slice(6).trim();
+              if (jsonStr && jsonStr !== '[DONE]') {
+                const eventData = JSON.parse(jsonStr);
+                if (eventData.event === 'message_end') {
+                  console.log('处理最终消息结束事件');
+                  onComplete(completeResponse, eventData.conversation_id || newConversationId);
+                  return;
+                }
+              }
+            } catch (parseError) {
+              console.error('解析最终缓冲区数据失败:', parseError);
             }
           }
         }
