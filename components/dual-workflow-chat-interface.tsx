@@ -468,9 +468,9 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
               )}
               
               <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
-                {message.content}
+                {message.content || (message.aiService === 'dify' && !message.showProfessionalButton ? 'AI正在思考...' : '')}
                 {/* 流式输入指示器 */}
-                {message.aiService === 'dify' && message.content && !message.showProfessionalButton && (
+                {message.aiService === 'dify' && !message.showProfessionalButton && (
                   <span className="inline-block w-1 h-4 bg-blue-500 ml-1 animate-pulse"></span>
                 )}
               </p>
@@ -586,7 +586,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-sm sm:text-base text-white truncate">
-                PFA智能助手 (双工作流)
+                PFA智能助手
               </h1>
               <p className="text-pfa-champagne-gold text-xs">快速+专业回答</p>
             </div>
@@ -609,7 +609,6 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
           {messages.map((message) => (
             <MessageComponent key={message.id} message={message} />
           ))}
-          {isLoading && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
 
