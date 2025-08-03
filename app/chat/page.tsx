@@ -14,16 +14,40 @@ export default function ChatPage() {
   useEffect(() => {
     const supabase = createClient();
     
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+    const getUser = async (retryCount = 0) => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.warn('认证检查错误:', error);
+          // 如果是网络错误，尝试重试
+          if (retryCount < 2) {
+            setTimeout(() => getUser(retryCount + 1), 1000);
+            return;
+          }
+        }
+        
+        if (!user) {
+          // 给用户一个短暂的缓冲时间，可能是认证状态更新延迟
+          if (retryCount < 2) {
+            setTimeout(() => getUser(retryCount + 1), 500);
+            return;
+          }
+          router.push("/auth/login");
+          return;
+        }
+        
+        setUser(user);
+        setLoading(false);
+      } catch (error) {
+        console.error('认证检查失败:', error);
+        // 重试机制
+        if (retryCount < 2) {
+          setTimeout(() => getUser(retryCount + 1), 1000);
+          return;
+        }
         router.push("/auth/login");
-        return;
       }
-      
-      setUser(user);
-      setLoading(false);
     };
 
     getUser();
@@ -48,7 +72,7 @@ export default function ChatPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pfa-light-gray to-white">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-pfa-champagne-gold/30 border-t-pfa-champagne-gold rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-pfa-dark-gray">正在验证登录状态...</p>
+          <p className="text-pfa-dark-gray">正在连接 AI 教练...</p>
         </div>
       </div>
     );
