@@ -5,6 +5,8 @@ import { ChatInput } from "@/components/chat-input";
 import { LogoutButton } from "@/components/logout-button";
 import { ArrowLeft, Bot, User, Brain, Zap, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // 原有的Message接口
 interface Message {
@@ -435,12 +437,40 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
                 </div>
               )}
               
-              <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
-                {message.content || (message.aiService === 'dify' && !message.showProfessionalButton ? 'AI正在思考...' : '')}
+              <div className="text-sm text-gray-800">
+                {message.content ? (
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      // 自定义markdown元素样式
+                      h1: ({children}) => <h1 className="text-xl font-bold text-pfa-royal-blue mb-3 mt-4 first:mt-0">{children}</h1>,
+                      h2: ({children}) => <h2 className="text-lg font-bold text-pfa-royal-blue mb-2 mt-3 first:mt-0">{children}</h2>,
+                      h3: ({children}) => <h3 className="text-base font-bold text-pfa-royal-blue mb-2 mt-3 first:mt-0">{children}</h3>,
+                      h4: ({children}) => <h4 className="text-sm font-bold text-pfa-royal-blue mb-1 mt-2 first:mt-0">{children}</h4>,
+                      p: ({children}) => <p className="mb-2 last:mb-0 whitespace-pre-wrap break-words">{children}</p>,
+                      strong: ({children}) => <strong className="font-bold text-gray-900">{children}</strong>,
+                      em: ({children}) => <em className="italic text-gray-700">{children}</em>,
+                      ul: ({children}) => <ul className="list-none space-y-1 mb-2 ml-4">{children}</ul>,
+                      ol: ({children}) => <ol className="list-decimal space-y-1 mb-2 ml-6">{children}</ol>,
+                      li: ({children}) => <li className="relative pl-3 before:content-['•'] before:text-pfa-champagne-gold before:font-bold before:absolute before:left-0">{children}</li>,
+                      blockquote: ({children}) => <blockquote className="border-l-4 border-pfa-champagne-gold pl-4 italic text-gray-600 my-2">{children}</blockquote>,
+                      code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+                      pre: ({children}) => <pre className="bg-gray-50 p-3 rounded-lg overflow-x-auto text-sm font-mono my-2">{children}</pre>,
+                      hr: () => <hr className="border-0 border-t border-gray-300 my-4" />,
+                      a: ({children, href}) => <a href={href} className="text-pfa-royal-blue hover:text-pfa-champagne-gold underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                ) : (
+                  message.aiService === 'dify' && !message.showProfessionalButton ? (
+                    <p className="whitespace-pre-wrap break-words">AI正在思考...</p>
+                  ) : null
+                )}
                 {message.aiService === 'dify' && !message.showProfessionalButton && (
                   <span className="inline-block w-1 h-4 bg-pfa-royal-blue ml-1 animate-pulse"></span>
                 )}
-              </p>
+              </div>
               
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center gap-2">
