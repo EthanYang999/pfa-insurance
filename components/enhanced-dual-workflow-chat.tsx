@@ -32,11 +32,17 @@ interface ChatInterfaceProps {
 }
 
 export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
+  // 🔧 功能开关：控制是否显示N8N专业回答功能
+  // 设置为 false 隐藏专业回答，设置为 true 恢复完整功能
+  const ENABLE_PROFESSIONAL_ANSWER = false;
+  
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会先为您提供快速回答，如需更专业的建议，可点击「获取专业回答」。",
+      content: ENABLE_PROFESSIONAL_ANSWER 
+        ? "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会先为您提供快速回答，如需更专业的建议，可点击「获取专业回答」。"
+        : "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会为您提供专业的AI回答和指导。",
       isUser: false,
       timestamp: new Date(),
       aiService: 'system'
@@ -285,7 +291,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           ? { 
               ...msg, 
               isLoadingProfessional: false, 
-              showProfessionalButton: true 
+              showProfessionalButton: ENABLE_PROFESSIONAL_ANSWER 
             }
           : msg
       ));
@@ -345,7 +351,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               ? { 
                   ...msg, 
                   content: completeResponse,
-                  showProfessionalButton: true 
+                  showProfessionalButton: ENABLE_PROFESSIONAL_ANSWER 
                 }
               : msg
           ));
@@ -426,11 +432,11 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           
           <div className="flex-1">
             <div className={`rounded-2xl px-4 py-2 ${
-              message.aiService === 'n8n' 
+              ENABLE_PROFESSIONAL_ANSWER && message.aiService === 'n8n' 
                 ? 'bg-gradient-to-r from-pfa-champagne-gold/10 to-pfa-champagne-gold/5 border border-pfa-champagne-gold/20' 
                 : 'bg-gray-100'
             }`}>
-              {message.aiService === 'n8n' && (
+              {ENABLE_PROFESSIONAL_ANSWER && message.aiService === 'n8n' && (
                 <div className="flex items-center gap-2 mb-2 pb-2 border-b border-pfa-champagne-gold/20">
                   <Brain className="w-4 h-4 text-pfa-champagne-gold" />
                   <span className="text-sm font-medium text-pfa-champagne-gold">AI专业教练深度分析</span>
@@ -480,7 +486,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
                       快速回答
                     </span>
                   )}
-                  {message.aiService === 'n8n' && (
+                  {ENABLE_PROFESSIONAL_ANSWER && message.aiService === 'n8n' && (
                     <span className="inline-flex items-center gap-1 text-xs bg-pfa-champagne-gold/10 text-pfa-champagne-gold px-2 py-1 rounded-full">
                       <Brain className="w-3 h-3" />
                       专业回答
@@ -493,7 +499,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               </div>
             </div>
             
-            {message.showProfessionalButton && !message.isLoadingProfessional && (
+            {ENABLE_PROFESSIONAL_ANSWER && message.showProfessionalButton && !message.isLoadingProfessional && (
               <div className="mt-3 p-3 bg-gradient-to-r from-pfa-royal-blue/5 to-pfa-champagne-gold/5 rounded-lg border border-pfa-royal-blue/20">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -515,7 +521,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               </div>
             )}
             
-            {message.isLoadingProfessional && (
+            {ENABLE_PROFESSIONAL_ANSWER && message.isLoadingProfessional && (
               <div className="mt-3 p-3 bg-gradient-to-r from-pfa-royal-blue/5 to-pfa-champagne-gold/5 rounded-lg border border-pfa-royal-blue/20">
                 <div className="flex items-center gap-3">
                   <Loader className="w-5 h-5 text-pfa-royal-blue animate-spin" />
@@ -560,7 +566,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               <h1 className="font-bold text-sm sm:text-base text-white truncate">
                 PFA智能助手
               </h1>
-              <p className="text-pfa-champagne-gold text-xs">快速+专业回答</p>
+              <p className="text-pfa-champagne-gold text-xs">
+                {ENABLE_PROFESSIONAL_ANSWER ? "快速+专业回答" : "AI智能回答"}
+              </p>
             </div>
           </div>
         </div>
