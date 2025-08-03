@@ -480,12 +480,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center gap-2">
-                  {message.aiService === 'dify' && (
-                    <span className="inline-flex items-center gap-1 text-xs bg-pfa-royal-blue/10 text-pfa-royal-blue px-2 py-1 rounded-full">
-                      <Zap className="w-3 h-3" />
-                      快速回答
-                    </span>
-                  )}
+                  {/* 隐藏快速回答标签 */}
                   {ENABLE_PROFESSIONAL_ANSWER && message.aiService === 'n8n' && (
                     <span className="inline-flex items-center gap-1 text-xs bg-pfa-champagne-gold/10 text-pfa-champagne-gold px-2 py-1 rounded-full">
                       <Brain className="w-3 h-3" />
@@ -564,11 +559,8 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-sm sm:text-base text-white truncate">
-                PFA智能助手
+                金牌教练
               </h1>
-              <p className="text-pfa-champagne-gold text-xs">
-                {ENABLE_PROFESSIONAL_ANSWER ? "快速+专业回答" : "AI智能回答"}
-              </p>
             </div>
           </div>
         </div>
