@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "./user-management";
-import { DifyChatManagement } from "./dify-chat-management";
+import { N8NChatManagement } from "./dify-chat-management";
 import { SystemMonitoring } from "./system-monitoring";
 import { SystemLogs } from "./system-logs";
 
@@ -28,7 +28,7 @@ export function AdminDashboard() {
         <Tabs defaultValue="users" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="users">用户管理</TabsTrigger>
-            <TabsTrigger value="dify-chat">聊天数据</TabsTrigger>
+            <TabsTrigger value="dify-chat">聊天记录</TabsTrigger>
             <TabsTrigger value="monitoring">系统监控</TabsTrigger>
             <TabsTrigger value="logs">日志管理</TabsTrigger>
           </TabsList>
@@ -38,7 +38,7 @@ export function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="dify-chat">
-            <DifyChatManagement />
+            <N8NChatManagement />
           </TabsContent>
 
           <TabsContent value="monitoring">

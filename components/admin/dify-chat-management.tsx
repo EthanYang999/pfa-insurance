@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { MessageSquare, Search, Eye, Trash2, Download, FileText, FileJson } from 'lucide-react';
 
-interface DifySession {
+interface ChatSession {
   session_id: string;
   message_count: number;
   first_message_id: number;
@@ -17,7 +17,7 @@ interface DifySession {
   preview_content: string;
 }
 
-interface DifyMessage {
+interface ChatMessage {
   id: number;
   session_id: string;
   message: {
@@ -28,17 +28,17 @@ interface DifyMessage {
   };
 }
 
-export function DifyChatManagement() {
-  const [sessions, setSessions] = useState<DifySession[]>([]);
+export function N8NChatManagement() {
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSession, setSelectedSession] = useState<DifySession | null>(null);
-  const [sessionMessages, setSessionMessages] = useState<DifyMessage[]>([]);
+  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null);
+  const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  // 加载Dify聊天会话
+  // 加载N8N聊天会话
   const loadSessions = async (page = 1) => {
     setLoading(true);
     try {
@@ -56,7 +56,7 @@ export function DifyChatManagement() {
         setTotalRecords(data.total);
       }
     } catch (error) {
-      console.error('Failed to load Dify sessions:', error);
+      console.error('Failed to load N8N sessions:', error);
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ export function DifyChatManagement() {
 
   // 删除会话
   const deleteSession = async (sessionId: string) => {
-    if (!confirm('确定要删除这个Dify会话吗？此操作不可恢复。')) {
+    if (!confirm('确定要删除这个N8N会话吗？此操作不可恢复。')) {
       return;
     }
 
@@ -114,7 +114,7 @@ export function DifyChatManagement() {
         // 从响应头获取文件名
         const contentDisposition = response.headers.get('content-disposition');
         const fileName = contentDisposition?.match(/filename="([^"]+)"/)?.[1] || 
-          `dify_export_${Date.now()}.${format}`;
+          `n8n_export_${Date.now()}.${format}`;
         
         a.download = fileName;
         document.body.appendChild(a);

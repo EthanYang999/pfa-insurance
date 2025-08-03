@@ -18,7 +18,7 @@ export async function GET(
 
     // 获取指定会话的所有消息
     const { data: messages, error } = await supabase
-      .from('dify_chat_histories')
+      .from('n8n_chat_histories')
       .select('*')
       .eq('session_id', sessionId)
       .order('id', { ascending: true });
@@ -55,7 +55,7 @@ export async function DELETE(
 
     // 删除指定会话的所有消息
     const { error } = await supabase
-      .from('dify_chat_histories')
+      .from('n8n_chat_histories')
       .delete()
       .eq('session_id', sessionId);
 

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     // 构建查询条件
     let query = supabase
-      .from('dify_chat_histories')
+      .from('n8n_chat_histories')
       .select('*', { count: 'exact' });
 
     // 如果有搜索条件，搜索message内容
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const { data: records, error, count } = await query;
 
     if (error) {
-      console.error('Error fetching Dify chat histories:', error);
+      console.error('Error fetching N8N chat histories:', error);
       return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
     }
 
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Dify sessions API error:', error);
+    console.error('N8N sessions API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // 构建查询
     let query = supabase
-      .from('dify_chat_histories')
+      .from('n8n_chat_histories')
       .select('*')
       .order('id', { ascending: true });
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const { data: records, error } = await query;
 
     if (error) {
-      console.error('Error fetching chat histories for export:', error);
+      console.error('Error fetching N8N chat histories for export:', error);
       return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
     }
 
@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
       ].join('\n');
 
       const fileName = sessionId 
-        ? `dify_chat_session_${sessionId}_${new Date().toISOString().split('T')[0]}.csv`
-        : `dify_chat_histories_${new Date().toISOString().split('T')[0]}.csv`;
+        ? `n8n_chat_session_${sessionId}_${new Date().toISOString().split('T')[0]}.csv`
+        : `n8n_chat_histories_${new Date().toISOString().split('T')[0]}.csv`;
 
       return new NextResponse(csvContent, {
         headers: {
@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
     } else if (format === 'json') {
       // 生成JSON格式
       const fileName = sessionId 
-        ? `dify_chat_session_${sessionId}_${new Date().toISOString().split('T')[0]}.json`
-        : `dify_chat_histories_${new Date().toISOString().split('T')[0]}.json`;
+        ? `n8n_chat_session_${sessionId}_${new Date().toISOString().split('T')[0]}.json`
+        : `n8n_chat_histories_${new Date().toISOString().split('T')[0]}.json`;
 
       return new NextResponse(JSON.stringify(records, null, 2), {
         headers: {
