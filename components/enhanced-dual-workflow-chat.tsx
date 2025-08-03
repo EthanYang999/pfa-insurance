@@ -35,6 +35,36 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   // 🔧 功能开关：控制是否显示N8N专业回答功能
   // 设置为 false 隐藏专业回答，设置为 true 恢复完整功能
   const ENABLE_PROFESSIONAL_ANSWER = false;
+
+  // 生成会话ID的函数
+  const generateSessionId = () => {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  };
+
+  // 保存聊天记录到数据库
+  const saveChatHistory = async (sessionId: string, type: 'human' | 'ai', content: string) => {
+    try {
+      const message = {
+        type,
+        content,
+        additional_kwargs: {},
+        response_metadata: {}
+      };
+
+      await fetch('/api/chat/dify-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message
+        })
+      });
+    } catch (error) {
+      console.error('保存聊天记录失败:', error);
+    }
+  };
   
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
@@ -50,6 +80,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [sessionId] = useState<string>(() => generateSessionId());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -312,6 +343,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
+    // 保存用户消息到数据库
+    await saveChatHistory(sessionId, 'human', content);
+
     const aiMessageId = `ai_${Date.now()}`;
     const aiMessage: Message = {
       id: aiMessageId,
@@ -335,7 +369,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               : msg
           ));
         },
-        (completeResponse: string, newConversationId?: string) => {
+        async (completeResponse: string, newConversationId?: string) => {
           if (newConversationId) {
             if (!conversationId || newConversationId !== conversationId) {
               setConversationId(newConversationId);
@@ -355,6 +389,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
                 }
               : msg
           ));
+          
+          // 保存AI回复到数据库
+          await saveChatHistory(sessionId, 'ai', completeResponse);
           
           setIsLoading(false);
         },
