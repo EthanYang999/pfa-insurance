@@ -11,7 +11,6 @@ import {
   Award, 
   Target,
   ArrowRight,
-  Play,
   Menu,
   X,
   Heart,
