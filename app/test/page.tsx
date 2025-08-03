@@ -354,7 +354,7 @@ export default function TeamDelivery() {
                     <div className="mb-4">
                       <h4 className="font-semibold text-purple-900 mb-3">Dual-Persona Prompt架构</h4>
                       <p className="text-sm text-gray-700">
-                        为AI Agent设计双重人格，根据场景无缝切换角色，从"问答机器人"升华为"金牌教练"
+                        为AI Agent设计双重人格，根据场景无缝切换角色，从&quot;问答机器人&quot;升华为&quot;金牌教练&quot;
                       </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -640,7 +640,7 @@ export default function TeamDelivery() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4">🚀 近期升级计划</h3>
                   <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border border-blue-200">
-                    <h4 className="font-semibold text-blue-900 mb-4">优先功能：自动化"首次触达"邮件系统</h4>
+                    <h4 className="font-semibold text-blue-900 mb-4">优先功能：自动化&quot;首次触达&quot;邮件系统</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <h5 className="font-semibold text-purple-800 mb-3">🤖 智能内容生成</h5>
@@ -764,7 +764,7 @@ export default function TeamDelivery() {
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">4</span>
-                        <span className="text-gray-700">形成"数据采集 → 首次触达 → 持续跟进 → 内容引流"的闭环流程</span>
+                        <span className="text-gray-700">形成&quot;数据采集 → 首次触达 → 持续跟进 → 内容引流&quot;的闭环流程</span>
                       </li>
                     </ol>
                   </div>
