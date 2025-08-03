@@ -53,35 +53,201 @@ export default function TeamDelivery() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">📱 建议测试流程</h3>
-                <ol className="text-gray-700 space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="bg-pfa-royal-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
-                    <span>使用测试账户登录主站，体验AI对话功能</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-pfa-royal-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
-                    <span>尝试不同类型的保险相关问题，测试AI回答质量</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-pfa-royal-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
-                    <span>体验实时流式回复和Markdown格式显示</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-pfa-royal-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">4</span>
-                    <span>验证上下文理解和专业知识准确性</span>
-                  </li>
-                </ol>
+            <div className="space-y-6">
+              {/* 基本信息 */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-3 text-pfa-royal-blue">📋 网站基本信息</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <strong>网站地址：</strong><br />
+                    <code className="text-blue-600">https://pfabot.netlify.app/</code>
+                  </div>
+                  <div>
+                    <strong>测试时间：</strong><br />
+                    随时可测试
+                  </div>
+                  <div>
+                    <strong>适用设备：</strong><br />
+                    电脑、手机、平板均可
+                  </div>
+                </div>
               </div>
+
+              {/* 核心功能介绍 */}
               <div>
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">🔑 测试账号</h3>
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 text-sm mb-1">用户账号</h4>
-                  <div className="text-xs text-blue-800 space-y-1">
-                    <div>邮箱：test@pfa.com</div>
-                    <div>密码：test123456</div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">🎯 网站核心功能</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600">🤖</span>
+                      <strong>双重AI回答：</strong>快速回答 + 专业深度分析
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600">👥</span>
+                      <strong>三级用户体系：</strong>普通用户、管理员、超级管理员
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600">💼</span>
+                      <strong>团队专业服务：</strong>网站开发、知识库、数字人、获客系统
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600">🛠</span>
+                      <strong>完整管理后台：</strong>用户管理、数据监控、系统维护
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 测试账号 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">👤 测试账号信息</h3>
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</span>
+                    <strong className="text-green-800">普通用户测试账号</strong>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <strong>邮箱：</strong><code className="bg-white px-2 py-1 rounded">test@pfa.com</code>
+                    </div>
+                    <div>
+                      <strong>密码：</strong><code className="bg-white px-2 py-1 rounded">test123456</code>
+                    </div>
+                  </div>
+                  <p className="text-xs text-green-700 mt-2">权限：AI聊天、查看个人历史记录</p>
+                </div>
+              </div>
+
+              {/* AI聊天功能测试 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">🤖 AI聊天功能测试</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="mb-3">
+                    <strong className="text-blue-600">测试地址：</strong>
+                    <code className="text-blue-600">https://pfabot.netlify.app/chat</code>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">步骤1：登录账户</h4>
+                      <ol className="text-sm text-gray-700 space-y-1 ml-4">
+                        <li>1. 点击"立即体验AI教练"或直接访问聊天页面</li>
+                        <li>2. 使用测试账号登录：test@pfa.com / test123456</li>
+                        <li>3. 成功进入聊天界面</li>
+                      </ol>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">步骤2：测试快速回答</h4>
+                      <div className="text-sm text-gray-700 space-y-1">
+                        <p>输入保险相关问题，例如：</p>
+                        <ul className="ml-4 space-y-1">
+                          <li>• "40岁购买养老保险有什么建议？"</li>
+                          <li>• "什么是重疾险？"</li>
+                          <li>• "如何向客户介绍保险产品？"</li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">步骤3：测试专业回答</h4>
+                      <ol className="text-sm text-gray-700 space-y-1 ml-4">
+                        <li>1. 在快速回答后，找到"获取专业回答"按钮</li>
+                        <li>2. 点击按钮，等待专业分析</li>
+                        <li>3. 专业回答应该更详细、深入</li>
+                      </ol>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-white rounded border">
+                    <strong className="text-green-600">预期结果：</strong>
+                    <ul className="text-sm text-gray-700 mt-1 space-y-1">
+                      <li>✅ 快速回答：1-3秒内显示</li>
+                      <li>✅ 专业回答：10-30秒内显示，内容更专业</li>
+                      <li>✅ 界面友好，回答清晰</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* 测试检查清单 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">✅ 测试检查清单</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2 text-sm">基础功能测试</h4>
+                    <ul className="text-xs text-gray-700 space-y-1">
+                      <li>□ 网站正常访问</li>
+                      <li>□ 主页内容显示完整</li>
+                      <li>□ 登录功能正常</li>
+                      <li>□ AI聊天快速回答正常</li>
+                      <li>□ AI专业回答功能正常</li>
+                    </ul>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <h4 className="font-semibold text-green-800 mb-2 text-sm">用户体验测试</h4>
+                    <ul className="text-xs text-gray-700 space-y-1">
+                      <li>□ 页面加载速度合理（3秒内）</li>
+                      <li>□ 手机端显示正常</li>
+                      <li>□ 电脑端显示正常</li>
+                      <li>□ 按钮点击响应正常</li>
+                      <li>□ 文字清晰易读</li>
+                    </ul>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <h4 className="font-semibold text-purple-800 mb-2 text-sm">功能完整性测试</h4>
+                    <ul className="text-xs text-gray-700 space-y-1">
+                      <li>□ 注册/登录流程顺畅</li>
+                      <li>□ AI回答内容专业</li>
+                      <li>□ 聊天历史记录正常</li>
+                      <li>□ 团队展示页面完整</li>
+                      <li>□ 测试账号可正常使用</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* 常见问题 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">🆘 常见问题解决</h3>
+                <div className="space-y-3">
+                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                    <div className="font-semibold text-yellow-800 text-sm mb-1">Q: 登录后点击"立即体验AI教练"还是跳转到登录页？</div>
+                    <div className="text-yellow-700 text-xs">A: 刷新页面重试，或清除浏览器缓存后重新登录</div>
+                  </div>
+                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                    <div className="font-semibold text-yellow-800 text-sm mb-1">Q: AI回答速度较慢？</div>
+                    <div className="text-yellow-700 text-xs">A: 专业回答需要更多处理时间，请耐心等待10-30秒</div>
+                  </div>
+                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                    <div className="font-semibold text-yellow-800 text-sm mb-1">Q: 测试账号无法登录？</div>
+                    <div className="text-yellow-700 text-xs">A: 确认邮箱和密码输入正确：test@pfa.com / test123456</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 重点测试建议 */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="text-lg font-semibold mb-3 text-blue-900">🎯 重点测试建议</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold text-blue-800 mb-2 text-sm">优先测试功能：</h4>
+                    <ol className="text-xs text-gray-700 space-y-1">
+                      <li>1. <strong>AI双重回答系统</strong> - 这是网站的核心功能</li>
+                      <li>2. <strong>用户登录体验</strong> - 测试账号的使用体验</li>
+                      <li>3. <strong>响应式设计</strong> - 多设备兼容性</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-800 mb-2 text-sm">测试问题示例：</h4>
+                    <ul className="text-xs text-gray-700 space-y-1">
+                      <li>• "保险销售技巧有哪些？"</li>
+                      <li>• "如何解释保险条款给客户？"</li>
+                      <li>• "什么情况下需要购买意外险？"</li>
+                      <li>• "保险经纪人的职业发展建议？"</li>
+                    </ul>
                   </div>
                 </div>
               </div>
