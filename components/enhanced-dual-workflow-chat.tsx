@@ -34,7 +34,7 @@ interface ChatInterfaceProps {
 export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   // 🔧 功能开关：控制是否显示N8N专业回答功能
   // 设置为 false 隐藏专业回答，设置为 true 恢复完整功能
-  const ENABLE_PROFESSIONAL_ANSWER = false;
+  const ENABLE_PROFESSIONAL_ANSWER = true;
 
   // 生成会话ID的函数
   const generateSessionId = () => {
