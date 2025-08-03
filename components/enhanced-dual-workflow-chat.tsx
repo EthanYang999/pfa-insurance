@@ -80,7 +80,6 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [sessionId] = useState<string>(() => generateSessionId());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -281,7 +280,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
         },
         body: JSON.stringify({
           text: lastUserMessage.content,
-          sessionId: `professional_${conversationId}`
+          sessionId: conversationId
         })
       });
       
@@ -343,8 +342,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // 保存用户消息到数据库
-    await saveChatHistory(sessionId, 'human', content);
+    // 保存用户消息到数据库（使用conversationId作为session_id）
+    const currentSessionId = conversationId || generateSessionId();
+    await saveChatHistory(currentSessionId, 'human', content);
 
     const aiMessageId = `ai_${Date.now()}`;
     const aiMessage: Message = {
@@ -390,8 +390,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               : msg
           ));
           
-          // 保存AI回复到数据库
-          await saveChatHistory(sessionId, 'ai', completeResponse);
+          // 保存AI回复到数据库（使用最新的conversationId）
+          const finalSessionId = newConversationId || conversationId || currentSessionId;
+          await saveChatHistory(finalSessionId, 'ai', completeResponse);
           
           setIsLoading(false);
         },

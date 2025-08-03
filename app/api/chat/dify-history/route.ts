@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // 保存聊天记录到dify_chat_histories表
+    // 保存聊天记录到n8n_chat_histories表（统一存储）
     const { data, error } = await supabase
-      .from('dify_chat_histories')
+      .from('n8n_chat_histories')
       .insert({
         session_id,
         message
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error saving Dify chat history:', error);
+      console.error('Error saving chat history to n8n_chat_histories:', error);
       return NextResponse.json(
         { error: 'Failed to save chat history' },
         { status: 500 }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Dify chat history API error:', error);
+    console.error('N8N chat history API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -62,13 +62,13 @@ export async function GET(request: NextRequest) {
 
     // 获取指定会话的聊天记录
     const { data, error } = await supabase
-      .from('dify_chat_histories')
+      .from('n8n_chat_histories')
       .select('*')
       .eq('session_id', session_id)
       .order('id', { ascending: true });
 
     if (error) {
-      console.error('Error fetching Dify chat history:', error);
+      console.error('Error fetching chat history from n8n_chat_histories:', error);
       return NextResponse.json(
         { error: 'Failed to fetch chat history' },
         { status: 500 }
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Dify chat history fetch API error:', error);
+    console.error('N8N chat history fetch API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
