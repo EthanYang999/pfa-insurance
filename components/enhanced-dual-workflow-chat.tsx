@@ -342,9 +342,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // 保存用户消息到数据库（使用conversationId作为session_id）
-    const currentSessionId = conversationId || generateSessionId();
-    await saveChatHistory(currentSessionId, 'human', content);
+    // 注意：延迟保存用户消息，等获得conversationId后再保存
 
     const aiMessageId = `ai_${Date.now()}`;
     const aiMessage: Message = {
@@ -370,6 +368,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           ));
         },
         async (completeResponse: string, newConversationId?: string) => {
+          // 确定最终的sessionId
+          const finalSessionId = newConversationId || conversationId || generateSessionId();
+          
           if (newConversationId) {
             if (!conversationId || newConversationId !== conversationId) {
               setConversationId(newConversationId);
@@ -379,6 +380,9 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               });
             }
           }
+          
+          // 现在保存用户消息（使用正确的conversationId）
+          await saveChatHistory(finalSessionId, 'human', content);
           
           setMessages(prev => prev.map(msg => 
             msg.id === aiMessageId 
@@ -390,14 +394,17 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               : msg
           ));
           
-          // 保存AI回复到数据库（使用最新的conversationId）
-          const finalSessionId = newConversationId || conversationId || currentSessionId;
+          // 保存AI回复到数据库（使用相同的sessionId）
           await saveChatHistory(finalSessionId, 'ai', completeResponse);
           
           setIsLoading(false);
         },
-        (error: string) => {
+        async (error: string) => {
           console.error('流式发送消息失败:', error);
+          
+          // 即使出错，也要保存用户消息
+          const fallbackSessionId = conversationId || generateSessionId();
+          await saveChatHistory(fallbackSessionId, 'human', content);
           
           setMessages(prev => prev.map(msg => 
             msg.id === aiMessageId 
@@ -415,6 +422,10 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
       );
     } catch (error) {
       console.error('发送消息失败:', error);
+      
+      // 即使出错，也要保存用户消息
+      const fallbackSessionId = conversationId || generateSessionId();
+      await saveChatHistory(fallbackSessionId, 'human', content);
       
       setMessages(prev => prev.map(msg => 
         msg.id === aiMessageId 
