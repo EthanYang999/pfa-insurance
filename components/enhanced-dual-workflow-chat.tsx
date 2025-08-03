@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatInput } from "@/components/chat-input";
 import { LogoutButton } from "@/components/logout-button";
-import { ArrowLeft, Bot, User, Brain, Zap, Loader } from "lucide-react";
+import { ArrowLeft, Bot, User, Brain, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

@@ -8,9 +8,7 @@ import {
   Users,
   Activity,
   Shield,
-  Server,
   CheckCircle,
-  Clock,
   MessageSquare
 } from "lucide-react";
 import { AdminDashboardStats } from "@/types/admin";
@@ -18,7 +16,6 @@ import { UserManagement } from "./user-management";
 import { DatabaseManagement } from "./database-management";
 import { SystemMonitoring } from "./system-monitoring";
 import { SystemLogs } from "./system-logs";
-import { SystemSettings } from "./system-settings";
 
 export function AdminDashboard() {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
@@ -79,7 +76,7 @@ export function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">总用户数</CardTitle>
@@ -119,38 +116,23 @@ export function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">n8n响应时间</CardTitle>
-                <Server className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.avg_n8n_response_time ? `${Math.round(stats.avg_n8n_response_time)}ms` : 'N/A'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  平均响应时间
-                </p>
-              </CardContent>
-            </Card>
           </div>
         )}
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">概览</TabsTrigger>
             <TabsTrigger value="users">用户管理</TabsTrigger>
             <TabsTrigger value="database">数据管理</TabsTrigger>
             <TabsTrigger value="monitoring">系统监控</TabsTrigger>
             <TabsTrigger value="logs">日志管理</TabsTrigger>
-            <TabsTrigger value="settings">系统设置</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               {/* System Status */}
-              <Card>
+              <Card className="max-w-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Activity className="h-5 w-5" />
@@ -165,48 +147,9 @@ export function AdminDashboard() {
                       <span className="text-sm">正常</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">n8n工作流</span>
-                    <div className="flex items-center gap-1 text-green-600">
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="text-sm">运行中</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">API服务</span>
-                    <div className="flex items-center gap-1 text-green-600">
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="text-sm">正常</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
-              {/* Recent Activity */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    最近活动
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span>新用户注册</span>
-                      <span className="text-gray-500">5分钟前</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>系统配置更新</span>
-                      <span className="text-gray-500">1小时前</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>数据备份完成</span>
-                      <span className="text-gray-500">2小时前</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
           </TabsContent>
@@ -225,10 +168,6 @@ export function AdminDashboard() {
 
           <TabsContent value="logs">
             <SystemLogs />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <SystemSettings />
           </TabsContent>
         </Tabs>
       </div>
