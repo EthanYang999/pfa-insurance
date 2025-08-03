@@ -104,20 +104,13 @@ export function PFAPublicDashboard() {
               <p className="mt-6 text-xl text-pfa-dark-gray leading-relaxed">
                 借助先进的AI技术，为保险经纪人提供24/7专业培训指导，提升销售技能，实现事业突破
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <div className="mt-8">
                 <Button 
                   onClick={() => router.push('/chat')}
                   className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-6 text-lg"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   立即体验
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="border-pfa-royal-blue text-pfa-royal-blue hover:bg-pfa-royal-blue hover:text-white px-8 py-6 text-lg"
-                >
-                  <Play className="mr-2 h-5 w-5" />
-                  观看演示
                 </Button>
               </div>
             </div>

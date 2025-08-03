@@ -703,7 +703,7 @@ export default function TeamDelivery() {
                       </p>
                       <Button 
                         className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue mb-2"
-                        onClick={() => window.open('https://docs.google.com/document/d/your-document-id', '_blank')}
+                        onClick={() => window.open('https://drive.google.com/drive/folders/1dsqMFrM9jQlRwqfoh_KNFZs7ltfN0yZW', '_blank')}
                       >
                         <Download className="h-4 w-4 mr-2" />
                         下载测试包
@@ -723,7 +723,10 @@ export default function TeamDelivery() {
                     <p className="text-sm text-gray-600 mb-4">
                       详细的安装步骤和使用方法演示视频
                     </p>
-                    <Button variant="outline">
+                    <Button 
+                      variant="outline"
+                      onClick={() => window.open('https://drive.google.com/file/d/1yxxsIvQYEFa26Fda6vOXVgiDKT_sffBQ/view', '_blank')}
+                    >
                       <Play className="h-4 w-4 mr-2" />
                       观看教程视频
                     </Button>
