@@ -1,0 +1,4 @@
+column_name,data_type,character_maximum_length,column_default,is_nullable
+id,integer,null,nextval('n8n_chat_histories_id_seq'::regclass),NO
+session_id,character varying,255,null,NO
+message,jsonb,null,null,NO

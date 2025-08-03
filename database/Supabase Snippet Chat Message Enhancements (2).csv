@@ -1,0 +1,4 @@
+id,session_id,message
+1,2e6060e2c8f34ec380df67599c85a141,"{""type"":""human"",""content"":""你好，请问40岁的购买养老保险的策略是什么"",""additional_kwargs"":{},""response_metadata"":{}}"
+2,2e6060e2c8f34ec380df67599c85a141,"{""type"":""ai"",""content"":""您好！我已理解您关于40岁购买养老保险策略的需求。我将为您调动专业的条款解析教练，进行深度分析并为您提供详细内容。这可能需要稍作等待，您准备好了吗？"",""tool_calls"":[],""additional_kwargs"":{},""response_metadata"":{},""invalid_tool_calls"":[]}"
+3,2e6060e2c8f34ec380df67599c85a141,"{""type"":""human"",""content"":""好的"",""additional_kwargs"":{},""response_metadata"":{}}"

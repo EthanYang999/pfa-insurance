@@ -72,7 +72,7 @@ async function checkDatabaseHealth(supabase: SupabaseClient): Promise<HealthReco
   try {
     // 测试数据库连接
     const { error } = await supabase
-      .from('chat_sessions')
+      .from('admin_users')
       .select('count')
       .limit(1);
 

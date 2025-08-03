@@ -1,0 +1,47 @@
+table_schema,table_name,column_name,data_type,character_maximum_length,is_nullable,column_default
+public,admin_users,id,uuid,null,NO,gen_random_uuid()
+public,admin_users,user_id,uuid,null,YES,null
+public,admin_users,role,character varying,50,YES,'admin'::character varying
+public,admin_users,permissions,jsonb,null,YES,'{}'::jsonb
+public,admin_users,created_at,timestamp with time zone,null,YES,now()
+public,admin_users,updated_at,timestamp with time zone,null,YES,now()
+public,admin_users,is_active,boolean,null,YES,true
+public,admin_users,last_login_at,timestamp with time zone,null,YES,null
+public,admin_users,created_by,uuid,null,YES,null
+public,document_metadata,id,text,null,NO,null
+public,document_metadata,title,text,null,YES,null
+public,document_metadata,url,text,null,YES,null
+public,document_metadata,created_at,timestamp without time zone,null,YES,now()
+public,document_metadata,schema,text,null,YES,null
+public,document_rows,id,integer,null,NO,nextval('document_rows_id_seq'::regclass)
+public,document_rows,dataset_id,text,null,YES,null
+public,document_rows,row_data,jsonb,null,YES,null
+public,documents,id,bigint,null,NO,null
+public,documents,content,text,null,YES,null
+public,documents,fts,tsvector,null,YES,null
+public,documents,metadata,jsonb,null,YES,null
+public,documents,embedding,USER-DEFINED,null,YES,null
+public,documents_ss,id,bigint,null,NO,null
+public,documents_ss,content,text,null,YES,null
+public,documents_ss,fts,tsvector,null,YES,null
+public,documents_ss,metadata,jsonb,null,YES,null
+public,documents_ss,embedding,USER-DEFINED,null,YES,null
+public,n8n_chat_histories,id,integer,null,NO,nextval('n8n_chat_histories_id_seq'::regclass)
+public,n8n_chat_histories,session_id,character varying,255,NO,null
+public,n8n_chat_histories,message,jsonb,null,NO,null
+public,service_health,id,uuid,null,NO,gen_random_uuid()
+public,service_health,service_name,character varying,50,NO,null
+public,service_health,status,character varying,20,NO,null
+public,service_health,response_time,integer,null,YES,null
+public,service_health,error_message,text,null,YES,null
+public,service_health,metadata,jsonb,null,YES,'{}'::jsonb
+public,service_health,checked_at,timestamp with time zone,null,YES,now()
+public,system_logs,id,uuid,null,NO,gen_random_uuid()
+public,system_logs,admin_id,uuid,null,YES,null
+public,system_logs,action,character varying,100,NO,null
+public,system_logs,target_type,character varying,50,YES,null
+public,system_logs,target_id,character varying,100,YES,null
+public,system_logs,details,jsonb,null,YES,'{}'::jsonb
+public,system_logs,ip_address,inet,null,YES,null
+public,system_logs,user_agent,text,null,YES,null
+public,system_logs,created_at,timestamp with time zone,null,YES,now()
