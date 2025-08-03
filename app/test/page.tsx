@@ -75,27 +75,19 @@ export default function TeamDelivery() {
 
               {/* 核心功能介绍 */}
               <div>
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">🎯 网站核心功能</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-600">🤖</span>
-                      <strong>双重AI回答：</strong>快速回答 + 专业深度分析
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-600">👥</span>
-                      <strong>三级用户体系：</strong>普通用户、管理员、超级管理员
-                    </div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">🎯 网站核心功能介绍</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-600">🤖</span>
+                    <strong>双重AI回答：</strong>快速回答 + 专业深度分析
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-600">💼</span>
-                      <strong>团队专业服务：</strong>网站开发、知识库、数字人、获客系统
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-600">🛠</span>
-                      <strong>完整管理后台：</strong>用户管理、数据监控、系统维护
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-600">👥</span>
+                    <strong>三级用户体系：</strong>普通用户、管理员、超级管理员
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-600">🛠</span>
+                    <strong>完整管理后台：</strong>用户管理、数据监控、系统维护
                   </div>
                 </div>
               </div>
@@ -104,10 +96,6 @@ export default function TeamDelivery() {
               <div>
                 <h3 className="text-lg font-semibold mb-3 text-gray-900">👤 测试账号信息</h3>
                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</span>
-                    <strong className="text-green-800">普通用户测试账号</strong>
-                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
                       <strong>邮箱：</strong><code className="bg-white px-2 py-1 rounded">test@pfa.com</code>
@@ -116,13 +104,12 @@ export default function TeamDelivery() {
                       <strong>密码：</strong><code className="bg-white px-2 py-1 rounded">test123456</code>
                     </div>
                   </div>
-                  <p className="text-xs text-green-700 mt-2">权限：AI聊天、查看个人历史记录</p>
                 </div>
               </div>
 
               {/* AI聊天功能测试 */}
               <div>
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">🤖 AI聊天功能测试</h3>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">🤖 1. AI聊天功能测试</h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="mb-3">
                     <strong className="text-blue-600">测试地址：</strong>
@@ -133,7 +120,7 @@ export default function TeamDelivery() {
                     <div>
                       <h4 className="font-semibold text-gray-800 mb-2">步骤1：登录账户</h4>
                       <ol className="text-sm text-gray-700 space-y-1 ml-4">
-                        <li>1. 点击"立即体验AI教练"或直接访问聊天页面</li>
+                        <li>1. 点击&quot;立即体验&quot;或直接访问聊天页面</li>
                         <li>2. 使用测试账号登录：test@pfa.com / test123456</li>
                         <li>3. 成功进入聊天界面</li>
                       </ol>
@@ -141,20 +128,17 @@ export default function TeamDelivery() {
                     
                     <div>
                       <h4 className="font-semibold text-gray-800 mb-2">步骤2：测试快速回答</h4>
-                      <div className="text-sm text-gray-700 space-y-1">
-                        <p>输入保险相关问题，例如：</p>
-                        <ul className="ml-4 space-y-1">
-                          <li>• "40岁购买养老保险有什么建议？"</li>
-                          <li>• "什么是重疾险？"</li>
-                          <li>• "如何向客户介绍保险产品？"</li>
-                        </ul>
-                      </div>
+                      <ol className="text-sm text-gray-700 space-y-1 ml-4">
+                        <li>1. 输入保险相关问题</li>
+                        <li>2. 观察AI快速回答</li>
+                        <li>3. 回答应该即时显示，内容专业</li>
+                      </ol>
                     </div>
                     
                     <div>
                       <h4 className="font-semibold text-gray-800 mb-2">步骤3：测试专业回答</h4>
                       <ol className="text-sm text-gray-700 space-y-1 ml-4">
-                        <li>1. 在快速回答后，找到"获取专业回答"按钮</li>
+                        <li>1. 在快速回答后，找到&quot;获取专业回答&quot;按钮</li>
                         <li>2. 点击按钮，等待专业分析</li>
                         <li>3. 专业回答应该更详细、深入</li>
                       </ol>
@@ -164,9 +148,30 @@ export default function TeamDelivery() {
                   <div className="mt-4 p-3 bg-white rounded border">
                     <strong className="text-green-600">预期结果：</strong>
                     <ul className="text-sm text-gray-700 mt-1 space-y-1">
-                      <li>✅ 快速回答：1-3秒内显示</li>
+                      <li>✅ 快速回答：3-5秒内显示</li>
                       <li>✅ 专业回答：10-30秒内显示，内容更专业</li>
                       <li>✅ 界面友好，回答清晰</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* 管理后台测试 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">🛠 2.管理后台测试</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="mb-3">
+                    <strong className="text-blue-600">测试地址：</strong>
+                    <code className="text-blue-600">https://pfabot.netlify.app/admin</code>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">功能预览：</h4>
+                    <ul className="text-sm text-gray-700 space-y-1 ml-4">
+                      <li>• 👤 用户管理：查看所有注册用户</li>
+                      <li>• 💬 聊天记录管理：查看所有对话数据</li>
+                      <li>• 📊 系统监控：监控系统运行状态</li>
+                      <li>• 📝 日志管理：查看系统操作日志</li>
                     </ul>
                   </div>
                 </div>
@@ -201,11 +206,22 @@ export default function TeamDelivery() {
                     <ul className="text-xs text-gray-700 space-y-1">
                       <li>□ 注册/登录流程顺畅</li>
                       <li>□ AI回答内容专业</li>
-                      <li>□ 聊天历史记录正常</li>
-                      <li>□ 团队展示页面完整</li>
                       <li>□ 测试账号可正常使用</li>
                     </ul>
                   </div>
+                </div>
+              </div>
+
+              {/* 重点测试建议 */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="text-lg font-semibold mb-3 text-blue-900">🎯 重点测试建议</h3>
+                <div>
+                  <h4 className="font-semibold text-blue-800 mb-2 text-sm">优先测试功能：</h4>
+                  <ol className="text-xs text-gray-700 space-y-1">
+                    <li>1. AI双重回答系统 - 这是网站的核心功能</li>
+                    <li>2. 用户登录体验 - 测试账号的使用体验</li>
+                    <li>3. 响应式设计 - 多设备兼容性</li>
+                  </ol>
                 </div>
               </div>
 
@@ -214,12 +230,12 @@ export default function TeamDelivery() {
                 <h3 className="text-lg font-semibold mb-3 text-gray-900">🆘 常见问题解决</h3>
                 <div className="space-y-3">
                   <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                    <div className="font-semibold text-yellow-800 text-sm mb-1">Q: 登录后点击"立即体验AI教练"还是跳转到登录页？</div>
-                    <div className="text-yellow-700 text-xs">A: 刷新页面重试，或清除浏览器缓存后重新登录</div>
-                  </div>
-                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                     <div className="font-semibold text-yellow-800 text-sm mb-1">Q: AI回答速度较慢？</div>
                     <div className="text-yellow-700 text-xs">A: 专业回答需要更多处理时间，请耐心等待10-30秒</div>
+                  </div>
+                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                    <div className="font-semibold text-yellow-800 text-sm mb-1">Q: 手机端显示异常？</div>
+                    <div className="text-yellow-700 text-xs">A: 建议使用较新版本的浏览器（Chrome、Safari等）</div>
                   </div>
                   <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                     <div className="font-semibold text-yellow-800 text-sm mb-1">Q: 测试账号无法登录？</div>
@@ -228,28 +244,23 @@ export default function TeamDelivery() {
                 </div>
               </div>
 
-              {/* 重点测试建议 */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="text-lg font-semibold mb-3 text-blue-900">🎯 重点测试建议</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-2 text-sm">优先测试功能：</h4>
-                    <ol className="text-xs text-gray-700 space-y-1">
-                      <li>1. <strong>AI双重回答系统</strong> - 这是网站的核心功能</li>
-                      <li>2. <strong>用户登录体验</strong> - 测试账号的使用体验</li>
-                      <li>3. <strong>响应式设计</strong> - 多设备兼容性</li>
-                    </ol>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-2 text-sm">测试问题示例：</h4>
-                    <ul className="text-xs text-gray-700 space-y-1">
-                      <li>• "保险销售技巧有哪些？"</li>
-                      <li>• "如何解释保险条款给客户？"</li>
-                      <li>• "什么情况下需要购买意外险？"</li>
-                      <li>• "保险经纪人的职业发展建议？"</li>
-                    </ul>
-                  </div>
+              {/* 测试反馈 */}
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border border-green-200">
+                <h3 className="text-lg font-semibold mb-3 text-green-900">📞 测试反馈</h3>
+                <div className="text-sm text-gray-700">
+                  <p className="mb-2">如测试过程中遇到问题或有改进建议，请记录：</p>
+                  <ul className="space-y-1 ml-4">
+                    <li>• 问题描述</li>
+                    <li>• 出现时间</li>
+                    <li>• 使用设备和浏览器</li>
+                    <li>• 具体操作步骤</li>
+                  </ul>
                 </div>
+              </div>
+
+              {/* 结尾 */}
+              <div className="text-center bg-gradient-to-r from-pfa-royal-blue to-pfa-navy-blue text-white p-4 rounded-lg">
+                <h3 className="text-lg font-semibold">🎉 测试愉快！PFA智能保险教练期待为您提供专业的AI服务！</h3>
               </div>
             </div>
           </CardContent>
