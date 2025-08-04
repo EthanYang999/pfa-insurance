@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AuthNav } from "@/components/auth-nav";
+import { navigateToProtectedRoute } from "@/lib/auth-utils";
 
 export function PFAPublicDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -51,7 +52,7 @@ export function PFAPublicDashboard() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <a href="#home" className="text-white hover:text-pfa-champagne-gold transition-colors">首页</a>
-              <button onClick={() => router.push('/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">AI教练</button>
+              <button onClick={() => navigateToProtectedRoute(router, '/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">AI教练</button>
               <a href="#about" className="text-white hover:text-pfa-champagne-gold transition-colors">关于我们</a>
               <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">核心理念</a>
               <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">事业机会</a>
@@ -76,7 +77,7 @@ export function PFAPublicDashboard() {
           <div className="md:hidden bg-pfa-navy-blue border-t border-pfa-champagne-gold/20">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a href="#home" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">首页</a>
-              <button onClick={() => router.push('/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">AI教练</button>
+              <button onClick={() => navigateToProtectedRoute(router, '/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">AI教练</button>
               <a href="#about" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">关于我们</a>
               <a href="#concept" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">核心理念</a>
               <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">事业机会</a>
@@ -105,7 +106,7 @@ export function PFAPublicDashboard() {
               </p>
               <div className="mt-8">
                 <Button 
-                  onClick={() => router.push('/chat')}
+                  onClick={() => navigateToProtectedRoute(router, '/chat')}
                   className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-6 text-lg"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
@@ -417,7 +418,7 @@ export function PFAPublicDashboard() {
                 <div className="mt-8 text-center">
                   <Button 
                     className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-3"
-                    onClick={() => router.push('/chat')}
+                    onClick={() => navigateToProtectedRoute(router, '/chat')}
                   >
                     了解加入详情
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -527,7 +528,7 @@ export function PFAPublicDashboard() {
           </p>
           <div className="mt-8">
             <Button 
-              onClick={() => router.push('/chat')}
+              onClick={() => navigateToProtectedRoute(router, '/chat')}
               className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-6 text-lg"
             >
               开始对话
@@ -581,7 +582,7 @@ export function PFAPublicDashboard() {
                 <div className="text-center">
                   <Button 
                     className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-4 text-lg w-full"
-                    onClick={() => router.push('/chat')}
+                    onClick={() => navigateToProtectedRoute(router, '/chat')}
                   >
                     立即咨询加入
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -610,7 +611,7 @@ export function PFAPublicDashboard() {
                       </p>
                       <Button 
                         className="bg-pfa-royal-blue hover:bg-pfa-navy-blue text-white px-6 py-2"
-                        onClick={() => router.push('/chat')}
+                        onClick={() => navigateToProtectedRoute(router, '/chat')}
                       >
                         开始咨询
                       </Button>
@@ -692,7 +693,7 @@ export function PFAPublicDashboard() {
                 <li><a href="#concept" className="text-gray-300 hover:text-white transition-colors">核心理念</a></li>
                 <li><a href="#opportunity" className="text-gray-300 hover:text-white transition-colors">事业机会</a></li>
                 <li><a href="#success" className="text-gray-300 hover:text-white transition-colors">成功案例</a></li>
-                <li><button onClick={() => router.push('/chat')} className="text-gray-300 hover:text-white transition-colors text-left">AI 教练</button></li>
+                <li><button onClick={() => navigateToProtectedRoute(router, '/chat')} className="text-gray-300 hover:text-white transition-colors text-left">AI 教练</button></li>
               </ul>
             </div>
             

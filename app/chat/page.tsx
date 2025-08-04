@@ -16,34 +16,43 @@ export default function ChatPage() {
     
     const getUser = async (retryCount = 0) => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
+        // 先尝试获取session，确保服务器端session同步
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (error) {
-          console.warn('认证检查错误:', error);
-          // 如果是网络错误，尝试重试
-          if (retryCount < 2) {
-            setTimeout(() => getUser(retryCount + 1), 1000);
+        if (!session?.user) {
+          // 如果没有session，尝试获取用户信息
+          const { data: { user }, error } = await supabase.auth.getUser();
+          
+          if (error) {
+            console.warn('认证检查错误:', error);
+            // 如果是网络错误，尝试重试
+            if (retryCount < 3) {
+              setTimeout(() => getUser(retryCount + 1), 1000);
+              return;
+            }
+          }
+          
+          if (!user) {
+            // 给用户一个更长的缓冲时间，可能是认证状态更新延迟
+            if (retryCount < 3) {
+              setTimeout(() => getUser(retryCount + 1), 1000 + retryCount * 500);
+              return;
+            }
+            router.push("/auth/login");
             return;
           }
+          
+          setUser(user);
+        } else {
+          setUser(session.user);
         }
         
-        if (!user) {
-          // 给用户一个短暂的缓冲时间，可能是认证状态更新延迟
-          if (retryCount < 2) {
-            setTimeout(() => getUser(retryCount + 1), 500);
-            return;
-          }
-          router.push("/auth/login");
-          return;
-        }
-        
-        setUser(user);
         setLoading(false);
       } catch (error) {
         console.error('认证检查失败:', error);
-        // 重试机制
-        if (retryCount < 2) {
-          setTimeout(() => getUser(retryCount + 1), 1000);
+        // 重试机制，增加重试次数
+        if (retryCount < 3) {
+          setTimeout(() => getUser(retryCount + 1), 1500);
           return;
         }
         router.push("/auth/login");

@@ -47,16 +47,29 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // 对于需要认证的页面进行检查
+  const protectedPaths = ['/chat', '/dashboard', '/profile'];
+  const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path));
+  
   if (
-    request.nextUrl.pathname !== "/" &&
+    isProtectedPath &&
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth") &&
-    !request.nextUrl.pathname.startsWith("/test")
+    !request.nextUrl.pathname.startsWith("/auth")
   ) {
+    // 如果是从主页跳转过来的，添加一个查询参数来标识
+    const referer = request.headers.get('referer');
+    const isFromMainPage = referer && referer.includes(request.nextUrl.origin);
+    
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    
+    // 如果是从主页跳转过来的，添加回调URL
+    if (isFromMainPage) {
+      url.searchParams.set('redirectTo', request.nextUrl.pathname);
+    }
+    
     return NextResponse.redirect(url);
   }
 
