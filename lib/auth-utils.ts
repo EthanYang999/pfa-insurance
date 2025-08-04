@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 /**
  * 确保认证状态同步的工具函数
@@ -37,7 +38,7 @@ export async function ensureAuthSync() {
  * 安全跳转到需要认证的页面
  * 确保认证状态同步后再进行跳转
  */
-export async function navigateToProtectedRoute(router: any, path: string) {
+export async function navigateToProtectedRoute(router: AppRouterInstance, path: string) {
   const isAuthenticated = await ensureAuthSync();
   
   if (isAuthenticated) {
