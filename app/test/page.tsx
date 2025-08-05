@@ -725,7 +725,7 @@ export default function TeamDelivery() {
                     </p>
                     <Button 
                       variant="outline"
-                      onClick={() => window.open('https://drive.google.com/file/d/1yxxsIvQYEFa26Fda6vOXVgiDKT_sffBQ/view', '_blank')}
+                      onClick={() => window.open('https://drive.google.com/file/d/1j0y8xfh50_h6M7k-8O77W6Zfs_XmsI56/view?usp=drive_link', '_blank')}
                     >
                       <Play className="h-4 w-4 mr-2" />
                       观看教程视频
