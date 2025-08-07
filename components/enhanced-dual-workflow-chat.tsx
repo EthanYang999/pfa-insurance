@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatInput } from "@/components/chat-input";
 import { LogoutButton } from "@/components/logout-button";
-import { ArrowLeft, Bot, User, Brain, Loader } from "lucide-react";
+import { Bot, User, Brain, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -593,14 +593,6 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     <div className="h-screen w-full flex flex-col bg-gradient-to-br from-pfa-light-gray to-white">
       {/* 顶部导航栏 */}
       <header className="bg-pfa-royal-blue text-white px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg">
-        <button
-          onClick={() => router.push('/')}
-          className="flex items-center gap-2 text-white hover:text-pfa-champagne-gold transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span className="hidden sm:inline">返回首页</span>
-        </button>
-
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 justify-center">
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">

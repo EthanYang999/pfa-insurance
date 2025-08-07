@@ -24,7 +24,7 @@ export default function Page() {
             注册成功！
           </h2>
           <p className="text-pfa-dark-gray mb-6">
-            请检查您的邮箱并点击确认链接来激活您的账户，然后即可开始您的保险学习之旅。
+            您的账户已创建成功，现在可以开始您的保险学习之旅！
           </p>
           <Link
             href="/auth/login"
