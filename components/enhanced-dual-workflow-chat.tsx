@@ -6,6 +6,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { Bot, User, Brain, Loader } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { FeedbackModal } from "@/components/feedback-modal";
 
 // 原有的Message接口
 interface Message {
@@ -608,6 +609,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           <span className="text-pfa-champagne-gold text-xs sm:text-sm">
             {user?.email?.split('@')[0] || '会员'}
           </span>
+          <FeedbackModal userEmail={user?.email} userId={user?.id} />
           <LogoutButton />
         </div>
       </header>
