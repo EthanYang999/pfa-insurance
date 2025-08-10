@@ -66,7 +66,7 @@ export function ChatInput({
             onStatusChange={(status) => {
               console.log('语音状态:', status);
             }}
-            className="h-10 sm:h-11"
+            className="shrink-0"
           />
         )}
         
@@ -74,7 +74,7 @@ export function ChatInput({
         <Button
           type="submit"
           disabled={!message.trim() || disabled}
-          className="btn-primary h-10 sm:h-11 px-3 sm:px-6 gap-1 sm:gap-2 text-sm sm:text-base"
+          className="btn-primary h-10 sm:h-11 px-3 sm:px-6 gap-1 sm:gap-2 text-sm sm:text-base shrink-0 shadow-sm"
         >
           <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span className="hidden sm:inline">发送</span>

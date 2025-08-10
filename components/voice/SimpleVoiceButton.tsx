@@ -548,62 +548,62 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     switch (voiceMode) {
       case VoiceMode.OFF:
         return {
-          icon: <Mic className="w-4 h-4" />,
+          icon: <Mic className="w-4 h-4 text-coach-gray-medium" />,
           variant: 'outline' as const,
           text: '启动语音助手',
           onClick: startContinuousListening,
           pulse: false,
           recording: false,
           playing: false,
-          bgColor: 'hover:bg-blue-50'
+          bgColor: 'hover:bg-blue-50 border-coach-gray-disabled hover:border-blue-300'
         };
       
       case VoiceMode.ACTIVE:
         return {
           icon: <Mic className="w-4 h-4 text-blue-600" />,
-          variant: 'secondary' as const,
+          variant: 'default' as const,
           text: '语音助手待命中（随时可说话）',
           onClick: stopContinuousListening,
           pulse: true,
           recording: false,
           playing: false,
-          bgColor: 'bg-blue-100 hover:bg-blue-200'
+          bgColor: 'bg-blue-50 hover:bg-blue-100 border-blue-300'
         };
       
       case VoiceMode.LISTENING:
         return {
           icon: <Mic className="w-4 h-4 text-red-600 animate-pulse" />,
-          variant: 'secondary' as const,
+          variant: 'default' as const,
           text: '正在识别您的语音...',
           onClick: stopContinuousListening,
           pulse: false,
           recording: true,
           playing: false,
-          bgColor: 'bg-red-100 hover:bg-red-200'
+          bgColor: 'bg-red-50 hover:bg-red-100 border-red-300'
         };
       
       case VoiceMode.SPEAKING:
         return {
           icon: <Volume2 className="w-4 h-4 text-green-600 animate-pulse" />,
-          variant: 'secondary' as const,
+          variant: 'default' as const,
           text: 'AI正在回复（可随时打断）',
           onClick: stopContinuousListening,
           pulse: false,
           recording: false,
           playing: true,
-          bgColor: 'bg-green-100 hover:bg-green-200'
+          bgColor: 'bg-green-50 hover:bg-green-100 border-green-300'
         };
       
       default:
         return {
-          icon: <Mic className="w-4 h-4" />,
+          icon: <Mic className="w-4 h-4 text-coach-gray-medium" />,
           variant: 'outline' as const,
           text: '启动语音助手',
           onClick: startContinuousListening,
           pulse: false,
           recording: false,
           playing: false,
-          bgColor: 'hover:bg-blue-50'
+          bgColor: 'hover:bg-blue-50 border-coach-gray-disabled hover:border-blue-300'
         };
     }
   };
@@ -616,71 +616,52 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
         onClick={buttonConfig.onClick}
         disabled={disabled}
         variant={buttonConfig.variant}
-        size="sm"
-        className={`relative transition-all duration-200 ${buttonConfig.bgColor} ${
+        className={`relative h-10 sm:h-11 px-3 sm:px-4 transition-all duration-200 ${buttonConfig.bgColor} ${
           voiceMode === VoiceMode.LISTENING ? 'voice-wave' : 
           voiceMode === VoiceMode.ACTIVE ? 'animate-pulse-slow' : ''
-        }`}
+        } ${className || ''}`}
         title={buttonConfig.text}
       >
-        <div className={voiceMode === VoiceMode.SPEAKING ? 'animate-bounce-gentle' : ''}>
+        <div className={`flex items-center justify-center ${voiceMode === VoiceMode.SPEAKING ? 'animate-bounce-gentle' : ''}`}>
           {buttonConfig.icon}
         </div>
         
-        {/* 🎨 多层次视觉指示器 */}
+        {/* 🎨 精美的视觉指示器 */}
         {buttonConfig.pulse && (
-          <>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-400 rounded-full animate-ping" />
-          </>
+          <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse shadow-sm" />
         )}
         
         {buttonConfig.recording && (
           <>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-            <div className="absolute -inset-1 bg-red-200 rounded-full animate-ping opacity-25" />
+            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
+            <div className="absolute -inset-0.5 bg-red-200 rounded-full animate-ping opacity-30" />
           </>
         )}
         
         {buttonConfig.playing && (
           <>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-            <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-green-300 rounded-full animate-ping opacity-30" />
+            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-sm" />
+            <div className="absolute -inset-0.5 bg-green-200 rounded-full animate-ping opacity-25" />
           </>
         )}
       </Button>
       
-      {/* 🎯 状态指示文本 - 更详细的提示 */}
+      {/* 🎯 简洁状态指示 - 只在移动端显示 */}
       {voiceMode !== VoiceMode.OFF && (
-        <div className="flex flex-col gap-1">
-          <Badge 
-            variant={voiceMode === VoiceMode.LISTENING ? 'destructive' : 
-                    voiceMode === VoiceMode.SPEAKING ? 'default' :
-                    'secondary'}
-            className={`text-xs transition-all duration-200 ${
-              voiceMode === VoiceMode.LISTENING ? 'animate-pulse' :
-              voiceMode === VoiceMode.SPEAKING ? 'animate-pulse' : ''
-            }`}
-          >
-            {voiceMode === VoiceMode.ACTIVE ? '🎯 待命' : 
-             voiceMode === VoiceMode.LISTENING ? '🎙️ 识别中' : 
-             voiceMode === VoiceMode.SPEAKING ? '🔊 播放中' : 
-             status === 'THINKING' ? '🤔 思考中' : '⚡ 就绪'}
-          </Badge>
-          
-          {/* 💡 智能提示 */}
-          {voiceMode === VoiceMode.SPEAKING && (
-            <div className="text-xs text-green-600 font-medium animate-fade-in">
-              💬 随时可说话打断
-            </div>
-          )}
-          
-          {voiceMode === VoiceMode.ACTIVE && (
-            <div className="text-xs text-blue-600 font-medium animate-fade-in">
-              🗣️ 开始说话
-            </div>
-          )}
-        </div>
+        <Badge 
+          variant={voiceMode === VoiceMode.LISTENING ? 'destructive' : 
+                  voiceMode === VoiceMode.SPEAKING ? 'default' :
+                  'secondary'}
+          className={`text-xs ml-1 transition-all duration-200 sm:hidden ${
+            voiceMode === VoiceMode.LISTENING ? 'animate-pulse' :
+            voiceMode === VoiceMode.SPEAKING ? 'animate-pulse' : ''
+          }`}
+        >
+          {voiceMode === VoiceMode.ACTIVE ? '待命' : 
+           voiceMode === VoiceMode.LISTENING ? '识别' : 
+           voiceMode === VoiceMode.SPEAKING ? '播放' : 
+           status === 'THINKING' ? '思考' : '就绪'}
+        </Badge>
       )}
     </div>
   );
