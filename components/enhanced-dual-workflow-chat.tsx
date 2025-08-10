@@ -7,6 +7,7 @@ import { Bot, User, Brain, Loader, Settings } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackModal } from "@/components/feedback-modal";
+import VoiceButton, { type VoiceButtonRef } from "@/components/voice/VoiceButton";
 import Link from "next/link";
 
 // 原有的Message接口
@@ -81,6 +82,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const voiceButtonRef = useRef<VoiceButtonRef>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -397,6 +399,16 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           // 保存AI回复到数据库（使用相同的sessionId）
           await saveChatHistory(finalSessionId, 'ai', completeResponse);
           
+          // 如果语音功能激活，播放AI回复
+          if (voiceButtonRef.current?.isActive()) {
+            console.log('语音播放AI回复');
+            try {
+              await voiceButtonRef.current.speakText(completeResponse);
+            } catch (error) {
+              console.error('语音播放失败:', error);
+            }
+          }
+          
           setIsLoading(false);
         },
         async (error: string) => {
@@ -610,6 +622,19 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           <span className="text-pfa-champagne-gold text-xs sm:text-sm">
             {user?.email?.split('@')[0] || '会员'}
           </span>
+          
+          {/* 语音交互按钮 */}
+          <VoiceButton 
+            ref={voiceButtonRef}
+            onUserSpeech={(transcript) => {
+              console.log('语音输入:', transcript);
+              handleSendMessage(transcript);
+            }}
+            onStatusChange={(status) => {
+              console.log('语音状态:', status);
+            }}
+          />
+          
           <Link 
             href="/voice-test" 
             className="text-white/80 hover:text-white transition-colors p-1 rounded"

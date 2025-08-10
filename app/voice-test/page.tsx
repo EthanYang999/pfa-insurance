@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import ConnectivityTest from '@/components/voice/ConnectivityTest';
 import BrowserCapabilityTest from '@/components/voice/BrowserCapabilityTest';
 import VoiceDebugPanel from '@/components/voice/VoiceDebugPanel';
+import VoiceInteraction from '@/components/voice/VoiceInteraction';
 
 export default function VoiceTestPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -70,10 +71,11 @@ export default function VoiceTestPage() {
 
         {/* 测试功能标签页 */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">总览</TabsTrigger>
             <TabsTrigger value="connectivity">连通性</TabsTrigger>
             <TabsTrigger value="browser">浏览器</TabsTrigger>
+            <TabsTrigger value="voice">语音测试</TabsTrigger>
             <TabsTrigger value="debug">调试</TabsTrigger>
           </TabsList>
           
@@ -136,6 +138,28 @@ export default function VoiceTestPage() {
           
           <TabsContent value="browser" className="space-y-4">
             <BrowserCapabilityTest />
+          </TabsContent>
+          
+          <TabsContent value="voice" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>🎤 语音交互测试</CardTitle>
+                <CardDescription>
+                  测试完整的语音交互流程：语音识别 → Dify处理 → 语音合成 → 播放
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <VoiceInteraction 
+                  showDebugInfo={true}
+                  onError={(error) => {
+                    console.error('语音交互错误:', error);
+                  }}
+                  onStatusChange={(status) => {
+                    console.log('语音状态变化:', status);
+                  }}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="debug" className="space-y-4">
