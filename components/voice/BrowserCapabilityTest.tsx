@@ -48,7 +48,7 @@ export default function BrowserCapabilityTest() {
       icon: '🎤',
       description: '检查浏览器是否支持Web Speech API语音识别',
       testFunction: async () => {
-        return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+        return !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
       }
     },
     {

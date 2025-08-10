@@ -12,7 +12,7 @@ interface ChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  voiceButtonRef?: React.RefObject<SimpleVoiceButtonRef>;
+  voiceButtonRef?: React.RefObject<SimpleVoiceButtonRef | null>;
 }
 
 export function ChatInput({ 

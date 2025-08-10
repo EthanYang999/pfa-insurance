@@ -146,7 +146,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // 限制缓存大小（最多100个条目）
       if (ttsCache.size > 100) {
         const firstKey = ttsCache.keys().next().value;
-        ttsCache.delete(firstKey);
+        if (firstKey !== undefined) {
+          ttsCache.delete(firstKey);
+        }
       }
     }
 
