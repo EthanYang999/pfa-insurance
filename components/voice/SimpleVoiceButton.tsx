@@ -201,7 +201,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
 
     recognitionRef.current = recognition;
     return true;
-  }, [onUserSpeech, status, updateStatus, voiceMode, stopContinuousListening]);
+  }, [onUserSpeech, status, updateStatus, voiceMode]);
 
   // 🔄 重启语音识别（连续监听核心）
   const restartRecognition = useCallback(() => {
@@ -492,7 +492,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     isActive: () => status !== 'STOPPED',
     startListening,
     stopListening
-  }), [speakText, processTextChunk, finishStreaming, resetStreaming, status, startListening, stopListening]);
+  }));
 
   // 清理资源和内存管理
   useEffect(() => {
