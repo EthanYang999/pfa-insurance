@@ -7,6 +7,8 @@ export class StreamingTTSProcessor {
   private textBuffer: string = '';
   private audioManager: AudioManager | null = null;
   private conversationId: string = '';
+  private lastProcessTime: number = 0;
+  private forceFlushTimer: NodeJS.Timeout | null = null;
 
   constructor(audioManager: AudioManager | null) {
     this.audioManager = audioManager;
@@ -21,6 +23,11 @@ export class StreamingTTSProcessor {
   reset(): void {
     this.textBuffer = '';
     this.conversationId = '';
+    this.lastProcessTime = 0;
+    if (this.forceFlushTimer) {
+      clearTimeout(this.forceFlushTimer);
+      this.forceFlushTimer = null;
+    }
   }
 
   // 设置对话ID
@@ -34,6 +41,15 @@ export class StreamingTTSProcessor {
 
     // 添加到缓冲区
     this.textBuffer += chunk;
+    this.lastProcessTime = Date.now();
+    
+    // 🚀 设置强制刷新定时器，确保即使没有句子结束符也能播放
+    if (this.forceFlushTimer) {
+      clearTimeout(this.forceFlushTimer);
+    }
+    this.forceFlushTimer = setTimeout(() => {
+      this.forceFlushBuffer();
+    }, 2000); // 2秒后强制刷新
     
     // 提取完整句子并进行TTS
     const sentences = this.extractCompleteSentences();
@@ -64,23 +80,46 @@ export class StreamingTTSProcessor {
     this.textBuffer = '';
   }
 
-  // 提取完整句子
+  // 提取完整句子（优化：更快触发TTS）
   private extractCompleteSentences(): string[] {
-    const sentenceEndings = /[.!?。！？]/g;
+    // 🚀 扩展句子结束标记，包含更多中断点
+    const sentenceEndings = /[.!?。！？;；:：,，\n]/g;
     const sentences: string[] = [];
     let lastIndex = 0;
     let match;
 
     while ((match = sentenceEndings.exec(this.textBuffer)) !== null) {
       const sentence = this.textBuffer.substring(lastIndex, match.index + 1);
-      if (sentence.trim()) {
-        sentences.push(sentence.trim());
+      const trimmedSentence = sentence.trim();
+      
+      if (trimmedSentence) {
+        // 🚀 降低最小长度要求，更快触发
+        if (trimmedSentence.length >= 5) {
+          sentences.push(trimmedSentence);
+          lastIndex = match.index + 1;
+        }
+        // 🚀 对于很长的文本块，即使没有标点也要切分
+        else if (this.textBuffer.length - lastIndex > 50) {
+          sentences.push(trimmedSentence);
+          lastIndex = match.index + 1;
+        }
       }
-      lastIndex = match.index + 1;
     }
 
-    // 更新文本缓冲区，保留未完成的部分
-    this.textBuffer = this.textBuffer.substring(lastIndex);
+    // 🚀 如果缓冲区太长（>80字符）且没有句子分割，强制分割
+    if (sentences.length === 0 && this.textBuffer.length > 80) {
+      const forcedSplit = this.textBuffer.substring(0, 60).trim();
+      if (forcedSplit) {
+        sentences.push(forcedSplit);
+        this.textBuffer = this.textBuffer.substring(60);
+        return sentences;
+      }
+    }
+
+    // 只有在找到句子时才更新缓冲区
+    if (sentences.length > 0) {
+      this.textBuffer = this.textBuffer.substring(lastIndex);
+    }
 
     return sentences;
   }
@@ -99,6 +138,24 @@ export class StreamingTTSProcessor {
       console.log('强制刷新TTS缓冲区:', this.textBuffer);
       await this.audioManager.addToQueue(this.textBuffer.trim());
       this.textBuffer = '';
+    }
+  }
+
+  // 🚀 定时强制刷新缓冲区
+  private async forceFlushBuffer(): Promise<void> {
+    if (this.textBuffer.trim() && this.audioManager) {
+      // 如果缓冲区有内容且超过1秒没有新内容，强制处理
+      const timeSinceLastProcess = Date.now() - this.lastProcessTime;
+      if (timeSinceLastProcess >= 1000 && this.textBuffer.length >= 10) {
+        console.log('定时强制刷新TTS缓冲区:', this.textBuffer.substring(0, 30) + '...');
+        await this.audioManager.addToQueue(this.textBuffer.trim());
+        this.textBuffer = '';
+      }
+    }
+    
+    if (this.forceFlushTimer) {
+      clearTimeout(this.forceFlushTimer);
+      this.forceFlushTimer = null;
     }
   }
 }
