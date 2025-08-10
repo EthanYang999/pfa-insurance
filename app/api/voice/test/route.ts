@@ -42,7 +42,7 @@ async function testAzureTTS(): Promise<ConnectivityTestResult> {
       service: 'azure_tts',
       status: 'error',
       responseTime: Date.now() - startTime,
-      error: error.message || '连接失败'
+      error: error instanceof Error ? error.message : '连接失败'
     };
   }
 }
@@ -88,7 +88,7 @@ async function testDifyStream(): Promise<ConnectivityTestResult> {
       service: 'dify_stream',
       status: 'error',
       responseTime: Date.now() - startTime,
-      error: error.message || '连接失败'
+      error: error instanceof Error ? error.message : '连接失败'
     };
   }
 }
@@ -116,7 +116,7 @@ async function testVADModel(): Promise<ConnectivityTestResult> {
       service: 'vad_model',
       status: 'error',
       responseTime: Date.now() - startTime,
-      error: error.message || '测试异常'
+      error: error instanceof Error ? error.message : '测试异常'
     };
   }
 }
@@ -180,7 +180,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       success: false,
       error: '测试服务异常',
-      details: error.message || '未知错误'
+      details: error instanceof Error ? error.message : '未知错误'
     }, { status: 500 });
   }
 }

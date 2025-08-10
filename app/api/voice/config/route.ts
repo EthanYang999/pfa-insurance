@@ -76,7 +76,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       } catch (error: unknown) {
         credentialValidation = {
           azure: false,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         };
       }
     }
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       valid: false,
       error: '配置验证异常',
-      details: error.message || '未知错误'
+      details: error instanceof Error ? error.message : '未知错误'
     }, { status: 500 });
   }
 }
