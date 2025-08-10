@@ -6,6 +6,7 @@ import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 import { createAudioManager, type AudioManager } from '@/lib/voice/audio-manager';
+import { StreamingTTSProcessor } from '@/lib/voice/streaming-tts';
 import type { VoiceStatus } from '@/types/voice';
 
 interface SimpleVoiceButtonProps {
@@ -17,6 +18,9 @@ interface SimpleVoiceButtonProps {
 
 export interface SimpleVoiceButtonRef {
   speakText: (text: string) => Promise<void>;
+  processTextChunk: (chunk: string) => Promise<void>;
+  finishStreaming: () => Promise<void>;
+  resetStreaming: () => void;
   getStatus: () => VoiceStatus;
   isActive: () => boolean;
   startListening: () => void;
@@ -36,6 +40,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
 
   const audioManagerRef = useRef<AudioManager | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const streamingTTSRef = useRef<StreamingTTSProcessor | null>(null);
   const isInitializedRef = useRef(false);
 
   // 更新状态
@@ -118,7 +123,11 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     });
 
     audioManagerRef.current = audioManager;
-    console.log('音频管理器初始化成功');
+    
+    // 初始化流式TTS处理器
+    streamingTTSRef.current = new StreamingTTSProcessor(audioManager);
+    
+    console.log('音频管理器和流式TTS处理器初始化成功');
   }, [status, updateStatus]);
 
   // 初始化管理器
@@ -215,7 +224,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     }
   }, [disabled, status, startVoice, stopVoice]);
 
-  // 处理AI响应的TTS
+  // 处理AI响应的TTS（完整文本）
   const speakText = useCallback(async (text: string) => {
     if (!text.trim()) return;
     
@@ -229,19 +238,61 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
       return;
     }
     
-    console.log('添加文本到语音队列:', text.substring(0, 50) + '...');
+    console.log('添加完整文本到语音队列:', text.substring(0, 50) + '...');
     updateStatus('SPEAKING');
     await audioManagerRef.current.addToQueue(text);
   }, [updateStatus, initializeManagers]);
 
+  // 流式处理文本块
+  const processTextChunk = useCallback(async (chunk: string) => {
+    if (!chunk?.trim()) return;
+    
+    // 确保组件已初始化
+    if (!audioManagerRef.current || !streamingTTSRef.current) {
+      await initializeManagers();
+    }
+    
+    if (!streamingTTSRef.current) {
+      console.error('流式TTS处理器未初始化');
+      return;
+    }
+    
+    // 如果还未开始播放，设置状态为SPEAKING
+    if (status !== 'SPEAKING') {
+      updateStatus('SPEAKING');
+    }
+    
+    console.log('流式处理文本块:', chunk.substring(0, 30) + '...');
+    await streamingTTSRef.current.processTextChunk(chunk);
+  }, [initializeManagers, status, updateStatus]);
+
+  // 完成流式处理
+  const finishStreaming = useCallback(async () => {
+    if (!streamingTTSRef.current) return;
+    
+    console.log('完成流式TTS处理');
+    await streamingTTSRef.current.processRemainingText();
+  }, []);
+
+  // 重置流式处理
+  const resetStreaming = useCallback(() => {
+    if (streamingTTSRef.current) {
+      console.log('重置流式TTS处理器');
+      streamingTTSRef.current.reset();
+    }
+  }, []);
+
   // 暴露给父组件的方法
   useImperativeHandle(ref, () => ({
     speakText,
+    processTextChunk,
+    finishStreaming,
+    resetStreaming,
     getStatus: () => status,
     isActive: () => status !== 'STOPPED',
     startListening,
     stopListening
-  }), [speakText, status, startListening, stopListening]);
+  }), [speakText, processTextChunk, finishStreaming, resetStreaming, status, startListening, stopListening]);
 
   // 清理资源
   useEffect(() => {

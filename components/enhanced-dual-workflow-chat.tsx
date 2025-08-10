@@ -368,6 +368,11 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
               ? { ...msg, content: msg.content + chunk }
               : msg
           ));
+          
+          // 流式TTS处理：如果语音功能激活，处理文本块
+          if (voiceButtonRef.current?.isActive()) {
+            voiceButtonRef.current.processTextChunk(chunk);
+          }
         },
         async (completeResponse: string, newConversationId?: string) => {
           // 确定最终的sessionId
@@ -399,13 +404,13 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           // 保存AI回复到数据库（使用相同的sessionId）
           await saveChatHistory(finalSessionId, 'ai', completeResponse);
           
-          // 如果语音功能激活，播放AI回复
+          // 完成流式TTS处理
           if (voiceButtonRef.current?.isActive()) {
-            console.log('语音播放AI回复');
+            console.log('完成流式TTS处理');
             try {
-              await voiceButtonRef.current.speakText(completeResponse);
+              await voiceButtonRef.current.finishStreaming();
             } catch (error) {
-              console.error('语音播放失败:', error);
+              console.error('完成流式TTS失败:', error);
             }
           }
           
@@ -413,6 +418,15 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
         },
         async (error: string) => {
           console.error('流式发送消息失败:', error);
+          
+          // 重置流式TTS状态
+          if (voiceButtonRef.current?.isActive()) {
+            try {
+              voiceButtonRef.current.resetStreaming();
+            } catch (resetError) {
+              console.error('重置流式TTS失败:', resetError);
+            }
+          }
           
           // 即使出错，也要保存用户消息
           const fallbackSessionId = conversationId || generateSessionId();
@@ -434,6 +448,15 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
       );
     } catch (error) {
       console.error('发送消息失败:', error);
+      
+      // 重置流式TTS状态
+      if (voiceButtonRef.current?.isActive()) {
+        try {
+          voiceButtonRef.current.resetStreaming();
+        } catch (resetError) {
+          console.error('重置流式TTS失败:', resetError);
+        }
+      }
       
       // 即使出错，也要保存用户消息
       const fallbackSessionId = conversationId || generateSessionId();
