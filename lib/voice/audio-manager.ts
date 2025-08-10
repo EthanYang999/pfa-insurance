@@ -13,6 +13,7 @@ export interface AudioManager {
   getCurrentItem(): AudioQueueItem | null;
   getQueue(): AudioQueueItem[];
   getState(): AudioManagerState;
+  destroy(): void;
 }
 
 export interface AudioManagerState {

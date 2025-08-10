@@ -3,6 +3,14 @@
 // 语音助手状态
 export type VoiceStatus = 'IDLE' | 'LISTENING' | 'THINKING' | 'SPEAKING' | 'STOPPED';
 
+// 连续语音模式
+export enum VoiceMode {
+  OFF = 'OFF',           // 完全关闭
+  ACTIVE = 'ACTIVE',     // 激活但等待语音
+  LISTENING = 'LISTENING', // 正在识别语音
+  SPEAKING = 'SPEAKING'   // AI正在播放
+}
+
 // VAD (Voice Activity Detection) 配置
 export interface VADConfig {
   onSpeechStart?: () => void;

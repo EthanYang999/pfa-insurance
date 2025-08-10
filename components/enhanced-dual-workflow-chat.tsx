@@ -333,6 +333,16 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
 
   // 原有的发送消息方法（保持不变）
   const handleSendMessage = async (content: string) => {
+    // 🚀 用户发送新消息时，彻底清理上一条AI回复的语音播放
+    if (voiceButtonRef.current?.isActive()) {
+      console.log('🧹 用户发送新消息，彻底停止并重置上一条AI回复的语音播放');
+      try {
+        voiceButtonRef.current.resetStreaming();
+      } catch (error) {
+        console.error('重置语音状态失败:', error);
+      }
+    }
+    
     const userMessage: Message = {
       id: `user_${Date.now()}`,
       content,
@@ -357,6 +367,16 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     };
 
     setMessages(prev => [...prev, aiMessage]);
+
+    // 🚀 AI开始新回复前，确保语音状态已完全重置
+    if (voiceButtonRef.current?.isActive()) {
+      console.log('🎯 AI开始新回复，确保语音状态已重置');
+      try {
+        voiceButtonRef.current.resetStreaming();
+      } catch (error) {
+        console.error('重置语音状态失败:', error);
+      }
+    }
 
     try {
       await sendMessageToDifyStream(

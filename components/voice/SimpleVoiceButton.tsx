@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { createAudioManager, type AudioManager } from '@/lib/voice/audio-manager';
 import { StreamingTTSProcessor } from '@/lib/voice/streaming-tts';
 import type { VoiceStatus } from '@/types/voice';
+import { VoiceMode } from '@/types/voice';
 
 interface SimpleVoiceButtonProps {
   onUserSpeech?: (transcript: string) => void;
@@ -35,6 +36,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
 }, ref) => {
   
   const [status, setStatus] = useState<VoiceStatus>('STOPPED');
+  const [voiceMode, setVoiceMode] = useState<VoiceMode>(VoiceMode.OFF);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -42,6 +44,21 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const streamingTTSRef = useRef<StreamingTTSProcessor | null>(null);
   const isInitializedRef = useRef(false);
+  
+  // 🔄 连续监听相关状态
+  const continuousListeningRef = useRef(false);
+  const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSpeechTimeRef = useRef(Date.now());
+  const processedResultsRef = useRef(0); // 🔒 追踪已处理的结果数量
+  
+  // 🚀 性能优化和错误恢复
+  const errorCountRef = useRef(0);
+  const maxErrorCount = 3;
+  const performanceMetricsRef = useRef({
+    lastSpeechTime: Date.now(),
+    avgProcessingTime: 0,
+    totalRequests: 0
+  });
 
   // 更新状态
   const updateStatus = useCallback((newStatus: VoiceStatus) => {
@@ -59,38 +76,125 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-CN';
-    recognition.interimResults = false;
-    recognition.continuous = false;
+    // 🚀 启用连续识别模式
+    recognition.interimResults = true;
+    recognition.continuous = true;
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
       console.log('语音识别启动');
       setIsRecording(true);
       updateStatus('LISTENING');
+      // 🔒 重置结果处理索引
+      processedResultsRef.current = 0;
     };
 
+    // 🚀 连续监听模式的结果处理（防重复 + 智能打断）
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results[0][0].transcript;
-      const confidence = event.results[0][0].confidence;
-      console.log(`识别结果: "${transcript}" (置信度: ${(confidence * 100).toFixed(1)}%)`);
+      const results = event.results;
+      let newFinalTranscript = '';
+      let hasInterimResults = false;
       
-      setIsRecording(false);
-      updateStatus('THINKING');
-      onUserSpeech?.(transcript);
+      // 检查是否有中间结果（用户开始说话）
+      for (let i = 0; i < results.length; i++) {
+        if (!results[i].isFinal && results[i][0].transcript.trim()) {
+          hasInterimResults = true;
+          break;
+        }
+      }
+      
+      // 🚀 快速打断：检测到用户开始说话就立即彻底停止播放
+      if (hasInterimResults && voiceMode === VoiceMode.SPEAKING && audioManagerRef.current) {
+        console.log('🚨 检测到用户开始说话，快速打断AI播放');
+        audioManagerRef.current.interrupt();
+        setIsPlaying(false);
+        setVoiceMode(VoiceMode.LISTENING);
+        
+        // 🧹 同时清理TTS处理器，防止后台继续处理
+        if (streamingTTSRef.current) {
+          console.log('🧹 快速打断时清理TTS处理器');
+          streamingTTSRef.current.reset();
+        }
+      }
+      
+      // 🔒 只处理新的最终结果，避免重复
+      for (let i = processedResultsRef.current; i < results.length; i++) {
+        const result = results[i];
+        if (result.isFinal) {
+          newFinalTranscript += result[0].transcript;
+          processedResultsRef.current = i + 1; // 更新已处理的结果索引
+        }
+      }
+      
+      if (newFinalTranscript.trim()) {
+        const confidence = results[results.length - 1][0].confidence;
+        console.log(`🎙️ 新识别结果: "${newFinalTranscript}" (置信度: ${(confidence * 100).toFixed(1)}%)`);
+        
+        // 🚀 性能监控
+        const now = Date.now();
+        const processingTime = now - lastSpeechTimeRef.current;
+        performanceMetricsRef.current.totalRequests++;
+        performanceMetricsRef.current.avgProcessingTime = 
+          (performanceMetricsRef.current.avgProcessingTime * (performanceMetricsRef.current.totalRequests - 1) + processingTime) / 
+          performanceMetricsRef.current.totalRequests;
+        
+        // 🔄 成功识别后重置错误计数
+        errorCountRef.current = 0;
+        
+        // 🚀 智能打断：如果正在播放，彻底停止并清理
+        if (voiceMode === VoiceMode.SPEAKING && audioManagerRef.current) {
+          console.log('🚨 用户打断AI播放，彻底停止TTS');
+          audioManagerRef.current.interrupt();
+          setIsPlaying(false);
+        }
+        
+        // 🧹 彻底清理TTS处理器，确保不会继续播放上一条回复
+        if (streamingTTSRef.current) {
+          console.log('🧹 清理流式TTS处理器，停止上一条回复');
+          streamingTTSRef.current.reset();
+        }
+        
+        lastSpeechTimeRef.current = now;
+        setVoiceMode(VoiceMode.LISTENING);
+        updateStatus('THINKING');
+        onUserSpeech?.(newFinalTranscript.trim());
+      }
     };
 
     recognition.onerror = (event: any) => {
-      console.error('语音识别错误:', event.error);
+      console.error('🚨 语音识别错误:', event.error);
       setIsRecording(false);
-      if (status !== 'STOPPED') {
+      
+      // 🚀 智能错误处理和恢复
+      errorCountRef.current++;
+      
+      if (errorCountRef.current > maxErrorCount) {
+        console.error('❌ 错误次数过多，停止连续监听模式');
+        stopContinuousListening();
+        return;
+      }
+      
+      // 🔄 连续模式下的错误处理
+      if (continuousListeningRef.current && event.error !== 'aborted') {
+        console.log(`🔄 错误后重启识别... (${errorCountRef.current}/${maxErrorCount})`);
+        // 延迟时间随错误次数递增
+        const delay = Math.min(1000 * errorCountRef.current, 5000);
+        setTimeout(() => restartRecognition(), delay);
+      } else if (voiceMode !== VoiceMode.OFF) {
+        setVoiceMode(VoiceMode.ACTIVE);
         updateStatus('IDLE');
       }
     };
 
     recognition.onend = () => {
-      console.log('语音识别结束');
+      console.log('📝 语音识别结束');
       setIsRecording(false);
-      if (status === 'LISTENING') {
+      
+      // 🔄 连续监听模式：自动重启识别
+      if (continuousListeningRef.current && voiceMode !== VoiceMode.OFF) {
+        restartRecognition();
+      } else if (voiceMode !== VoiceMode.OFF) {
+        setVoiceMode(VoiceMode.ACTIVE);
         updateStatus('IDLE');
       }
     };
@@ -98,6 +202,35 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     recognitionRef.current = recognition;
     return true;
   }, [onUserSpeech, status, updateStatus]);
+
+  // 🔄 重启语音识别（连续监听核心）
+  const restartRecognition = useCallback(() => {
+    if (!continuousListeningRef.current || voiceMode === VoiceMode.OFF) {
+      return;
+    }
+
+    // 清除现有的重启定时器
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
+
+    // 延迟重启，避免过于频繁
+    restartTimeoutRef.current = setTimeout(() => {
+      if (recognitionRef.current && continuousListeningRef.current) {
+        try {
+          console.log('🔄 重启语音识别...');
+          processedResultsRef.current = 0; // 🔒 重置处理索引
+          recognitionRef.current.start();
+          setVoiceMode(VoiceMode.ACTIVE);
+        } catch (error) {
+          console.error('重启语音识别失败:', error);
+          // 如果重启失败，稍后再试
+          setTimeout(() => restartRecognition(), 2000);
+        }
+      }
+    }, 500);
+  }, [voiceMode]);
 
   // 初始化音频管理器
   const initializeAudioManager = useCallback(() => {
@@ -107,13 +240,21 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
       onPlay: () => {
         console.log('开始播放音频');
         setIsPlaying(true);
+        setVoiceMode(VoiceMode.SPEAKING);
         updateStatus('SPEAKING');
       },
       
       onStateChange: (state) => {
         setIsPlaying(state.isPlaying);
+        // 🔄 播放完成后，根据连续监听状态决定模式
         if (!state.isPlaying && state.queueLength === 0 && status === 'SPEAKING') {
-          updateStatus('IDLE');
+          if (continuousListeningRef.current) {
+            setVoiceMode(VoiceMode.ACTIVE);
+            updateStatus('IDLE');
+          } else {
+            setVoiceMode(VoiceMode.OFF);
+            updateStatus('STOPPED');
+          }
         }
       },
       
@@ -153,6 +294,68 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
       return false;
     }
   }, [initializeSpeechRecognition, initializeAudioManager]);
+
+  // 🚀 启动连续监听模式
+  const startContinuousListening = useCallback(async () => {
+    console.log('🚀 启动连续监听模式');
+    
+    const initialized = await initializeManagers();
+    if (!initialized) {
+      console.error('初始化失败，无法启动连续监听');
+      return;
+    }
+
+    continuousListeningRef.current = true;
+    setVoiceMode(VoiceMode.ACTIVE);
+    updateStatus('IDLE');
+    
+    // 启动语音识别
+    if (recognitionRef.current) {
+      try {
+        processedResultsRef.current = 0; // 🔒 重置处理索引
+        recognitionRef.current.start();
+        console.log('✅ 连续监听模式已激活');
+      } catch (error) {
+        console.error('启动语音识别失败:', error);
+        continuousListeningRef.current = false;
+        setVoiceMode(VoiceMode.OFF);
+      }
+    }
+  }, [initializeManagers, updateStatus]);
+
+  // 🛑 停止连续监听模式
+  const stopContinuousListening = useCallback(() => {
+    console.log('🛑 停止连续监听模式');
+    
+    continuousListeningRef.current = false;
+    processedResultsRef.current = 0; // 🔒 重置处理索引
+    setVoiceMode(VoiceMode.OFF);
+    updateStatus('STOPPED');
+    
+    // 清除定时器
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
+    
+    // 停止语音识别
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (error) {
+        console.error('停止语音识别失败:', error);
+      }
+    }
+    
+    // 停止音频播放
+    if (audioManagerRef.current) {
+      audioManagerRef.current.interrupt();
+      setIsPlaying(false);
+    }
+    
+    setIsRecording(false);
+    console.log('❌ 连续监听模式已关闭');
+  }, [updateStatus]);
 
   // 开始聆听
   const startListening = useCallback(async () => {
@@ -199,30 +402,6 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     console.log('语音功能已停止');
   }, [isRecording, updateStatus]);
 
-  // 开始语音交互
-  const startVoice = useCallback(async () => {
-    const initialized = await initializeManagers();
-    if (!initialized) return;
-    
-    updateStatus('IDLE');
-    console.log('语音交互已启动');
-  }, [initializeManagers, updateStatus]);
-
-  // 停止语音交互
-  const stopVoice = useCallback(() => {
-    stopListening();
-  }, [stopListening]);
-
-  // 切换语音状态
-  const toggleVoice = useCallback(async () => {
-    if (disabled) return;
-    
-    if (status === 'STOPPED') {
-      await startVoice();
-    } else {
-      stopVoice();
-    }
-  }, [disabled, status, startVoice, stopVoice]);
 
   // 处理AI响应的TTS（完整文本）
   const speakText = useCallback(async (text: string) => {
@@ -278,13 +457,30 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     await streamingTTSRef.current.processRemainingText();
   }, []);
 
-  // 重置流式处理
+  // 重置流式处理（彻底清理）
   const resetStreaming = useCallback(() => {
+    console.log('🧹 彻底重置语音状态');
+    
+    // 停止当前音频播放
+    if (audioManagerRef.current) {
+      console.log('🚨 停止当前音频播放');
+      audioManagerRef.current.interrupt();
+      setIsPlaying(false);
+    }
+    
+    // 重置流式TTS处理器
     if (streamingTTSRef.current) {
-      console.log('重置流式TTS处理器');
+      console.log('🔄 重置流式TTS处理器');
       streamingTTSRef.current.reset();
     }
-  }, []);
+    
+    // 重置语音模式状态
+    if (voiceMode === VoiceMode.SPEAKING) {
+      console.log('🔄 重置语音模式为激活状态');
+      setVoiceMode(VoiceMode.ACTIVE);
+      updateStatus('IDLE');
+    }
+  }, [voiceMode, updateStatus]);
 
   // 暴露给父组件的方法
   useImperativeHandle(ref, () => ({
@@ -298,56 +494,118 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
     stopListening
   }), [speakText, processTextChunk, finishStreaming, resetStreaming, status, startListening, stopListening]);
 
-  // 清理资源
+  // 清理资源和内存管理
   useEffect(() => {
     return () => {
-      audioManagerRef.current?.destroy();
+      // 🔄 清理连续监听相关资源
+      continuousListeningRef.current = false;
+      processedResultsRef.current = 0;
+      errorCountRef.current = 0;
+      
+      if (restartTimeoutRef.current) {
+        clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = null;
+      }
+      
+      // 🚀 彻底清理音频资源
+      if (audioManagerRef.current) {
+        try {
+          audioManagerRef.current.destroy();
+          audioManagerRef.current = null;
+        } catch (error) {
+          console.warn('清理音频管理器失败:', error);
+        }
+      }
+      
+      // 🚀 彻底清理流式TTS处理器
+      if (streamingTTSRef.current) {
+        try {
+          streamingTTSRef.current.reset();
+          streamingTTSRef.current = null;
+        } catch (error) {
+          console.warn('清理流式TTS处理器失败:', error);
+        }
+      }
       
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
+          recognitionRef.current = null;
         } catch (error) {
           console.warn('清理语音识别失败:', error);
         }
       }
+      
+      // 重置初始化标识
+      isInitializedRef.current = false;
+      
+      console.log('🧹 连续监听组件已彻底清理');
     };
   }, []);
 
-  // 获取按钮图标和样式
+  // 🚀 增强的按钮配置（连续监听模式 + 优化视觉反馈）
   const getButtonConfig = () => {
-    if (isRecording) {
-      return {
-        icon: <MicOff className="w-4 h-4 text-red-500" />,
-        variant: 'destructive' as const,
-        text: '录音中',
-        onClick: stopListening
-      };
+    switch (voiceMode) {
+      case VoiceMode.OFF:
+        return {
+          icon: <Mic className="w-4 h-4" />,
+          variant: 'outline' as const,
+          text: '启动语音助手',
+          onClick: startContinuousListening,
+          pulse: false,
+          recording: false,
+          playing: false,
+          bgColor: 'hover:bg-blue-50'
+        };
+      
+      case VoiceMode.ACTIVE:
+        return {
+          icon: <Mic className="w-4 h-4 text-blue-600" />,
+          variant: 'secondary' as const,
+          text: '语音助手待命中（随时可说话）',
+          onClick: stopContinuousListening,
+          pulse: true,
+          recording: false,
+          playing: false,
+          bgColor: 'bg-blue-100 hover:bg-blue-200'
+        };
+      
+      case VoiceMode.LISTENING:
+        return {
+          icon: <Mic className="w-4 h-4 text-red-600 animate-pulse" />,
+          variant: 'secondary' as const,
+          text: '正在识别您的语音...',
+          onClick: stopContinuousListening,
+          pulse: false,
+          recording: true,
+          playing: false,
+          bgColor: 'bg-red-100 hover:bg-red-200'
+        };
+      
+      case VoiceMode.SPEAKING:
+        return {
+          icon: <Volume2 className="w-4 h-4 text-green-600 animate-pulse" />,
+          variant: 'secondary' as const,
+          text: 'AI正在回复（可随时打断）',
+          onClick: stopContinuousListening,
+          pulse: false,
+          recording: false,
+          playing: true,
+          bgColor: 'bg-green-100 hover:bg-green-200'
+        };
+      
+      default:
+        return {
+          icon: <Mic className="w-4 h-4" />,
+          variant: 'outline' as const,
+          text: '启动语音助手',
+          onClick: startContinuousListening,
+          pulse: false,
+          recording: false,
+          playing: false,
+          bgColor: 'hover:bg-blue-50'
+        };
     }
-    
-    if (isPlaying) {
-      return {
-        icon: <Volume2 className="w-4 h-4 text-blue-500" />,
-        variant: 'default' as const,
-        text: '播放中',
-        onClick: () => audioManagerRef.current?.interrupt()
-      };
-    }
-    
-    if (status === 'STOPPED') {
-      return {
-        icon: <Mic className="w-4 h-4" />,
-        variant: 'outline' as const,
-        text: '启动语音',
-        onClick: toggleVoice
-      };
-    }
-    
-    return {
-      icon: <Mic className="w-4 h-4 text-green-500" />,
-      variant: 'default' as const,
-      text: '开始说话',
-      onClick: startListening
-    };
   };
 
   const buttonConfig = getButtonConfig();
@@ -359,25 +617,70 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
         disabled={disabled}
         variant={buttonConfig.variant}
         size="sm"
-        className="relative"
+        className={`relative transition-all duration-200 ${buttonConfig.bgColor} ${
+          voiceMode === VoiceMode.LISTENING ? 'voice-wave' : 
+          voiceMode === VoiceMode.ACTIVE ? 'animate-pulse-slow' : ''
+        }`}
         title={buttonConfig.text}
       >
-        {buttonConfig.icon}
-        {(isRecording || isPlaying) && (
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        <div className={voiceMode === VoiceMode.SPEAKING ? 'animate-bounce-gentle' : ''}>
+          {buttonConfig.icon}
+        </div>
+        
+        {/* 🎨 多层次视觉指示器 */}
+        {buttonConfig.pulse && (
+          <>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-400 rounded-full animate-ping" />
+          </>
+        )}
+        
+        {buttonConfig.recording && (
+          <>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <div className="absolute -inset-1 bg-red-200 rounded-full animate-ping opacity-25" />
+          </>
+        )}
+        
+        {buttonConfig.playing && (
+          <>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+            <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-green-300 rounded-full animate-ping opacity-30" />
+          </>
         )}
       </Button>
       
-      {status !== 'STOPPED' && (
-        <Badge 
-          variant="secondary" 
-          className="text-xs"
-        >
-          {isRecording ? '录音中' : 
-           isPlaying ? '播放中' : 
-           status === 'THINKING' ? '处理中' : 
-           status === 'SPEAKING' ? '回答中' : '待机'}
-        </Badge>
+      {/* 🎯 状态指示文本 - 更详细的提示 */}
+      {voiceMode !== VoiceMode.OFF && (
+        <div className="flex flex-col gap-1">
+          <Badge 
+            variant={voiceMode === VoiceMode.LISTENING ? 'destructive' : 
+                    voiceMode === VoiceMode.SPEAKING ? 'default' :
+                    'secondary'}
+            className={`text-xs transition-all duration-200 ${
+              voiceMode === VoiceMode.LISTENING ? 'animate-pulse' :
+              voiceMode === VoiceMode.SPEAKING ? 'animate-pulse' : ''
+            }`}
+          >
+            {voiceMode === VoiceMode.ACTIVE ? '🎯 待命' : 
+             voiceMode === VoiceMode.LISTENING ? '🎙️ 识别中' : 
+             voiceMode === VoiceMode.SPEAKING ? '🔊 播放中' : 
+             status === 'THINKING' ? '🤔 思考中' : '⚡ 就绪'}
+          </Badge>
+          
+          {/* 💡 智能提示 */}
+          {voiceMode === VoiceMode.SPEAKING && (
+            <div className="text-xs text-green-600 font-medium animate-fade-in">
+              💬 随时可说话打断
+            </div>
+          )}
+          
+          {voiceMode === VoiceMode.ACTIVE && (
+            <div className="text-xs text-blue-600 font-medium animate-fade-in">
+              🗣️ 开始说话
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -386,4 +689,3 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
 SimpleVoiceButton.displayName = 'SimpleVoiceButton';
 
 export default SimpleVoiceButton;
-export type { SimpleVoiceButtonRef };
