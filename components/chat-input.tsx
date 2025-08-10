@@ -5,19 +5,22 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
+import SimpleVoiceButton, { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  voiceButtonRef?: React.RefObject<SimpleVoiceButtonRef>;
 }
 
 export function ChatInput({ 
   onSendMessage, 
   disabled = false, 
   placeholder = "请输入您的问题，PFA智能助手会为您提供专业指导...",
-  className 
+  className,
+  voiceButtonRef
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
 
@@ -51,6 +54,21 @@ export function ChatInput({
             rows={1}
           />
         </div>
+        
+        {/* 语音按钮 */}
+        {voiceButtonRef && (
+          <SimpleVoiceButton 
+            ref={voiceButtonRef}
+            onUserSpeech={(transcript) => {
+              console.log('语音输入:', transcript);
+              onSendMessage(transcript);
+            }}
+            onStatusChange={(status) => {
+              console.log('语音状态:', status);
+            }}
+            className="h-10 sm:h-11"
+          />
+        )}
         
         {/* 发送按钮 */}
         <Button

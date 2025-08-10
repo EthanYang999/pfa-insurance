@@ -3,12 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatInput } from "@/components/chat-input";
 import { LogoutButton } from "@/components/logout-button";
-import { Bot, User, Brain, Loader, Settings } from "lucide-react";
+import { Bot, User, Brain, Loader } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackModal } from "@/components/feedback-modal";
 import SimpleVoiceButton, { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
-import Link from "next/link";
 
 // 原有的Message接口
 interface Message {
@@ -646,25 +645,6 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
             {user?.email?.split('@')[0] || '会员'}
           </span>
           
-          {/* 语音交互按钮 */}
-          <SimpleVoiceButton 
-            ref={voiceButtonRef}
-            onUserSpeech={(transcript) => {
-              console.log('语音输入:', transcript);
-              handleSendMessage(transcript);
-            }}
-            onStatusChange={(status) => {
-              console.log('语音状态:', status);
-            }}
-          />
-          
-          <Link 
-            href="/voice-test" 
-            className="text-white/80 hover:text-white transition-colors p-1 rounded"
-            title="语音测试"
-          >
-            <Settings className="w-4 h-4" />
-          </Link>
           <FeedbackModal userEmail={user?.email} userId={user?.id} />
           <LogoutButton />
         </div>
@@ -682,7 +662,11 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
 
         {/* 输入区域 */}
         <div className="border-t bg-white p-3 sm:p-4">
-          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
+          <ChatInput 
+            onSendMessage={handleSendMessage} 
+            disabled={isLoading}
+            voiceButtonRef={voiceButtonRef}
+          />
         </div>
       </div>
     </div>
