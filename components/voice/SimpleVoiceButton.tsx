@@ -247,9 +247,13 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
   const processTextChunk = useCallback(async (chunk: string) => {
     if (!chunk?.trim()) return;
     
-    // 确保组件已初始化
-    if (!audioManagerRef.current || !streamingTTSRef.current) {
-      await initializeManagers();
+    // 🔒 严格检查初始化状态，避免重复初始化
+    if (!isInitializedRef.current) {
+      const initialized = await initializeManagers();
+      if (!initialized) {
+        console.error('组件初始化失败');
+        return;
+      }
     }
     
     if (!streamingTTSRef.current) {

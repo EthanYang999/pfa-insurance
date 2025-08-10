@@ -109,9 +109,14 @@ export class TTSAudioManager implements AudioManager {
 
     this.updateQueueState();
 
-    // 如果当前没有播放，自动开始播放
-    if (!this.state.isPlaying && !this.state.isPaused) {
-      this.playNext();
+    // 🔒 安全的播放检查，避免并发调用
+    if (!this.state.isPlaying && !this.state.isPaused && !this.state.currentItemId) {
+      // 短暂延迟，让音频合成有时间完成
+      setTimeout(() => {
+        if (!this.state.isPlaying && !this.state.isPaused) {
+          this.playNext();
+        }
+      }, 50);
     }
 
     return id;
@@ -164,6 +169,16 @@ export class TTSAudioManager implements AudioManager {
       throw new Error('音频上下文未准备就绪');
     }
 
+    // 🔒 防止重复播放检查
+    if (item.isPlaying || this.state.currentItemId === item.id) {
+      console.warn(`⚠️ 项目已在播放中，跳过: ${item.id}`);
+      return;
+    }
+
+    // 🔒 立即标记为播放状态，防止并发调用
+    item.isPlaying = true;
+    this.state.currentItemId = item.id;
+
     if (!item.audioBuffer) {
       console.warn(`音频缓冲区未就绪: ${item.id}`);
       // 尝试重新获取音频
@@ -182,6 +197,9 @@ export class TTSAudioManager implements AudioManager {
 
     if (!item.audioBuffer) {
       console.error(`无法播放音频项目: ${item.id}`);
+      // 🔒 清理状态
+      item.isPlaying = false;
+      this.state.currentItemId = undefined;
       this.playNext();
       return;
     }
@@ -228,7 +246,10 @@ export class TTSAudioManager implements AudioManager {
       const errorMessage = `播放音频失败: ${error.message}`;
       console.error(errorMessage, error);
       
+      // 🔒 完整清理状态
       item.isPlaying = false;
+      this.state.isPlaying = false;
+      this.state.currentItemId = undefined;
       this.state.error = errorMessage;
       this.callbacks.onError?.(errorMessage, item);
       
@@ -239,7 +260,12 @@ export class TTSAudioManager implements AudioManager {
 
   // 播放下一个项目
   private playNext(): void {
-    const nextItem = this.queue.find(item => !item.isPlaying);
+    // 🔍 查找未播放且不是当前项目的下一个项目
+    const nextItem = this.queue.find(item => 
+      !item.isPlaying && 
+      item.id !== this.state.currentItemId
+    );
+    
     if (nextItem) {
       this.playItem(nextItem);
     } else {
