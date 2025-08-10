@@ -7,7 +7,7 @@ import { Bot, User, Brain, Loader, Settings } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackModal } from "@/components/feedback-modal";
-import VoiceButton, { type VoiceButtonRef } from "@/components/voice/VoiceButton";
+import SimpleVoiceButton, { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
 import Link from "next/link";
 
 // 原有的Message接口
@@ -82,7 +82,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const voiceButtonRef = useRef<VoiceButtonRef>(null);
+  const voiceButtonRef = useRef<SimpleVoiceButtonRef>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -624,7 +624,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
           </span>
           
           {/* 语音交互按钮 */}
-          <VoiceButton 
+          <SimpleVoiceButton 
             ref={voiceButtonRef}
             onUserSpeech={(transcript) => {
               console.log('语音输入:', transcript);

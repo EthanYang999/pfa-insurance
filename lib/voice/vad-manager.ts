@@ -250,11 +250,22 @@ export class VADVoiceManager implements VADManager {
   // 动态加载VAD库
   private async loadVADLibrary(): Promise<any> {
     try {
+      console.log('正在动态加载VAD库...');
       // 尝试从不同的源加载VAD库
-      return await import('@ricky0123/vad-web');
+      const vadModule = await import('@ricky0123/vad-web');
+      console.log('VAD库加载成功:', vadModule);
+      
+      // 检查VAD对象是否存在
+      if (!vadModule.VAD) {
+        console.error('VAD库结构:', Object.keys(vadModule));
+        throw new Error('VAD对象不存在于加载的模块中');
+      }
+      
+      return vadModule;
     } catch (error) {
       console.error('VAD库加载失败:', error);
-      throw new Error('无法加载VAD语音检测库');
+      console.error('错误详情:', error);
+      throw new Error(`无法加载VAD语音检测库: ${error instanceof Error ? error.message : '未知错误'}`);
     }
   }
 
