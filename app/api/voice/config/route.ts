@@ -33,11 +33,11 @@ export async function GET(): Promise<NextResponse> {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('获取语音配置失败:', error);
     return NextResponse.json({
       error: '获取配置失败',
-      details: error.message || '未知错误'
+      details: error instanceof Error ? error.message : '未知错误'
     }, { status: 500 });
   }
 }
@@ -58,8 +58,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     };
 
     const missingVars = Object.entries(checks.environmentVariables)
-      .filter(([_, exists]) => !exists)
-      .map(([name, _]) => name);
+      .filter(([, exists]) => !exists)
+      .map(([name]) => name);
 
     let credentialValidation = null;
     if (validateCredentials && missingVars.length === 0) {
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           azure: testResponse.ok,
           error: testResponse.ok ? null : await testResponse.text()
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
         credentialValidation = {
           azure: false,
           error: error.message
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('配置验证失败:', error);
     return NextResponse.json({
       valid: false,

@@ -161,11 +161,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('TTS API路由错误:', error);
     const errorResponse: TTSResponse = {
       error: '语音合成服务异常',
-      details: error.message || '未知错误'
+      details: error instanceof Error ? error.message : '未知错误'
     };
     return NextResponse.json(errorResponse, { status: 500 });
   }

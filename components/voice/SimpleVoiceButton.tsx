@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Mic, Volume2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 import { createAudioManager, type AudioManager } from '@/lib/voice/audio-manager';
@@ -161,7 +161,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
       }
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('🚨 语音识别错误:', event.error);
       setIsRecording(false);
       
@@ -201,7 +201,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
 
     recognitionRef.current = recognition;
     return true;
-  }, [onUserSpeech, status, updateStatus]);
+  }, [onUserSpeech, status, updateStatus, voiceMode, stopContinuousListening]);
 
   // 🔄 重启语音识别（连续监听核心）
   const restartRecognition = useCallback(() => {
@@ -289,7 +289,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
       console.log('语音组件初始化成功');
       return true;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('初始化语音组件失败:', error);
       return false;
     }
@@ -377,7 +377,7 @@ const SimpleVoiceButton = forwardRef<SimpleVoiceButtonRef, SimpleVoiceButtonProp
       if (recognitionRef.current) {
         recognitionRef.current.start();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('启动语音识别失败:', error);
     }
   }, [initializeManagers, isRecording, isPlaying]);

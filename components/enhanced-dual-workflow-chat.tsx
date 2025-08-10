@@ -7,7 +7,7 @@ import { Bot, User, Brain, Loader } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackModal } from "@/components/feedback-modal";
-import SimpleVoiceButton, { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
+import { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
 
 // 原有的Message接口
 interface Message {

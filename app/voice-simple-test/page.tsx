@@ -41,7 +41,7 @@ export default function SimpleVoiceTestPage() {
               🎤 语音交互测试
             </CardTitle>
             <CardDescription>
-              点击麦克风按钮开始，然后点击"开始说话"进行语音识别
+              点击麦克风按钮开始，然后点击&ldquo;开始说话&rdquo;进行语音识别
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -79,7 +79,7 @@ export default function SimpleVoiceTestPage() {
               <h3 className="font-medium text-foreground">使用步骤：</h3>
               <ol className="list-decimal list-inside space-y-1">
                 <li>点击麦克风图标启动语音功能</li>
-                <li>看到"开始说话"按钮后，点击它</li>
+                <li>看到&ldquo;开始说话&rdquo;按钮后，点击它</li>
                 <li>开始清晰地说话</li>
                 <li>说完后等待识别结果</li>
                 <li>查看AI的语音回复</li>
