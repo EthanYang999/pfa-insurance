@@ -3,6 +3,54 @@
 
 import type { AudioManager } from './audio-manager';
 
+// 🧹 TTS文本清理函数 - 移除Markdown格式和表情符号
+function cleanTextForTTS(text: string): string {
+  if (!text || typeof text !== 'string') return '';
+  
+  let cleanText = text;
+  
+  // 1. 移除Markdown链接格式 [文字](链接) -> 文字
+  cleanText = cleanText.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  
+  // 2. 移除Markdown粗体格式 **文字** -> 文字
+  cleanText = cleanText.replace(/\*\*([^*]+)\*\*/g, '$1');
+  
+  // 3. 移除Markdown斜体格式 *文字* -> 文字
+  cleanText = cleanText.replace(/\*([^*]+)\*/g, '$1');
+  
+  // 4. 移除代码块格式 ```代码``` -> (移除)
+  cleanText = cleanText.replace(/```[\s\S]*?```/g, '');
+  
+  // 5. 移除行内代码格式 `代码` -> 代码
+  cleanText = cleanText.replace(/`([^`]+)`/g, '$1');
+  
+  // 6. 移除标题格式 # 标题 -> 标题
+  cleanText = cleanText.replace(/^#{1,6}\s+/gm, '');
+  
+  // 7. 移除列表符号 - 项目 -> 项目
+  cleanText = cleanText.replace(/^[-*+]\s+/gm, '');
+  
+  // 8. 移除数字列表 1. 项目 -> 项目
+  cleanText = cleanText.replace(/^\d+\.\s+/gm, '');
+  
+  // 9. 移除引用格式 > 引用 -> 引用
+  cleanText = cleanText.replace(/^>\s+/gm, '');
+  
+  // 10. 移除表情符号 (Unicode范围)
+  cleanText = cleanText.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+  
+  // 11. 移除常见文本表情符号
+  cleanText = cleanText.replace(/:\w+:/g, ''); // :smile:, :heart: 等
+  
+  // 12. 移除多余的空白字符
+  cleanText = cleanText.replace(/\s+/g, ' ');
+  
+  // 13. 移除首尾空白
+  cleanText = cleanText.trim();
+  
+  return cleanText;
+}
+
 export class StreamingTTSProcessor {
   private textBuffer: string = '';
   private audioManager: AudioManager | null = null;
@@ -56,9 +104,17 @@ export class StreamingTTSProcessor {
     
     for (const sentence of sentences) {
       if (sentence.trim()) {
-        console.log('流式TTS合成句子:', sentence.substring(0, 30) + '...');
+        // 🧹 清理Markdown格式和表情符号
+        const cleanedSentence = cleanTextForTTS(sentence.trim());
+        
+        // 跳过清理后为空的句子
+        if (!cleanedSentence) continue;
+        
+        console.log('原始句子:', sentence.substring(0, 30) + '...');
+        console.log('清理后句子:', cleanedSentence.substring(0, 30) + '...');
+        
         try {
-          await this.audioManager.addToQueue(sentence.trim());
+          await this.audioManager.addToQueue(cleanedSentence);
         } catch (error) {
           console.error('添加句子到TTS队列失败:', error);
         }
@@ -70,11 +126,18 @@ export class StreamingTTSProcessor {
   async processRemainingText(): Promise<void> {
     if (!this.textBuffer.trim() || !this.audioManager) return;
 
-    console.log('流式TTS合成剩余文本:', this.textBuffer.substring(0, 30) + '...');
-    try {
-      await this.audioManager.addToQueue(this.textBuffer.trim());
-    } catch (error) {
-      console.error('添加剩余文本到TTS队列失败:', error);
+    // 🧹 清理Markdown格式和表情符号
+    const cleanedText = cleanTextForTTS(this.textBuffer.trim());
+    
+    if (cleanedText) {
+      console.log('流式TTS合成剩余文本 - 原始:', this.textBuffer.substring(0, 30) + '...');
+      console.log('流式TTS合成剩余文本 - 清理后:', cleanedText.substring(0, 30) + '...');
+      
+      try {
+        await this.audioManager.addToQueue(cleanedText);
+      } catch (error) {
+        console.error('添加剩余文本到TTS队列失败:', error);
+      }
     }
     
     this.textBuffer = '';
@@ -135,8 +198,15 @@ export class StreamingTTSProcessor {
   // 强制处理当前缓冲区（用于紧急情况）
   async flushBuffer(): Promise<void> {
     if (this.textBuffer.trim() && this.audioManager) {
-      console.log('强制刷新TTS缓冲区:', this.textBuffer);
-      await this.audioManager.addToQueue(this.textBuffer.trim());
+      // 🧹 清理Markdown格式和表情符号
+      const cleanedText = cleanTextForTTS(this.textBuffer.trim());
+      
+      if (cleanedText) {
+        console.log('强制刷新TTS缓冲区 - 原始:', this.textBuffer.substring(0, 30) + '...');
+        console.log('强制刷新TTS缓冲区 - 清理后:', cleanedText.substring(0, 30) + '...');
+        await this.audioManager.addToQueue(cleanedText);
+      }
+      
       this.textBuffer = '';
     }
   }
@@ -147,8 +217,15 @@ export class StreamingTTSProcessor {
       // 如果缓冲区有内容且超过1秒没有新内容，强制处理
       const timeSinceLastProcess = Date.now() - this.lastProcessTime;
       if (timeSinceLastProcess >= 1000 && this.textBuffer.length >= 10) {
-        console.log('定时强制刷新TTS缓冲区:', this.textBuffer.substring(0, 30) + '...');
-        await this.audioManager.addToQueue(this.textBuffer.trim());
+        // 🧹 清理Markdown格式和表情符号
+        const cleanedText = cleanTextForTTS(this.textBuffer.trim());
+        
+        if (cleanedText) {
+          console.log('定时强制刷新TTS缓冲区 - 原始:', this.textBuffer.substring(0, 30) + '...');
+          console.log('定时强制刷新TTS缓冲区 - 清理后:', cleanedText.substring(0, 30) + '...');
+          await this.audioManager.addToQueue(cleanedText);
+        }
+        
         this.textBuffer = '';
       }
     }
