@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       // 更新最后一条消息
       if (record.created_at > session.last_message_time) {
         session.last_message_time = record.created_at;
-        session.last_message = message.content || '';
+        session.last_message = record.message?.content || '';
       }
     });
 

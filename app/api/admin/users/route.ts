@@ -86,26 +86,33 @@ export async function GET(request: NextRequest) {
     // 获取用户统计信息
     const finalUserIds = finalFilteredUsers.map(u => u.id);
     
-    const { data: sessionStats } = await supabase
-      .from('chat_sessions')
-      .select('user_id')
-      .in('user_id', finalUserIds);
-
-    const { data: messageStats } = await supabase
-      .from('chat_messages')
-      .select('user_id') 
-      .in('user_id', finalUserIds);
+    // 从 n8n_chat_histories 表获取用户聊天统计
+    const { data: chatStats } = await supabase
+      .from('n8n_chat_histories')
+      .select('user_id, session_id')
+      .eq('session_type', 'user')
+      .in('user_id', finalUserIds)
+      .not('user_id', 'is', null);
 
     // 统计每个用户的会话和消息数量
-    const sessionCounts = (sessionStats || []).reduce((acc: Record<string, number>, stat) => {
-      acc[stat.user_id] = (acc[stat.user_id] || 0) + 1;
+    const userStatsMap = (chatStats || []).reduce((acc: Record<string, { sessionIds: Set<string>, messageCount: number }>, record) => {
+      const userId = record.user_id;
+      if (!acc[userId]) {
+        acc[userId] = { sessionIds: new Set(), messageCount: 0 };
+      }
+      acc[userId].sessionIds.add(record.session_id);
+      acc[userId].messageCount++;
       return acc;
     }, {});
 
-    const messageCounts = (messageStats || []).reduce((acc: Record<string, number>, stat) => {
-      acc[stat.user_id] = (acc[stat.user_id] || 0) + 1;
-      return acc;
-    }, {});
+    // 转换为最终的统计格式
+    const sessionCounts: Record<string, number> = {};
+    const messageCounts: Record<string, number> = {};
+    
+    Object.entries(userStatsMap).forEach(([userId, stats]) => {
+      sessionCounts[userId] = stats.sessionIds.size;
+      messageCounts[userId] = stats.messageCount;
+    });
 
     // 合并统计数据
     const usersWithStats = finalFilteredUsers.map(user => ({
