@@ -8,6 +8,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackModal } from "@/components/feedback-modal";
 import { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
+import { LoginButton } from "@/components/LoginButton";
+import { ChatHistoryButton } from "@/components/ChatHistoryButton";
 
 // 原有的Message接口
 interface Message {
@@ -29,10 +31,12 @@ interface User {
 }
 
 interface ChatInterfaceProps {
-  user: User;
+  user: User | null;           // null表示访客模式
+  guestId?: string | null;     // 访客模式的ID
+  onLoginRequest?: () => void; // 登录请求回调
 }
 
-export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
+export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: ChatInterfaceProps) {
   // 🔧 功能开关：控制是否显示N8N专业回答功能
   // 设置为 false 隐藏专业回答，设置为 true 恢复完整功能
   const ENABLE_PROFESSIONAL_ANSWER = true;
@@ -42,15 +46,28 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
     return Math.random().toString(36).substring(2) + Date.now().toString(36);
   };
 
-  // 保存聊天记录到数据库
+  // 保存聊天记录到数据库（支持用户和访客模式）
   const saveChatHistory = async (sessionId: string, type: 'human' | 'ai', content: string) => {
     try {
       const message = {
         type,
         content,
         additional_kwargs: {},
-        response_metadata: {}
+        response_metadata: {},
+        // 关键：根据用户状态选择存储方式
+        user_id: user?.id || null,           // 登录用户ID
+        guest_id: user ? null : (guestId || null), // 访客ID（只在未登录时使用）
+        session_type: user ? 'user' : 'guest'      // 标记会话类型
       };
+
+      console.log('保存聊天记录:', {
+        sessionId,
+        type,
+        userMode: user ? 'logged_in' : 'guest',
+        userId: user?.id,
+        guestId: guestId,
+        contentLength: content.length
+      });
 
       await fetch('/api/chat/dify-history', {
         method: 'POST',
@@ -104,7 +121,7 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
       conversationId?: string;
     } = {
       message,
-      user: user.id || user.sub || `user_${Date.now()}`
+      user: user?.id || user?.sub || guestId || `fallback_${Date.now()}`
     };
     
     if (conversationId) {
@@ -661,12 +678,25 @@ export function EnhancedDualWorkflowChat({ user }: ChatInterfaceProps) {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <span className="text-pfa-champagne-gold text-xs sm:text-sm">
-            {user?.email?.split('@')[0] || '会员'}
-          </span>
-          
-          <FeedbackModal userEmail={user?.email} userId={user?.id} />
-          <LogoutButton />
+          {user ? (
+            // 已登录用户：显示用户信息 + 聊天历史 + 反馈 + 登出
+            <>
+              <span className="text-pfa-champagne-gold text-xs sm:text-sm">
+                {user.email?.split('@')[0] || '会员'}
+              </span>
+              <ChatHistoryButton user={user} />
+              <FeedbackModal userEmail={user.email} userId={user.id} />
+              <LogoutButton />
+            </>
+          ) : (
+            // 访客模式：显示访客标识 + 登录按钮
+            <>
+              <span className="text-pfa-champagne-gold text-xs sm:text-sm">
+                访客模式
+              </span>
+              {onLoginRequest && <LoginButton onClick={onLoginRequest} />}
+            </>
+          )}
         </div>
       </header>
 

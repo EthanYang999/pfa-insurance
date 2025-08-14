@@ -14,13 +14,38 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
+    // 构建插入数据，支持用户ID和访客ID
+    const insertData: any = {
+      session_id,
+      message: {
+        ...message,
+        // 确保message对象包含所有必要字段
+        type: message.type,
+        content: message.content,
+        additional_kwargs: message.additional_kwargs || {},
+        response_metadata: message.response_metadata || {}
+      }
+    };
+
+    // 添加用户标识信息（支持用户ID或访客ID）
+    if (message.user_id) {
+      insertData.user_id = message.user_id;
+      insertData.session_type = 'user';
+      console.log('保存用户聊天记录:', { session_id, user_id: message.user_id });
+    } else if (message.guest_id) {
+      insertData.guest_id = message.guest_id;
+      insertData.session_type = 'guest';
+      console.log('保存访客聊天记录:', { session_id, guest_id: message.guest_id });
+    } else {
+      // 兜底处理：如果都没有，记录为未知类型
+      insertData.session_type = 'unknown';
+      console.warn('聊天记录缺少用户/访客标识:', { session_id });
+    }
+
     // 保存聊天记录到n8n_chat_histories表（统一存储）
     const { data, error } = await supabase
       .from('n8n_chat_histories')
-      .insert({
-        session_id,
-        message
-      })
+      .insert(insertData)
       .select()
       .single();
 
