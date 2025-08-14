@@ -84,8 +84,8 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
     {
       id: "welcome",
       content: ENABLE_PROFESSIONAL_ANSWER 
-        ? "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会先为您提供快速回答，如需更专业的建议，可点击「获取专业回答」。"
-        : "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会为您提供专业的AI回答和指导。",
+        ? "您好！我是AI实战教练。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会先为您提供快速回答，如需更专业的建议，可点击「获取专业回答」。"
+        : "您好！我是AI实战教练。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会为您提供专业的AI回答和指导。",
       isUser: false,
       timestamp: new Date(),
       aiService: 'system'
@@ -318,7 +318,7 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
       
       const professionalMessage: Message = {
         id: `professional_${Date.now()}`,
-        content: data.output || data.response || "抱歉，专业AI教练暂时无法处理您的请求。",
+        content: data.output || data.response || "抱歉，AI实战教练暂时无法处理您的请求。",
         isUser: false,
         timestamp: new Date(),
         aiService: 'n8n',
@@ -555,7 +555,7 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
               {ENABLE_PROFESSIONAL_ANSWER && message.aiService === 'n8n' && (
                 <div className="flex items-center gap-2 mb-2 pb-2 border-b border-pfa-champagne-gold/20">
                   <Brain className="w-4 h-4 text-pfa-champagne-gold" />
-                  <span className="text-sm font-medium text-pfa-champagne-gold">AI专业教练深度分析</span>
+                  <span className="text-sm font-medium text-pfa-champagne-gold">AI实战教练深度分析</span>
                 </div>
               )}
               
@@ -618,7 +618,7 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
                       需要更专业的回答？
                     </p>
                     <p className="text-xs text-gray-500">
-                      AI专业教练将为您提供更详细的分析和建议（约30秒）
+                      AI实战教练将为您提供更详细的分析和建议（约30秒）
                     </p>
                   </div>
                   <button
@@ -641,7 +641,7 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
                       正在获取专业回答...
                     </p>
                     <p className="text-xs text-gray-500">
-                      AI专业教练正在为您分析，预计需要30秒
+                      AI实战教练正在为您分析，预计需要30秒
                     </p>
                   </div>
                 </div>
@@ -667,7 +667,7 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-sm sm:text-base text-white truncate">
-                金牌教练
+                AI实战教练
               </h1>
             </div>
           </div>

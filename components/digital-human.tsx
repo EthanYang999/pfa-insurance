@@ -103,9 +103,9 @@ export function DigitalHuman({
                 </div>
               </div>
               
-              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-1 sm:mb-2">PFA智能助手</h3>
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-1 sm:mb-2">AI实战教练</h3>
               <p className="text-coach-gold-light text-xs sm:text-sm opacity-80">
-                AI保险培训助手
+                AI实战教练
               </p>
             </div>
           </div>

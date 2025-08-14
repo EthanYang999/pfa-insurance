@@ -7,8 +7,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "金牌保险教练 - 雪梨 (Shirley)",
-  description: "为PFA保险经纪人提供7x24小时AI智能培训指导，提升销售技能和产品知识水平",
+  title: "AI实战教练",
+  description: "为保险经纪人提供7x24小时AI智能培训指导，提升销售技能和产品知识水平",
 };
 
 export default function RootLayout({

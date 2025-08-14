@@ -29,12 +29,12 @@ const translations = {
     'hero.title.ai': 'AI驱动的',
     'hero.title.coach': ' 保险教练',
     'hero.title.excellence': '助您成就卓越',
-    'hero.description': '专为PFA保险经纪人打造的智能培训平台。24/7 AI教练雪莉，提供个性化指导，助您掌握销售技巧、产品知识，实现事业突破。',
+    'hero.description': '专为保险经纪人打造的智能培训平台。24/7 AI实战教练，提供个性化指导，助您掌握销售技巧、产品知识，实现事业突破。',
     'hero.cta.experience': '立即体验 AI 教练',
     'hero.cta.demo': '观看演示视频',
-    'hero.coach.name': 'AI教练雪莉',
+    'hero.coach.name': 'AI实战教练',
     'hero.coach.status': '在线 · 随时为您服务',
-    'hero.coach.intro': '您好！我是雪莉，您的专属AI保险教练。我可以帮助您...',
+    'hero.coach.intro': '您好！我是AI实战教练。我可以帮助您...',
     'hero.topics.product': '产品知识',
     'hero.topics.sales': '销售技巧',
     'hero.topics.service': '客户服务',
@@ -70,7 +70,7 @@ const translations = {
     
     // Philosophy Section
     'philosophy.title': '核心理念',
-    'philosophy.subtitle': 'PFA 独特的保险经营理念，以创新科技赋能传统保险业务，实现客户、经纪人、公司的三方共赢',
+    'philosophy.subtitle': '独特的保险经营理念，以创新科技赋能传统保险业务，实现客户、经纪人、公司的三方共赢',
     'philosophy.wisdom.title': '智慧驱动',
     'philosophy.wisdom.desc': '运用AI技术和数据分析，为每位经纪人提供智能化的培训支持和业务指导，让专业服务更加精准高效。',
     'philosophy.teamwork.title': '团队共赢',
@@ -82,11 +82,11 @@ const translations = {
     
     // Opportunity Section
     'opportunity.title': '事业机会',
-    'opportunity.subtitle': '加入 PFA 团队，开启您的保险事业新篇章。我们提供完整的培训体系、强大的团队支持和广阔的发展空间，助您实现事业梦想。',
+    'opportunity.subtitle': '加入我们的团队，开启您的保险事业新篇章。我们提供完整的培训体系、强大的团队支持和广阔的发展空间，助您实现事业梦想。',
     'opportunity.training.title': '完善培训体系',
     'opportunity.training.desc': '从入门基础到高级技能，从产品知识到销售技巧，提供系统化、专业化的培训课程，确保每位伙伴都能快速成长为专业的保险顾问。',
     'opportunity.support.title': '强大团队支持',
-    'opportunity.support.desc': '资深导师一对一指导，团队资源共享，定期交流分享会。在PFA，您永远不是一个人在奋斗，整个团队都是您的坚强后盾。',
+    'opportunity.support.desc': '资深导师一对一指导，团队资源共享，定期交流分享会。在这里，您永远不是一个人在奋斗，整个团队都是您的坚强后盾。',
     'opportunity.development.title': '广阔发展前景',
     'opportunity.development.desc': '多元化的职业发展路径，从个人顾问到团队领导，从区域经理到合伙人，为每个人提供适合的成长空间和晋升机会。',
     'opportunity.why.title': '为什么选择 PFA？',
@@ -96,12 +96,12 @@ const translations = {
     'opportunity.benefit4': '持续的技能提升和职业发展',
     'opportunity.benefit5': '温暖的团队文化和工作氛围',
     'opportunity.cta': '了解加入详情',
-    'opportunity.quote': '"一个人走得快，一群人走得远。在PFA，我们不仅仅是同事，更是相互支撑的伙伴和朋友。"',
-    'opportunity.quote.author': '— PFA 核心理念',
+    'opportunity.quote': '"一个人走得快，一群人走得远。在这里，我们不仅仅是同事，更是相互支撑的伙伴和朋友。"',
+    'opportunity.quote.author': '— 核心理念',
     
     // Success Stories
     'success.title': '成功案例',
-    'success.subtitle': '真实的成长故事，见证每一位伙伴在PFA平台上的专业蜕变和事业成功',
+    'success.subtitle': '真实的成长故事，见证每一位伙伴在平台上的专业蜕变和事业成功',
     'success.more.title': '更多成功故事',
     'success.more.placeholder': '[真实经纪人成功案例展示区域 - 详细内容待添加]',
     'success.stats.agents': '成功经纪人',
@@ -111,11 +111,11 @@ const translations = {
     
     // CTA Section
     'cta.title': '准备开始您的专业成长之旅？',
-    'cta.subtitle': '立即体验AI教练雪莉，获得个性化的专业指导，让您的保险事业更上一层楼',
+    'cta.subtitle': '立即体验AI实战教练，获得个性化的专业指导，让您的保险事业更上一层楼',
     'cta.button': '开始对话',
     
     // Contact Section
-    'contact.join.title': '加入 PFA 团队',
+    'contact.join.title': '加入我们的团队',
     'contact.join.subtitle': '开启您的保险事业新篇章，与我们一起创造更美好的未来',
     'contact.membership.title': '会员计划',
     'contact.membership.item1': '专业培训认证体系',
@@ -127,7 +127,7 @@ const translations = {
     'contact.us.title': '联系我们',
     'contact.us.subtitle': '有任何问题或想要了解更多信息？我们随时为您服务',
     'contact.ai.title': 'AI智能咨询',
-    'contact.ai.desc': '与我们的AI教练雪莉对话，获得即时的专业解答和个性化建议',
+    'contact.ai.desc': '与我们的AI实战教练对话，获得即时的专业解答和个性化建议',
     'contact.ai.button': '开始咨询',
     'contact.team.title': '团队交流',
     'contact.team.placeholder': '[团队联系方式待添加]',
@@ -148,7 +148,7 @@ const translations = {
     'footer.copyright': '© 2025 PFA 保险联盟. 保留所有权利.',
     
     // Chat Interface
-    'chat.title': '金牌保险教练 - 雪梨 (Shirley)',
+    'chat.title': 'AI实战教练',
     'chat.back': '返回首页',
     'chat.online': '在线',
     'chat.placeholder': '输入您的问题...',

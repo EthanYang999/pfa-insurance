@@ -117,7 +117,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                 <br />助您成就卓越
               </h1>
               <p className="mt-6 text-xl text-pfa-dark-gray leading-relaxed">
-                专为PFA保险经纪人打造的智能培训平台。24/7 PFA智能助手，提供个性化指导，
+                专为保险经纪人打造的智能培训平台。24/7 AI实战教练，提供个性化指导，
                 助您掌握销售技巧、产品知识，实现事业突破。
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -147,13 +147,13 @@ export function PFADashboard({ user }: PFADashboardProps) {
                       <MessageCircle className="h-5 w-5 text-pfa-royal-blue" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-pfa-royal-blue">PFA智能助手</h3>
+                      <h3 className="font-semibold text-pfa-royal-blue">AI实战教练</h3>
                       <p className="text-sm text-pfa-dark-gray">在线 · 随时为您服务</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="bg-pfa-light-gray rounded-lg p-3">
-                      <p className="text-sm text-pfa-dark-gray">您好！我是PFA智能助手，您的专属AI保险培训助手。我可以帮助您...</p>
+                      <p className="text-sm text-pfa-dark-gray">您好！我是AI实战教练。我可以帮助您...</p>
                     </div>
                     <div className="flex space-x-2">
                       <Button size="sm" variant="outline" className="text-xs">产品知识</Button>
@@ -314,7 +314,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
               核心理念
             </h2>
             <p className="text-xl text-pfa-dark-gray max-w-3xl mx-auto">
-              PFA 独特的保险经营理念，以创新科技赋能传统保险业务，实现客户、经纪人、公司的三方共赢
+              独特的保险经营理念，以创新科技赋能传统保险业务，实现客户、经纪人、公司的三方共赢
             </p>
           </div>
 
@@ -374,7 +374,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
               事业机会
             </h2>
             <p className="text-xl text-pfa-dark-gray max-w-3xl mx-auto">
-              加入 PFA 团队，开启您的保险事业新篇章。我们提供完整的培训体系、
+              加入我们的团队，开启您的保险事业新篇章。我们提供完整的培训体系、
               强大的团队支持和广阔的发展空间，助您实现事业梦想。
             </p>
           </div>
@@ -403,7 +403,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                 </div>
                 <p className="text-pfa-dark-gray">
                   资深导师一对一指导，团队资源共享，定期交流分享会。
-                  在PFA，您永远不是一个人在奋斗，整个团队都是您的坚强后盾。
+                  在这里，您永远不是一个人在奋斗，整个团队都是您的坚强后盾。
                 </p>
               </div>
 
@@ -426,7 +426,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                 <h3 className="text-2xl font-bold mb-6 text-center">为什么选择 PFA？</h3>
                 <div className="space-y-4">
                   {[
-                    "AI智能教练24/7专业指导",
+                    "AI实战教练24/7专业指导",
                     "行业领先的产品组合和服务",
                     "完善的激励机制和福利体系", 
                     "持续的技能提升和职业发展",
@@ -452,9 +452,9 @@ export function PFADashboard({ user }: PFADashboardProps) {
               <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-pfa-champagne-gold">
                 <Quote className="h-8 w-8 text-pfa-champagne-gold mb-4" />
                 <p className="text-pfa-dark-gray italic mb-4">
-                  &ldquo;一个人走得快，一群人走得远。在PFA，我们不仅仅是同事，更是相互支撑的伙伴和朋友。&rdquo;
+                  &ldquo;一个人走得快，一群人走得远。在这里，我们不仅仅是同事，更是相互支撑的伙伴和朋友。&rdquo;
                 </p>
-                <p className="text-pfa-royal-blue font-semibold">— PFA 核心理念</p>
+                <p className="text-pfa-royal-blue font-semibold">— 核心理念</p>
               </div>
             </div>
           </div>
@@ -469,7 +469,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
               成功案例
             </h2>
             <p className="text-xl text-pfa-dark-gray max-w-3xl mx-auto">
-              真实的成长故事，见证每一位伙伴在PFA平台上的专业蜕变和事业成功
+              真实的成长故事，见证每一位伙伴在平台上的专业蜕变和事业成功
             </p>
           </div>
 
@@ -478,19 +478,19 @@ export function PFADashboard({ user }: PFADashboardProps) {
               {
                 name: "李经理",
                 role: "资深保险顾问",
-                story: "从零基础到年度销售冠军，在PFA的专业培训和AI教练指导下，一年内业绩提升300%，成功帮助200多个家庭建立完善的保障规划。",
+                story: "从零基础到年度销售冠军，在专业培训和AI实战教练指导下，一年内业绩提升300%，成功帮助200多个家庭建立完善的保障规划。",
                 achievement: "年度销售冠军"
               },
               {
                 name: "王团队长",
                 role: "区域团队领导",  
-                story: "通过PFA的团队管理培训，从个人顾问成长为优秀的团队领导者，带领30人团队创造了区域业绩第一的佳绩。",
+                story: "通过平台的团队管理培训，从个人顾问成长为优秀的团队领导者，带领30人团队创造了区域业绩第一的佳绩。",
                 achievement: "优秀团队领导者"
               },
               {
                 name: "张经纪人",
                 role: "新人培训导师",
-                story: "利用PFA的AI教练系统快速掌握专业技能，半年内通过所有认证考试，现已成为新人培训的资深导师。",
+                story: "利用AI实战教练系统快速掌握专业技能，半年内通过所有认证考试，现已成为新人培训的资深导师。",
                 achievement: "资深培训导师"
               }
             ].map((story, index) => (
@@ -547,7 +547,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
             准备开始您的专业成长之旅？
           </h2>
           <p className="mt-6 text-xl text-pfa-champagne-gold">
-            立即体验PFA智能助手，获得个性化的专业指导，让您的保险事业更上一层楼
+            立即体验AI实战教练，获得个性化的专业指导，让您的保险事业更上一层楼
           </p>
           <div className="mt-8">
             <Button 
@@ -568,7 +568,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
             {/* Join Us */}
             <div className="bg-gradient-to-br from-pfa-royal-blue to-pfa-navy-blue rounded-2xl p-8 text-white">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4">加入 PFA 团队</h2>
+                <h2 className="text-3xl font-bold mb-4">加入我们的团队</h2>
                 <p className="text-pfa-champagne-gold text-lg">
                   开启您的保险事业新篇章，与我们一起创造更美好的未来
                 </p>
@@ -584,7 +584,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                     </div>
                     <div className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-pfa-champagne-gold mr-3" />
-                      <span className="text-white/90">AI教练一对一指导</span>
+                      <span className="text-white/90">AI实战教练一对一指导</span>
                     </div>
                     <div className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-pfa-champagne-gold mr-3" />
@@ -630,7 +630,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
                       <MessageCircle className="h-12 w-12 text-pfa-champagne-gold mx-auto mb-4" />
                       <h3 className="text-xl font-semibold text-pfa-royal-blue mb-3">AI智能咨询</h3>
                       <p className="text-pfa-dark-gray mb-4">
-                        与我们的PFA智能助手对话，获得即时的专业解答和个性化建议
+                        与我们的AI实战教练对话，获得即时的专业解答和个性化建议
                       </p>
                       <Button 
                         className="bg-pfa-royal-blue hover:bg-pfa-navy-blue text-white px-6 py-2"

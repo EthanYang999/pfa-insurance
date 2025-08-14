@@ -33,7 +33,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "您好！我是PFA智能助手，您的AI保险培训助手。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会先为您提供快速回答，如需更专业的建议，可点击「获取专业回答」。",
+      content: "您好！我是AI实战教练。我可以帮助您学习产品知识、练习销售话术、解答专业问题。我会先为您提供快速回答，如需更专业的建议，可点击「获取专业回答」。",
       isUser: false,
       timestamp: new Date(),
       aiService: 'system'
@@ -566,7 +566,7 @@ export function DualWorkflowChatInterface({ user }: ChatInterfaceProps) {
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-sm sm:text-base text-white truncate">
-                PFA智能助手
+                AI实战教练
               </h1>
               <p className="text-pfa-champagne-gold text-xs">快速+专业回答</p>
             </div>
