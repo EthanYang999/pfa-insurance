@@ -318,7 +318,6 @@ export function UserManagement() {
                   <TableHead>状态</TableHead>
                   <TableHead>注册时间</TableHead>
                   <TableHead>最后登录</TableHead>
-                  <TableHead>活动统计</TableHead>
                   <TableHead className="text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
@@ -357,12 +356,6 @@ export function UserManagement() {
                       </TableCell>
                       <TableCell className="text-sm">
                         {user.last_sign_in_at ? formatDate(user.last_sign_in_at) : '从未登录'}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <div className="space-y-1">
-                          <div>{user.session_count || 0} 个会话</div>
-                          <div className="text-gray-500">{user.message_count || 0} 条消息</div>
-                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-2">
@@ -571,25 +564,6 @@ function UserDetailView({ user }: { user: UserInfo }) {
         </div>
       </div>
 
-      <div className="border-t pt-4">
-        <h4 className="text-sm font-medium text-gray-500 mb-3">活动统计</h4>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-pfa-royal-blue">{user.session_count || 0}</div>
-            <div className="text-xs text-gray-500">聊天会话</div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-pfa-royal-blue">{user.message_count || 0}</div>
-            <div className="text-xs text-gray-500">消息数量</div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-pfa-royal-blue">
-              {user.last_activity ? new Date(user.last_activity).toLocaleDateString() : 'N/A'}
-            </div>
-            <div className="text-xs text-gray-500">最后活动</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

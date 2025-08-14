@@ -3,7 +3,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "./user-management";
 import { AdvancedChatManagement } from "./advanced-chat-management";
-import { SystemMonitoring } from "./system-monitoring";
 import { SystemLogs } from "./system-logs";
 import { FeedbackManagement } from "./feedback-management";
 import { SystemSettings } from "./system-settings";
@@ -28,12 +27,11 @@ export function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Main Content Tabs */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="users">用户管理</TabsTrigger>
             <TabsTrigger value="dify-chat">聊天记录</TabsTrigger>
             <TabsTrigger value="feedback">反馈管理</TabsTrigger>
             <TabsTrigger value="settings">系统设置</TabsTrigger>
-            <TabsTrigger value="monitoring">系统监控</TabsTrigger>
             <TabsTrigger value="logs">日志管理</TabsTrigger>
           </TabsList>
 
@@ -47,10 +45,6 @@ export function AdminDashboard() {
 
           <TabsContent value="feedback">
             <FeedbackManagement />
-          </TabsContent>
-
-          <TabsContent value="monitoring">
-            <SystemMonitoring />
           </TabsContent>
 
           <TabsContent value="settings">

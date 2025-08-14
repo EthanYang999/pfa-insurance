@@ -37,18 +37,37 @@ function Switch({ checked, onCheckedChange, disabled }: SwitchProps) {
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Users, 
-  MessageSquare, 
-  Activity, 
-  Settings, 
-  UserCheck,
-  UserX,
   Shield,
   RefreshCw,
-  BarChart3,
-  Monitor
+  Monitor,
+  Database,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Activity,
+  Settings
 } from 'lucide-react';
-import { GuestAccessMonitor } from './guest-access-monitor';
+import { format } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
+
+interface ServiceHealth {
+  service_name: string;
+  status: 'healthy' | 'warning' | 'error' | 'unknown';
+  response_time: number | null;
+  error_message: string | null;
+  checked_at: string;
+  metadata?: {
+    uptime?: number;
+    memory_usage?: number;
+    cpu_usage?: number;
+    active_connections?: number;
+  };
+}
+
+interface SystemMetrics {
+  database: ServiceHealth;
+}
 
 interface AdminStats {
   overview: {
@@ -75,7 +94,9 @@ export function SystemSettings() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [guestModeEnabled, setGuestModeEnabled] = useState(false);
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
+  const [metricsLoading, setMetricsLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // 加载统计数据
   const loadStats = async () => {
@@ -88,7 +109,6 @@ export function SystemSettings() {
         // 更新开关状态
         const settings = data.stats.systemSettings;
         setGuestModeEnabled(settings.guest_access_enabled === true);
-        setMaintenanceMode(settings.maintenance_mode === true);
         
         console.log('管理员统计数据加载成功');
       } else {
@@ -132,45 +152,76 @@ export function SystemSettings() {
     await updateSystemSetting('guest_access_enabled', enabled);
   };
 
-  // 处理维护模式开关
-  const handleMaintenanceModeToggle = async (enabled: boolean) => {
-    setMaintenanceMode(enabled);
-    await updateSystemSetting('maintenance_mode', enabled);
-  };
-
-  // 格式化数字
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('zh-CN').format(num);
-  };
-
-  // 生成最近7天的图表数据
-  const generateWeeklyChartData = () => {
-    if (!stats?.weeklyTrend) return [];
-    
-    const last7Days = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      const dayData = stats.weeklyTrend[dateStr] || { user: 0, guest: 0, total: 0 };
+  // 加载系统监控数据
+  const fetchSystemMetrics = async () => {
+    setMetricsLoading(true);
+    try {
+      const response = await fetch('/api/admin/system/health');
+      const data = await response.json();
       
-      last7Days.push({
-        date: dateStr,
-        day: date.toLocaleDateString('zh-CN', { weekday: 'short' }),
-        user: dayData.user,
-        guest: dayData.guest,
-        total: dayData.total
-      });
+      if (data.success) {
+        setMetrics(data.metrics);
+        setLastUpdated(new Date());
+      }
+    } catch (error) {
+      console.error('Failed to fetch system metrics:', error);
+    } finally {
+      setMetricsLoading(false);
     }
-    
-    return last7Days;
   };
+
+  // 获取状态图标
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'healthy':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // 获取状态颜色
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'healthy':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'warning':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'error':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
+  // 获取状态文本
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'healthy':
+        return '正常';
+      case 'warning':
+        return '警告';
+      case 'error':
+        return '错误';
+      default:
+        return '未知';
+    }
+  };
+
 
   useEffect(() => {
     loadStats();
+    fetchSystemMetrics();
     
     // 设置定时刷新（每5分钟）
-    const interval = setInterval(loadStats, 5 * 60 * 1000);
+    const interval = setInterval(() => {
+      loadStats();
+      fetchSystemMetrics();
+    }, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -184,8 +235,6 @@ export function SystemSettings() {
       </div>
     );
   }
-
-  const weeklyData = generateWeeklyChartData();
 
   return (
     <div className="space-y-6">
@@ -204,167 +253,32 @@ export function SystemSettings() {
           <Badge variant={stats ? "default" : "secondary"} className="px-3 py-1">
             {stats ? "系统正常" : "数据加载中"}
           </Badge>
+          {lastUpdated && (
+            <span className="text-sm text-gray-500">
+              监控更新: {format(lastUpdated, 'HH:mm:ss', { locale: zhCN })}
+            </span>
+          )}
           <Button 
-            onClick={loadStats} 
-            disabled={updating}
+            onClick={() => {
+              loadStats();
+              fetchSystemMetrics();
+            }} 
+            disabled={updating || metricsLoading}
             size="sm"
             variant="outline"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${updating ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-2 ${(updating || metricsLoading) ? 'animate-spin' : ''}`} />
             刷新数据
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">系统概览</TabsTrigger>
+      <Tabs defaultValue="settings" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="settings">访问控制</TabsTrigger>
-          <TabsTrigger value="monitor">访客监控</TabsTrigger>
+          <TabsTrigger value="monitoring">系统监控</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-
-      {/* 快速状态卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">总消息数</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(stats?.overview.totalMessages || 0)}</div>
-            <p className="text-xs text-muted-foreground">
-              今日新增 {formatNumber(stats?.today.messages || 0)} 条
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">用户数量</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(stats?.overview.totalUsers || 0)}</div>
-            <p className="text-xs text-muted-foreground">
-              今日活跃 {formatNumber(stats?.today.users || 0)} 人
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">访客数量</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(stats?.overview.totalGuests || 0)}</div>
-            <p className="text-xs text-muted-foreground">
-              今日访问 {formatNumber(stats?.today.guests || 0)} 人
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">会话总数</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(stats?.overview.totalSessions || 0)}</div>
-            <p className="text-xs text-muted-foreground">
-              今日会话 {formatNumber(stats?.today.sessions || 0)} 个
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* 会话类型分布 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>会话类型分布</CardTitle>
-            <CardDescription>用户会话与访客会话的比例</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-blue-600" />
-                  <span>注册用户会话</span>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">{formatNumber(stats?.overview.userSessions || 0)}</div>
-                  <div className="text-sm text-gray-500">
-                    {stats?.overview.totalSessions ? 
-                      Math.round((stats.overview.userSessions / stats.overview.totalSessions) * 100) : 0}%
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserX className="w-4 h-4 text-orange-600" />
-                  <span>访客会话</span>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">{formatNumber(stats?.overview.guestSessions || 0)}</div>
-                  <div className="text-sm text-gray-500">
-                    {stats?.overview.totalSessions ? 
-                      Math.round((stats.overview.guestSessions / stats.overview.totalSessions) * 100) : 0}%
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
-              7日使用趋势
-            </CardTitle>
-            <CardDescription>
-              最近一周的消息数量变化趋势
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {weeklyData.map((day, index) => (
-                <div key={day.date} className="flex items-center gap-4">
-                  <div className="w-12 text-sm text-gray-600">
-                    {day.day}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="text-sm font-medium">
-                        {formatNumber(day.total)} 条消息
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        (用户: {day.user}, 访客: {day.guest})
-                      </div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all"
-                        style={{ 
-                          width: `${Math.max(1, (day.total / Math.max(...weeklyData.map(d => d.total), 1)) * 100)}%` 
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="w-16 text-right text-sm text-gray-600">
-                    {day.date.split('-').slice(1).join('/')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-        </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -392,20 +306,6 @@ export function SystemSettings() {
                     disabled={updating}
                   />
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="font-medium">维护模式</div>
-                    <div className="text-sm text-gray-500">
-                      启用后所有用户都无法访问系统
-                    </div>
-                  </div>
-                  <Switch
-                    checked={maintenanceMode}
-                    onCheckedChange={handleMaintenanceModeToggle}
-                    disabled={updating}
-                  />
-                </div>
 
                 {updating && (
                   <div className="text-sm text-blue-600 flex items-center gap-2">
@@ -430,13 +330,6 @@ export function SystemSettings() {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <span>系统状态</span>
-                  <Badge variant={maintenanceMode ? "destructive" : "default"}>
-                    {maintenanceMode ? "维护中" : "正常运行"}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center justify-between">
                   <span>数据更新时间</span>
                   <span className="text-sm text-gray-500">
                     {stats?.lastUpdated ? new Date(stats.lastUpdated).toLocaleString('zh-CN') : '未知'}
@@ -447,9 +340,75 @@ export function SystemSettings() {
           </div>
         </TabsContent>
 
-        <TabsContent value="monitor" className="space-y-6">
-          <GuestAccessMonitor />
+        <TabsContent value="monitoring" className="space-y-6">
+          <div className="space-y-6">
+            {/* 系统监控头部 */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                  <Monitor className="h-5 w-5" />
+                  系统服务监控
+                </h3>
+                <p className="text-gray-500">实时监控系统运行状态和性能指标</p>
+              </div>
+              <Button 
+                onClick={fetchSystemMetrics} 
+                disabled={metricsLoading}
+                variant="outline"
+                size="sm"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${metricsLoading ? 'animate-spin' : ''}`} />
+                刷新监控
+              </Button>
+            </div>
+
+            {metricsLoading && !metrics ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+                <p className="text-gray-500 mt-2">加载监控数据...</p>
+              </div>
+            ) : (
+              <>
+                {/* 服务状态概览 */}
+                <div className="grid grid-cols-1 gap-6">
+                  {/* 数据库状态 */}
+                  <Card className="max-w-lg">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Database className="h-4 w-4" />
+                        数据库服务
+                      </CardTitle>
+                      {metrics?.database && getStatusIcon(metrics.database.status)}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <Badge className={getStatusColor(metrics?.database?.status || 'unknown')}>
+                          {getStatusText(metrics?.database?.status || 'unknown')}
+                        </Badge>
+                        {metrics?.database?.response_time && (
+                          <div className="text-sm text-gray-600">
+                            响应时间: {metrics.database.response_time}ms
+                          </div>
+                        )}
+                        {metrics?.database?.error_message && (
+                          <div className="text-xs text-red-600 mt-1">
+                            {metrics.database.error_message}
+                          </div>
+                        )}
+                        {metrics?.database?.checked_at && (
+                          <div className="text-xs text-gray-500">
+                            检查时间: {format(new Date(metrics.database.checked_at), 'yyyy-MM-dd HH:mm:ss', { locale: zhCN })}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+            )}
+          </div>
         </TabsContent>
+
       </Tabs>
     </div>
   );
