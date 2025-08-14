@@ -121,17 +121,26 @@ export function AdvancedChatManagement() {
   };
 
   // 加载指定会话的消息
-  const loadSessionMessages = async (sessionId: string, userId: string) => {
+  const loadSessionMessages = async (sessionId: string, userId: string, isGuest = false) => {
     try {
       setLoading(true);
+      
+      const requestBody: any = {
+        session_id: sessionId
+      };
+      
+      if (isGuest) {
+        requestBody.guest_id = userId;
+      } else {
+        requestBody.user_id = userId;
+      }
+      
       const response = await fetch('/api/chat/history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id: sessionId,
-          user_id: userId
-        })
+        body: JSON.stringify(requestBody)
       });
+      
       if (response.ok) {
         const data = await response.json();
         setMessages(data.messages || []);
@@ -213,7 +222,7 @@ export function AdvancedChatManagement() {
     if (!selectedUser) return;
     setSelectedSession(session);
     setViewMode('messages');
-    loadSessionMessages(session.session_id, selectedUser.user_id);
+    loadSessionMessages(session.session_id, selectedUser.user_id, selectedUser.is_guest);
   };
 
   // 返回上级

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { isAdmin } from "@/lib/admin-auth";
 
 export async function POST(request: Request) {
   try {
@@ -167,6 +168,98 @@ export async function GET(request: Request) {
 
   } catch (error) {
     console.error('处理反馈列表请求失败:', error);
+    return NextResponse.json(
+      { error: "服务器内部错误" },
+      { status: 500 }
+    );
+  }
+}
+
+// 更新反馈状态（管理员用）
+export async function PUT(request: Request) {
+  try {
+    // 验证管理员权限
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+    const { id, status, priority } = body;
+
+    // 验证必填字段
+    if (!id || !status) {
+      return NextResponse.json(
+        { error: "缺少必填字段: id 和 status" },
+        { status: 400 }
+      );
+    }
+
+    // 验证状态值
+    const validStatuses = ['pending', 'in_progress', 'resolved', 'closed'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: "无效的状态值" },
+        { status: 400 }
+      );
+    }
+
+    // 验证优先级（如果提供）
+    if (priority) {
+      const validPriorities = ['low', 'medium', 'high', 'urgent'];
+      if (!validPriorities.includes(priority)) {
+        return NextResponse.json(
+          { error: "无效的优先级值" },
+          { status: 400 }
+        );
+      }
+    }
+
+    const supabase = await createClient();
+    
+    // 构建更新数据
+    const updateData: any = {
+      status,
+      updated_at: new Date().toISOString()
+    };
+    
+    if (priority) {
+      updateData.priority = priority;
+    }
+
+    // 更新反馈
+    const { data, error } = await supabase
+      .from('feedback')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('更新反馈状态失败:', error);
+      return NextResponse.json(
+        { error: "更新失败，请稍后重试" },
+        { status: 500 }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "未找到指定的反馈记录" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      message: "反馈状态更新成功",
+      feedback: data
+    });
+
+  } catch (error) {
+    console.error('处理反馈更新请求失败:', error);
     return NextResponse.json(
       { error: "服务器内部错误" },
       { status: 500 }

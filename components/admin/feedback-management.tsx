@@ -20,7 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MessageSquare, RefreshCw, Search, Filter, Download } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { MessageSquare, RefreshCw, Search, Filter, Download, Eye, User, Clock, FileText } from "lucide-react";
 
 interface FeedbackItem {
   id: string;
@@ -56,6 +63,10 @@ export function FeedbackManagement() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  
+  // 详情对话框状态
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const feedbackTypeLabels: Record<string, string> = {
     'knowledge_error': '知识点错误',
@@ -133,6 +144,57 @@ export function FeedbackManagement() {
       case 'resolved': return 'default';
       case 'closed': return 'outline';
       default: return 'secondary';
+    }
+  };
+
+  const getBadgeColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
+      case 'in_progress': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      case 'resolved': return 'bg-green-100 text-green-800 hover:bg-green-200';
+      case 'closed': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+    }
+  };
+
+  const handleViewDetail = (feedback: FeedbackItem) => {
+    setSelectedFeedback(feedback);
+    setDetailDialogOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setDetailDialogOpen(false);
+    setSelectedFeedback(null);
+  };
+
+  const handleUpdateStatus = async (feedbackId: string, newStatus: string) => {
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: feedbackId,
+          status: newStatus
+        })
+      });
+
+      if (response.ok) {
+        // 刷新列表
+        await fetchFeedbacks();
+        // 更新选中的反馈状态
+        if (selectedFeedback && selectedFeedback.id === feedbackId) {
+          setSelectedFeedback(prev => prev ? { ...prev, status: newStatus } : null);
+        }
+        alert('状态更新成功');
+      } else {
+        const errorData = await response.json();
+        alert(`更新失败: ${errorData.error || '未知错误'}`);
+      }
+    } catch (error) {
+      console.error('更新状态失败:', error);
+      alert('更新失败，请重试');
     }
   };
 
@@ -272,12 +334,13 @@ export function FeedbackManagement() {
                     <TableHead>描述</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>提交时间</TableHead>
+                    <TableHead className="text-center">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         <div className="flex items-center justify-center">
                           <RefreshCw className="animate-spin h-4 w-4 mr-2" />
                           加载中...
@@ -286,7 +349,7 @@ export function FeedbackManagement() {
                     </TableRow>
                   ) : feedbacks.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                         暂无反馈数据
                       </TableCell>
                     </TableRow>
@@ -305,17 +368,34 @@ export function FeedbackManagement() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="max-w-xs truncate" title={feedback.description}>
+                          <div 
+                            className="max-w-xs truncate cursor-pointer hover:text-blue-600 transition-colors" 
+                            title="点击查看详情"
+                            onClick={() => handleViewDetail(feedback)}
+                          >
                             {feedback.description}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getBadgeVariant(feedback.status)}>
+                          <Badge 
+                            variant="secondary" 
+                            className={getBadgeColor(feedback.status)}
+                          >
                             {statusLabels[feedback.status] || feedback.status}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm">
                           {formatDate(feedback.created_at)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Button
+                            onClick={() => handleViewDetail(feedback)}
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))
@@ -353,6 +433,120 @@ export function FeedbackManagement() {
           )}
         </CardContent>
       </Card>
+
+      {/* 反馈详情对话框 */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              反馈详情
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedFeedback && (
+            <div className="space-y-6">
+              {/* 基本信息 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">提交者</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <User className="h-4 w-4 text-gray-400" />
+                      <span className="font-medium">{selectedFeedback.submitter_name}</span>
+                    </div>
+                    <div className="text-sm text-gray-500 ml-6">{selectedFeedback.user_email}</div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">反馈类型</label>
+                    <div className="mt-1">
+                      <Badge variant="outline" className="text-sm">
+                        {feedbackTypeLabels[selectedFeedback.feedback_type] || selectedFeedback.feedback_type}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">当前状态</label>
+                    <div className="mt-1">
+                      <Badge 
+                        variant="secondary" 
+                        className={getBadgeColor(selectedFeedback.status)}
+                      >
+                        {statusLabels[selectedFeedback.status] || selectedFeedback.status}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">提交时间</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Clock className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm">{formatDate(selectedFeedback.created_at)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 反馈内容 */}
+              <div>
+                <label className="text-sm font-medium text-gray-500">反馈描述</label>
+                <div className="mt-2 p-4 bg-gray-50 rounded-lg border">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {selectedFeedback.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* 操作按钮 */}
+              <div className="flex justify-between pt-4 border-t">
+                <div className="flex gap-2">
+                  {selectedFeedback.status === 'pending' && (
+                    <Button 
+                      onClick={() => handleUpdateStatus(selectedFeedback.id, 'in_progress')}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      标记为处理中
+                    </Button>
+                  )}
+                  {selectedFeedback.status === 'in_progress' && (
+                    <Button 
+                      onClick={() => handleUpdateStatus(selectedFeedback.id, 'resolved')}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      标记为已解决
+                    </Button>
+                  )}
+                  {(selectedFeedback.status === 'resolved' || selectedFeedback.status === 'in_progress') && (
+                    <Button 
+                      onClick={() => handleUpdateStatus(selectedFeedback.id, 'closed')}
+                      variant="outline"
+                      className="border-gray-400 text-gray-600 hover:bg-gray-50"
+                    >
+                      关闭反馈
+                    </Button>
+                  )}
+                  {selectedFeedback.status !== 'pending' && (
+                    <Button 
+                      onClick={() => handleUpdateStatus(selectedFeedback.id, 'pending')}
+                      variant="outline"
+                      className="border-orange-400 text-orange-600 hover:bg-orange-50"
+                    >
+                      重新打开
+                    </Button>
+                  )}
+                </div>
+                <Button variant="outline" onClick={handleCloseDetail}>
+                  关闭
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
