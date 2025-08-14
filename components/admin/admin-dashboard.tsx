@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "./user-management";
-import { N8NChatManagement } from "./dify-chat-management";
+import { AdvancedChatManagement } from "./advanced-chat-management";
 import { SystemMonitoring } from "./system-monitoring";
 import { SystemLogs } from "./system-logs";
 import { FeedbackManagement } from "./feedback-management";
@@ -42,7 +42,7 @@ export function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="dify-chat">
-            <N8NChatManagement />
+            <AdvancedChatManagement />
           </TabsContent>
 
           <TabsContent value="feedback">
