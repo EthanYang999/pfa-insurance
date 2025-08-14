@@ -30,6 +30,7 @@ import {
 interface UserChatSummary {
   user_id: string;
   user_email: string;
+  is_guest?: boolean;
   session_count: number;
   message_count: number;
   last_activity: string;
@@ -75,6 +76,9 @@ export function AdvancedChatManagement() {
     start: '',
     end: ''
   });
+  
+  // 访客数据控制
+  const [includeGuests, setIncludeGuests] = useState(false);
 
   // 加载用户聊天统计
   const loadUserChatSummary = async () => {
@@ -82,6 +86,7 @@ export function AdvancedChatManagement() {
       setLoading(true);
       const params = new URLSearchParams();
       if (searchTerm) params.set('search', searchTerm);
+      if (includeGuests) params.set('include_guests', 'true');
       
       const response = await fetch(`/api/admin/chat/users?${params}`);
       if (response.ok) {
@@ -96,10 +101,14 @@ export function AdvancedChatManagement() {
   };
 
   // 加载指定用户的会话列表
-  const loadUserSessions = async (userId: string) => {
+  const loadUserSessions = async (userId: string, isGuest = false) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/chat/user-sessions?user_id=${userId}`);
+      const params = new URLSearchParams();
+      params.set('user_id', userId);
+      if (isGuest) params.set('is_guest', 'true');
+      
+      const response = await fetch(`/api/admin/chat/user-sessions?${params}`);
       if (response.ok) {
         const data = await response.json();
         setSessions(data.sessions || []);
@@ -146,9 +155,19 @@ export function AdvancedChatManagement() {
       
       if (type === 'user' && selectedUser) {
         exportParams.set('user_id', selectedUser.user_id);
+        if (selectedUser.is_guest) {
+          exportParams.set('is_guest', 'true');
+        }
       } else if (type === 'date') {
         exportParams.set('start_date', dateRange.start);
         exportParams.set('end_date', dateRange.end);
+        if (includeGuests) {
+          exportParams.set('include_guests', 'true');
+        }
+      } else if (type === 'all') {
+        if (includeGuests) {
+          exportParams.set('include_guests', 'true');
+        }
       }
       
       const response = await fetch(`${url}?${exportParams}`);
@@ -186,7 +205,7 @@ export function AdvancedChatManagement() {
   const handleUserClick = (user: UserChatSummary) => {
     setSelectedUser(user);
     setViewMode('sessions');
-    loadUserSessions(user.user_id);
+    loadUserSessions(user.user_id, user.is_guest);
   };
 
   // 处理会话点击
@@ -227,7 +246,7 @@ export function AdvancedChatManagement() {
     if (viewMode === 'users') {
       loadUserChatSummary();
     }
-  }, [viewMode, searchTerm]);
+  }, [viewMode, searchTerm, includeGuests]);
 
   // 设置默认日期范围（最近7天）
   useEffect(() => {
@@ -358,18 +377,32 @@ export function AdvancedChatManagement() {
         </div>
       </div>
 
-      {/* 搜索框 */}
+      {/* 搜索框和控制选项 */}
       {viewMode === 'users' && (
         <Card>
           <CardContent className="pt-6">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="搜索用户邮箱..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="搜索用户邮箱..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="includeGuests"
+                  checked={includeGuests}
+                  onChange={(e) => setIncludeGuests(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="includeGuests" className="text-sm text-gray-700">
+                  包含访客记录
+                </label>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -406,11 +439,22 @@ export function AdvancedChatManagement() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <UserIcon className="w-5 h-5 text-blue-600" />
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            user.is_guest ? 'bg-orange-100' : 'bg-blue-100'
+                          }`}>
+                            <UserIcon className={`w-5 h-5 ${
+                              user.is_guest ? 'text-orange-600' : 'text-blue-600'
+                            }`} />
                           </div>
                           <div>
-                            <h3 className="font-medium text-gray-900">{user.user_email}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-gray-900">{user.user_email}</h3>
+                              {user.is_guest && (
+                                <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                                  访客
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-500">
                               {user.session_count} 个会话 · {user.message_count} 条消息
                             </p>

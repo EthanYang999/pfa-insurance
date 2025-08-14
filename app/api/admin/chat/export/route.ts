@@ -59,17 +59,34 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient();
 
+    // 获取URL参数
+    const includeGuests = searchParams.get('include_guests') === 'true';
+    const isGuestUser = searchParams.get('is_guest') === 'true';
+
     // 构建查询条件
-    let query = supabase
+    let userQuery = supabase
       .from('n8n_chat_histories')
       .select('*')
       .eq('session_type', 'user')
       .not('user_id', 'is', null)
       .order('created_at', { ascending: true });
 
+    let guestQuery = supabase
+      .from('n8n_chat_histories')
+      .select('*')
+      .eq('session_type', 'guest')
+      .not('guest_id', 'is', null)
+      .order('created_at', { ascending: true });
+
     // 应用筛选条件
     if (type === 'user') {
-      query = query.eq('user_id', userId);
+      if (isGuestUser) {
+        guestQuery = guestQuery.eq('guest_id', userId);
+        userQuery = null; // 只查询访客数据
+      } else {
+        userQuery = userQuery.eq('user_id', userId);
+        guestQuery = null; // 只查询用户数据
+      }
     } else if (type === 'date') {
       const startDateTime = new Date(startDate!);
       startDateTime.setHours(0, 0, 0, 0);
@@ -77,25 +94,57 @@ export async function GET(request: NextRequest) {
       const endDateTime = new Date(endDate!);
       endDateTime.setHours(23, 59, 59, 999);
       
-      query = query
+      const timeFilter = (q: any) => q
         .gte('created_at', startDateTime.toISOString())
         .lte('created_at', endDateTime.toISOString());
+
+      userQuery = timeFilter(userQuery);
+      if (includeGuests) {
+        guestQuery = timeFilter(guestQuery);
+      } else {
+        guestQuery = null;
+      }
+    } else if (type === 'all') {
+      if (!includeGuests) {
+        guestQuery = null;
+      }
     }
 
-    const { data: chatData, error } = await query;
+    // 执行查询
+    let allChatData: any[] = [];
 
-    if (error) {
-      console.error('Error fetching chat data for export:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch chat data' },
-        { status: 500 }
-      );
+    if (userQuery) {
+      const { data: userData, error: userError } = await userQuery;
+      if (userError) {
+        console.error('Error fetching user chat data for export:', userError);
+        return NextResponse.json(
+          { error: 'Failed to fetch user chat data' },
+          { status: 500 }
+        );
+      }
+      allChatData = [...allChatData, ...(userData || [])];
     }
+
+    if (guestQuery) {
+      const { data: guestData, error: guestError } = await guestQuery;
+      if (guestError) {
+        console.error('Error fetching guest chat data for export:', guestError);
+        return NextResponse.json(
+          { error: 'Failed to fetch guest chat data' },
+          { status: 500 }
+        );
+      }
+      allChatData = [...allChatData, ...(guestData || [])];
+    }
+
+    const chatData = allChatData;
 
     // 获取用户邮箱信息以便更好的导出
-    const userIds = [...new Set(chatData?.map(record => record.user_id) || [])];
+    const userIds = [...new Set(chatData?.map(record => record.user_id).filter(Boolean) || [])];
+    const guestIds = [...new Set(chatData?.map(record => record.guest_id).filter(Boolean) || [])];
     let userEmailMap = new Map();
 
+    // 为注册用户获取邮箱
     if (userIds.length > 0) {
       try {
         const { createAdminClient } = await import('@/lib/supabase/admin');
@@ -110,6 +159,11 @@ export async function GET(request: NextRequest) {
         console.error('Failed to fetch user emails:', error);
       }
     }
+
+    // 为访客生成标识符
+    guestIds.forEach(guestId => {
+      userEmailMap.set(guestId, `访客_${guestId.substring(0, 8)}`);
+    });
 
     // CSV格式处理函数
     const generateCSV = (data: any[]) => {
@@ -132,10 +186,11 @@ export async function GET(request: NextRequest) {
       const csvRows = [
         headers.join(','), // 标题行
         ...data.map(record => {
-          const userEmail = userEmailMap.get(record.user_id) || 'Unknown';
+          const identifier = record.user_id || record.guest_id;
+          const userEmail = userEmailMap.get(identifier) || 'Unknown';
           return [
             record.id,
-            record.user_id,
+            identifier,
             `"${userEmail}"`, // 用引号包围邮箱以防逗号问题
             record.session_id,
             record.message?.type || '',
@@ -155,8 +210,10 @@ export async function GET(request: NextRequest) {
         export_time: new Date().toISOString(),
         date_range: type === 'date' ? { start_date: startDate, end_date: endDate } : null,
         user_id: type === 'user' ? userId : null,
+        is_guest_user: type === 'user' ? isGuestUser : null,
         total_records: chatData?.length || 0,
-        total_users: userIds.length
+        total_registered_users: userIds.length,
+        total_guests: guestIds.length
       },
       users: {} as Record<string, any>
     };
@@ -164,26 +221,28 @@ export async function GET(request: NextRequest) {
     // 按用户分组数据（仅用于JSON格式）
     if (format === 'json') {
       chatData?.forEach(record => {
-        const userId = record.user_id;
-        const userEmail = userEmailMap.get(userId) || 'Unknown';
+        const identifier = record.user_id || record.guest_id;
+        const isGuest = !!record.guest_id;
+        const userEmail = userEmailMap.get(identifier) || 'Unknown';
         
-        if (!exportData.users[userId]) {
-          exportData.users[userId] = {
-            user_id: userId,
+        if (!exportData.users[identifier]) {
+          exportData.users[identifier] = {
+            user_id: identifier,
             user_email: userEmail,
+            is_guest: isGuest,
             sessions: {} as Record<string, any>
           };
         }
         
         const sessionId = record.session_id;
-        if (!exportData.users[userId].sessions[sessionId]) {
-          exportData.users[userId].sessions[sessionId] = {
+        if (!exportData.users[identifier].sessions[sessionId]) {
+          exportData.users[identifier].sessions[sessionId] = {
             session_id: sessionId,
             messages: []
           };
         }
         
-        exportData.users[userId].sessions[sessionId].messages.push({
+        exportData.users[identifier].sessions[sessionId].messages.push({
           id: record.id,
           message_type: record.message?.type,
           content: record.message?.content,

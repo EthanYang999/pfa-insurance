@@ -15,33 +15,60 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
+    const includeGuests = searchParams.get('include_guests') === 'true';
 
     const supabase = await createClient();
 
-    // 获取所有有聊天记录的用户统计
-    const { data: chatData, error } = await supabase
+    // 获取注册用户的聊天记录
+    const { data: userChatData, error: userError } = await supabase
       .from('n8n_chat_histories')
       .select('user_id, session_id, created_at')
       .eq('session_type', 'user')
       .not('user_id', 'is', null)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching chat data:', error);
+    if (userError) {
+      console.error('Error fetching user chat data:', userError);
       return NextResponse.json(
-        { error: 'Failed to fetch chat data' },
+        { error: 'Failed to fetch user chat data' },
         { status: 500 }
       );
     }
 
-    // 统计每个用户的数据
+    // 获取访客的聊天记录（如果需要）
+    let guestChatData: any[] = [];
+    if (includeGuests) {
+      const { data: guestData, error: guestError } = await supabase
+        .from('n8n_chat_histories')
+        .select('guest_id, session_id, created_at')
+        .eq('session_type', 'guest')
+        .not('guest_id', 'is', null)
+        .order('created_at', { ascending: false });
+
+      if (guestError) {
+        console.error('Error fetching guest chat data:', guestError);
+      } else {
+        guestChatData = guestData || [];
+      }
+    }
+
+    // 合并数据
+    const chatData = [...(userChatData || []), ...guestChatData];
+
+    // 统计每个用户/访客的数据
     const userStatsMap = new Map();
     
     chatData?.forEach((record) => {
-      const userId = record.user_id;
-      if (!userStatsMap.has(userId)) {
-        userStatsMap.set(userId, {
-          user_id: userId,
+      // 使用user_id或guest_id作为标识符
+      const identifier = record.user_id || record.guest_id;
+      const isGuest = !!record.guest_id;
+      
+      if (!identifier) return;
+      
+      if (!userStatsMap.has(identifier)) {
+        userStatsMap.set(identifier, {
+          user_id: identifier,
+          is_guest: isGuest,
           sessions: new Set(),
           message_count: 0,
           first_activity: record.created_at,
@@ -49,7 +76,7 @@ export async function GET(request: NextRequest) {
         });
       }
       
-      const stats = userStatsMap.get(userId);
+      const stats = userStatsMap.get(identifier);
       stats.sessions.add(record.session_id);
       stats.message_count++;
       
@@ -62,37 +89,48 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // 获取用户邮箱信息
-    const userIds = Array.from(userStatsMap.keys());
-    if (userIds.length === 0) {
+    // 获取所有标识符
+    const allIds = Array.from(userStatsMap.keys());
+    if (allIds.length === 0) {
       return NextResponse.json({
         success: true,
         users: []
       });
     }
 
-    // 从认证系统获取用户信息
-    const { createAdminClient } = await import('@/lib/supabase/admin');
-    const adminClient = createAdminClient();
-    
-    const { data: authUsers, error: authError } = await adminClient.auth.admin.listUsers();
-    
-    if (authError) {
-      console.error('Error fetching auth users:', authError);
-      return NextResponse.json(
-        { error: 'Failed to fetch user information' },
-        { status: 500 }
-      );
+    // 获取注册用户的邮箱信息
+    const registeredUserIds = allIds.filter(id => !userStatsMap.get(id).is_guest);
+    let userEmailMap = new Map();
+
+    if (registeredUserIds.length > 0) {
+      try {
+        const { createAdminClient } = await import('@/lib/supabase/admin');
+        const adminClient = createAdminClient();
+        
+        const { data: authUsers, error: authError } = await adminClient.auth.admin.listUsers();
+        
+        if (authError) {
+          console.error('Error fetching auth users:', authError);
+        } else {
+          authUsers?.users.forEach(user => {
+            userEmailMap.set(user.id, user.email || 'Unknown');
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch user emails:', error);
+      }
     }
 
     // 合并用户信息和统计数据
-    const userSummaries = authUsers.users
-      .filter(user => userStatsMap.has(user.id))
-      .map(user => {
-        const stats = userStatsMap.get(user.id);
+    const userSummaries = allIds
+      .map(id => {
+        const stats = userStatsMap.get(id);
+        const isGuest = stats.is_guest;
+        
         return {
-          user_id: user.id,
-          user_email: user.email || 'Unknown',
+          user_id: id,
+          user_email: isGuest ? `访客_${id.substring(0, 8)}` : (userEmailMap.get(id) || 'Unknown'),
+          is_guest: isGuest,
           session_count: stats.sessions.size,
           message_count: stats.message_count,
           first_activity: stats.first_activity,
@@ -110,6 +148,9 @@ export async function GET(request: NextRequest) {
 
     console.log('用户聊天统计查询成功:', {
       totalUsers: userSummaries.length,
+      registeredUsers: userSummaries.filter(u => !u.is_guest).length,
+      guests: userSummaries.filter(u => u.is_guest).length,
+      includeGuests,
       search
     });
 

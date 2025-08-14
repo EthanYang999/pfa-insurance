@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('user_id');
+    const isGuest = searchParams.get('is_guest') === 'true';
 
     if (!userId) {
       return NextResponse.json(
@@ -25,13 +26,23 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // 获取指定用户的所有会话
-    const { data: chatData, error } = await supabase
+    // 获取指定用户或访客的所有会话
+    let query = supabase
       .from('n8n_chat_histories')
       .select('session_id, message, created_at')
-      .eq('session_type', 'user')
-      .eq('user_id', userId)
       .order('created_at', { ascending: false });
+
+    if (isGuest) {
+      query = query
+        .eq('session_type', 'guest')
+        .eq('guest_id', userId);
+    } else {
+      query = query
+        .eq('session_type', 'user')
+        .eq('user_id', userId);
+    }
+
+    const { data: chatData, error } = await query;
 
     if (error) {
       console.error('Error fetching user chat sessions:', error);
@@ -89,6 +100,7 @@ export async function GET(request: NextRequest) {
 
     console.log('用户会话查询成功:', {
       userId,
+      isGuest,
       totalSessions: sessions.length
     });
 
