@@ -63,6 +63,7 @@ export async function GET(request: NextRequest) {
           created_at: record.created_at,
           last_message_time: record.created_at,
           last_message: '',
+          first_user_message: '', // 用户的第一条消息作为标题
           message_count: 0,
           messages: []
         });
@@ -71,6 +72,11 @@ export async function GET(request: NextRequest) {
       const session = sessionMap.get(sessionId);
       session.message_count++;
       session.messages.push(record);
+      
+      // 记录用户的第一条消息作为会话标题
+      if (record.message?.type === 'human' && !session.first_user_message) {
+        session.first_user_message = record.message?.content || '';
+      }
       
       // 更新最后一条消息
       if (record.created_at > session.last_message_time) {
@@ -86,6 +92,7 @@ export async function GET(request: NextRequest) {
       .map(session => ({
         id: session.id,
         conversation_id: session.conversation_id,
+        title: session.first_user_message || '新会话', // 使用用户第一条消息作为标题
         last_message: session.last_message,
         last_message_time: session.last_message_time,
         message_count: session.message_count,

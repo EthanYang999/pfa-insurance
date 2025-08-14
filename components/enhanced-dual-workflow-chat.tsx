@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatInput } from "@/components/chat-input";
 import { LogoutButton } from "@/components/logout-button";
-import { Bot, User, Brain, Loader } from "lucide-react";
+import { Bot, User as UserIcon, Brain, Loader } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackModal } from "@/components/feedback-modal";
 import { type SimpleVoiceButtonRef } from "@/components/voice/SimpleVoiceButton";
 import { LoginButton } from "@/components/LoginButton";
 import { ChatHistoryButton } from "@/components/ChatHistoryButton";
+import { User } from "@supabase/supabase-js";
 
 // 原有的Message接口
 interface Message {
@@ -24,11 +25,6 @@ interface Message {
 }
 
 
-interface User {
-  email?: string;
-  sub?: string;
-  id?: string;
-}
 
 interface ChatInterfaceProps {
   user: User | null;           // null表示访客模式
@@ -533,7 +529,7 @@ export function EnhancedDualWorkflowChat({ user, guestId, onLoginRequest }: Chat
               </p>
             </div>
             <div className="w-8 h-8 bg-pfa-champagne-gold rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-pfa-royal-blue" />
+              <UserIcon className="w-4 h-4 text-pfa-royal-blue" />
             </div>
           </div>
         </div>

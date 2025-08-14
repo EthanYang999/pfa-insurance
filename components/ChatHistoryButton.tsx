@@ -7,9 +7,20 @@ import { User } from "@supabase/supabase-js";
 interface ChatSession {
   id: string;
   conversation_id: string;
+  title: string; // 会话标题
   last_message: string;
   last_message_time: string;
   message_count: number;
+  created_at: string;
+}
+
+interface ChatMessage {
+  id: number;
+  session_id: string;
+  message: {
+    type: 'human' | 'ai';
+    content: string;
+  };
   created_at: string;
 }
 
@@ -21,6 +32,9 @@ export function ChatHistoryButton({ user }: ChatHistoryButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null);
+  const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const loadChatHistory = async () => {
     if (!user?.id) return;
@@ -42,11 +56,52 @@ export function ChatHistoryButton({ user }: ChatHistoryButtonProps) {
     }
   };
 
+  const loadSessionMessages = async (session: ChatSession) => {
+    try {
+      setLoadingMessages(true);
+      const response = await fetch('/api/chat/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: session.id,
+          user_id: user.id
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSessionMessages(data.messages || []);
+        setSelectedSession(session);
+      } else {
+        console.error('加载会话详情失败:', response.status);
+      }
+    } catch (error) {
+      console.error('加载会话详情错误:', error);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
   const handleToggle = () => {
     if (!isOpen) {
       loadChatHistory();
+    } else {
+      // 关闭时重置状态
+      setSelectedSession(null);
+      setSessionMessages([]);
     }
     setIsOpen(!isOpen);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setSelectedSession(null);
+    setSessionMessages([]);
+  };
+
+  const handleBackToList = () => {
+    setSelectedSession(null);
+    setSessionMessages([]);
   };
 
   const formatTime = (timeStr: string) => {
@@ -102,7 +157,7 @@ export function ChatHistoryButton({ user }: ChatHistoryButtonProps) {
                 <h2 className="text-lg font-semibold text-gray-900">聊天历史</h2>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -111,7 +166,56 @@ export function ChatHistoryButton({ user }: ChatHistoryButtonProps) {
 
             {/* 内容 */}
             <div className="flex-1 overflow-y-auto p-4">
-              {loading ? (
+              {selectedSession ? (
+                // 会话详情视图
+                <div className="space-y-4">
+                  {/* 返回按钮 */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <button
+                      onClick={handleBackToList}
+                      className="flex items-center gap-2 px-3 py-1.5 text-pfa-royal-blue hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      ← 返回列表
+                    </button>
+                    <div>
+                      <h3 className="font-medium text-gray-900">{selectedSession.title}</h3>
+                      <p className="text-sm text-gray-500">{selectedSession.message_count} 条消息</p>
+                    </div>
+                  </div>
+
+                  {/* 消息列表 */}
+                  {loadingMessages ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-6 h-6 border-2 border-pfa-royal-blue border-t-transparent rounded-full animate-spin"></div>
+                      <span className="ml-2 text-gray-600">加载消息中...</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {sessionMessages.map((msg) => (
+                        <div
+                          key={msg.id}
+                          className={`flex ${msg.message.type === 'human' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[80%] p-3 rounded-lg ${
+                              msg.message.type === 'human'
+                                ? 'bg-pfa-royal-blue text-white ml-4'
+                                : 'bg-gray-100 text-gray-900 mr-4'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{msg.message.content}</p>
+                            <p className={`text-xs mt-1 ${
+                              msg.message.type === 'human' ? 'text-blue-100' : 'text-gray-500'
+                            }`}>
+                              {formatTime(msg.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : loading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="w-6 h-6 border-2 border-pfa-royal-blue border-t-transparent rounded-full animate-spin"></div>
                   <span className="ml-2 text-gray-600">加载中...</span>
@@ -122,17 +226,14 @@ export function ChatHistoryButton({ user }: ChatHistoryButtonProps) {
                     <div
                       key={session.id}
                       className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => {
-                        // 这里可以添加跳转到特定会话的逻辑
-                        console.log('点击会话:', session);
-                      }}
+                      onClick={() => loadSessionMessages(session)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
                             <MessageCircle className="w-4 h-4 text-pfa-royal-blue flex-shrink-0" />
                             <span className="text-sm font-medium text-gray-900">
-                              会话 {session.conversation_id.substring(0, 8)}...
+                              {truncateMessage(session.title, 30)}
                             </span>
                             <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                               {session.message_count} 条消息
@@ -169,7 +270,7 @@ export function ChatHistoryButton({ user }: ChatHistoryButtonProps) {
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span>显示最近 {sessions.length} 个会话</span>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   className="px-4 py-2 bg-pfa-royal-blue text-white rounded-lg hover:bg-pfa-royal-blue/90 transition-colors"
                 >
                   关闭
