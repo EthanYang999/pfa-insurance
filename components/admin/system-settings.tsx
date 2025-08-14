@@ -246,7 +246,7 @@ export function SystemSettings() {
             系统设置与监控
           </h2>
           <p className="text-gray-600 mt-1">
-            管理访客模式、维护模式和系统状态监控
+            管理访客模式和系统状态监控
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -281,7 +281,7 @@ export function SystemSettings() {
 
 
         <TabsContent value="settings" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="max-w-lg">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -289,7 +289,7 @@ export function SystemSettings() {
                   访问控制设置
                 </CardTitle>
                 <CardDescription>
-                  管理用户访问权限和模式
+                  管理访客访问权限设置
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -313,28 +313,6 @@ export function SystemSettings() {
                     正在更新设置...
                   </div>
                 )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>系统状态</CardTitle>
-                <CardDescription>当前系统配置和运行状态</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span>访客访问</span>
-                  <Badge variant={guestModeEnabled ? "default" : "secondary"}>
-                    {guestModeEnabled ? "已启用" : "已禁用"}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span>数据更新时间</span>
-                  <span className="text-sm text-gray-500">
-                    {stats?.lastUpdated ? new Date(stats.lastUpdated).toLocaleString('zh-CN') : '未知'}
-                  </span>
-                </div>
               </CardContent>
             </Card>
           </div>
