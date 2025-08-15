@@ -62,6 +62,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#home" className="text-white hover:text-pfa-champagne-gold transition-colors">首页</a>
               <button onClick={() => router.push('/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">AI 教练</button>
+              <button onClick={() => router.push('/training')} className="text-white hover:text-pfa-champagne-gold transition-colors">专业培训</button>
               <a href="#about" className="text-white hover:text-pfa-champagne-gold transition-colors">关于我们</a>
               <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">核心理念</a>
               <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">事业机会</a>
@@ -92,6 +93,7 @@ export function PFADashboard({ user }: PFADashboardProps) {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a href="#home" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">首页</a>
               <button onClick={() => router.push('/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">AI 教练</button>
+              <button onClick={() => router.push('/training')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">专业培训</button>
               <a href="#about" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">关于我们</a>
               <a href="#concept" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">核心理念</a>
               <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">事业机会</a>
@@ -127,6 +129,13 @@ export function PFADashboard({ user }: PFADashboardProps) {
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   立即体验 AI 教练
+                </Button>
+                <Button 
+                  onClick={() => router.push('/training')}
+                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg"
+                >
+                  <BookOpen className="mr-2 h-5 w-5" />
+                  专业培训模式
                 </Button>
                 <Button 
                   variant="outline"

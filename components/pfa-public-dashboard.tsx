@@ -53,6 +53,7 @@ export function PFAPublicDashboard() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#home" className="text-white hover:text-pfa-champagne-gold transition-colors">首页</a>
               <button onClick={() => navigateToProtectedRoute(router, '/chat')} className="text-white hover:text-pfa-champagne-gold transition-colors">AI教练</button>
+              <button onClick={() => navigateToProtectedRoute(router, '/training')} className="text-white hover:text-pfa-champagne-gold transition-colors">专业培训</button>
               <a href="#about" className="text-white hover:text-pfa-champagne-gold transition-colors">关于我们</a>
               <a href="#concept" className="text-white hover:text-pfa-champagne-gold transition-colors">核心理念</a>
               <a href="#opportunity" className="text-white hover:text-pfa-champagne-gold transition-colors">事业机会</a>
@@ -78,6 +79,7 @@ export function PFAPublicDashboard() {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a href="#home" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">首页</a>
               <button onClick={() => navigateToProtectedRoute(router, '/chat')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">AI教练</button>
+              <button onClick={() => navigateToProtectedRoute(router, '/training')} className="block px-3 py-2 text-white hover:text-pfa-champagne-gold text-left w-full">专业培训</button>
               <a href="#about" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">关于我们</a>
               <a href="#concept" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">核心理念</a>
               <a href="#opportunity" className="block px-3 py-2 text-white hover:text-pfa-champagne-gold">事业机会</a>
@@ -104,13 +106,20 @@ export function PFAPublicDashboard() {
               <p className="mt-6 text-xl text-pfa-dark-gray leading-relaxed">
                 借助先进的AI技术，为保险经纪人提供24/7专业培训指导，提升销售技能，实现事业突破
               </p>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <Button 
                   onClick={() => navigateToProtectedRoute(router, '/chat')}
                   className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue font-semibold px-8 py-6 text-lg"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   立即体验
+                </Button>
+                <Button 
+                  onClick={() => navigateToProtectedRoute(router, '/training')}
+                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg"
+                >
+                  <BookOpen className="mr-2 h-5 w-5" />
+                  专业培训
                 </Button>
               </div>
             </div>
