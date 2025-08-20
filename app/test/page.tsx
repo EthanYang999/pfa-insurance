@@ -60,7 +60,7 @@ export default function TeamDelivery() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <strong>网站地址：</strong><br />
-                    <code className="text-blue-600">https://pfabot.netlify.app/</code>
+                    <code className="text-blue-600">http://fuyaolucky.com</code>
                   </div>
                   <div>
                     <strong>测试时间：</strong><br />
@@ -113,7 +113,7 @@ export default function TeamDelivery() {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="mb-3">
                     <strong className="text-blue-600">测试地址：</strong>
-                    <code className="text-blue-600">https://pfabot.netlify.app/chat</code>
+                    <code className="text-blue-600">http://fuyaolucky.comchat</code>
                   </div>
                   
                   <div className="space-y-4">
@@ -162,7 +162,7 @@ export default function TeamDelivery() {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="mb-3">
                     <strong className="text-blue-600">测试地址：</strong>
-                    <code className="text-blue-600">https://pfabot.netlify.app/admin</code>
+                    <code className="text-blue-600">http://fuyaolucky.comadmin</code>
                   </div>
                   
                   <div>
@@ -303,7 +303,7 @@ export default function TeamDelivery() {
                   size="sm" 
                   variant="outline"
                   className="w-full border-pfa-royal-blue text-pfa-royal-blue hover:bg-blue-50"
-                  onClick={() => window.open('https://pfabot.netlify.app/admin', '_blank')}
+                  onClick={() => window.open('http://fuyaolucky.comadmin', '_blank')}
                 >
                   <Shield className="h-4 w-4 mr-2" />
                   管理面板
