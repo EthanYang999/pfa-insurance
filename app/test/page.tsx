@@ -60,7 +60,7 @@ export default function TeamDelivery() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <strong>网站地址：</strong><br />
-                    <code className="text-blue-600">http://fuyaolucky.com</code>
+                    <code className="text-blue-600">http://fuyaolucky.com/</code>
                   </div>
                   <div>
                     <strong>测试时间：</strong><br />
@@ -113,7 +113,7 @@ export default function TeamDelivery() {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="mb-3">
                     <strong className="text-blue-600">测试地址：</strong>
-                    <code className="text-blue-600">http://fuyaolucky.comchat</code>
+                    <code className="text-blue-600">http://fuyaolucky.com/chat</code>
                   </div>
                   
                   <div className="space-y-4">
@@ -162,7 +162,7 @@ export default function TeamDelivery() {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="mb-3">
                     <strong className="text-blue-600">测试地址：</strong>
-                    <code className="text-blue-600">http://fuyaolucky.comadmin</code>
+                    <code className="text-blue-600">http://fuyaolucky.com/admin</code>
                   </div>
                   
                   <div>
@@ -279,14 +279,14 @@ export default function TeamDelivery() {
               <div className="bg-white p-4 rounded-lg border">
                 <h4 className="font-semibold mb-2 text-blue-600">🌐 主站体验</h4>
                 <div className="text-sm text-gray-600 mb-3">
-                  <div>网址：pfabot.netlify.app</div>
+                  <div>网址：fuyaolucky.com</div>
                   <div>账号：test@pfa.com</div>
                   <div>密码：test123456</div>
                 </div>
                 <Button 
                   size="sm" 
                   className="w-full bg-pfa-royal-blue hover:bg-pfa-navy-blue"
-                  onClick={() => window.open('https://pfabot.netlify.app', '_blank')}
+                  onClick={() => window.open('http://fuyaolucky.com', '_blank')}
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   立即体验
@@ -295,7 +295,7 @@ export default function TeamDelivery() {
               <div className="bg-white p-4 rounded-lg border">
                 <h4 className="font-semibold mb-2 text-green-600">🛡️ 管理后台</h4>
                 <div className="text-sm text-gray-600 mb-3">
-                  <div>网址：pfabot.netlify.app/admin</div>
+                  <div>网址：fuyaolucky.com/admin</div>
                   <div>账号：test@pfa.com</div>
                   <div>密码：test123456</div>
                 </div>
@@ -303,7 +303,7 @@ export default function TeamDelivery() {
                   size="sm" 
                   variant="outline"
                   className="w-full border-pfa-royal-blue text-pfa-royal-blue hover:bg-blue-50"
-                  onClick={() => window.open('http://fuyaolucky.comadmin', '_blank')}
+                  onClick={() => window.open('http://fuyaolucky.com/admin', '_blank')}
                 >
                   <Shield className="h-4 w-4 mr-2" />
                   管理面板
