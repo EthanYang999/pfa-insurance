@@ -83,7 +83,7 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Shield className="h-8 w-8 text-pfa-champagne-gold" />
-                <span className="font-serif font-bold text-xl text-white">AI实战教练</span>
+                <span className="font-bold text-xl text-white">AI实战教练</span>
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
@@ -117,7 +117,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-pfa-royal-blue/8 to-pfa-navy-blue/10"></div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="font-serif font-bold text-4xl md:text-6xl lg:text-7xl text-pfa-royal-blue mb-6 leading-tight">
+            <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl text-pfa-royal-blue mb-6 leading-tight">
               {content.hero_title_line1}
               <span className="text-pfa-champagne-gold block">{content.hero_title_line2}</span>
             </h1>
@@ -126,7 +126,7 @@ export default function HomePage() {
             </p>
             <div className="flex justify-center">
               <Button size="lg" className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue text-lg px-8 py-4" asChild>
-                <Link href="/ai-coach">
+                <Link href="/chat">
                   <Bot className="mr-2 h-5 w-5" />
                   {content.hero_button_text}
                 </Link>
@@ -140,7 +140,7 @@ export default function HomePage() {
       <section id="ai-coach" className="py-24 lg:py-40 xl:py-48 bg-pfa-light-gray">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="font-serif font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-6">{content.ai_coach_title}</h2>
+            <h2 className="font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-6">{content.ai_coach_title}</h2>
             <p className="text-lg text-pfa-royal-blue/70 leading-relaxed">
               {content.ai_coach_description}
             </p>
@@ -150,7 +150,7 @@ export default function HomePage() {
             <Card className="border-pfa-champagne-gold/20 hover:shadow-lg transition-shadow bg-white">
               <CardHeader>
                 <Bot className="h-12 w-12 text-pfa-champagne-gold mb-4" />
-                <CardTitle className="font-serif text-pfa-royal-blue">{content.ai_coach_feature1_title}</CardTitle>
+                <CardTitle className="text-pfa-royal-blue">{content.ai_coach_feature1_title}</CardTitle>
                 <CardDescription className="text-pfa-royal-blue/60">{content.ai_coach_feature1_desc}</CardDescription>
               </CardHeader>
             </Card>
@@ -158,7 +158,7 @@ export default function HomePage() {
             <Card className="border-pfa-champagne-gold/20 hover:shadow-lg transition-shadow bg-white">
               <CardHeader>
                 <TrendingUp className="h-12 w-12 text-pfa-champagne-gold mb-4" />
-                <CardTitle className="font-serif text-pfa-royal-blue">{content.ai_coach_feature2_title}</CardTitle>
+                <CardTitle className="text-pfa-royal-blue">{content.ai_coach_feature2_title}</CardTitle>
                 <CardDescription className="text-pfa-royal-blue/60">{content.ai_coach_feature2_desc}</CardDescription>
               </CardHeader>
             </Card>
@@ -166,7 +166,7 @@ export default function HomePage() {
             <Card className="border-pfa-champagne-gold/20 hover:shadow-lg transition-shadow bg-white">
               <CardHeader>
                 <Users className="h-12 w-12 text-pfa-champagne-gold mb-4" />
-                <CardTitle className="font-serif text-pfa-royal-blue">{content.ai_coach_feature3_title}</CardTitle>
+                <CardTitle className="text-pfa-royal-blue">{content.ai_coach_feature3_title}</CardTitle>
                 <CardDescription className="text-pfa-royal-blue/60">{content.ai_coach_feature3_desc}</CardDescription>
               </CardHeader>
             </Card>
@@ -179,7 +179,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="font-serif font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-6">{content.about_title}</h2>
+              <h2 className="font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-6">{content.about_title}</h2>
               <p className="text-lg text-pfa-royal-blue/70 mb-6 leading-relaxed">
                 {content.about_description}
               </p>
@@ -210,28 +210,28 @@ export default function HomePage() {
       <section id="success-cases" className="py-24 lg:py-40 xl:py-48 bg-pfa-light-gray">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-4">{content.success_cases_title}</h2>
+            <h2 className="font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-4">{content.success_cases_title}</h2>
             <p className="text-lg text-pfa-royal-blue/70">{content.success_cases_description}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card className="border-pfa-champagne-gold/20 hover:shadow-lg transition-shadow bg-white">
               <CardHeader className="text-center">
                 <div className="text-3xl font-bold text-pfa-champagne-gold mb-2">{content.case1_number}</div>
-                <CardTitle className="font-serif text-pfa-royal-blue">{content.case1_title}</CardTitle>
+                <CardTitle className="text-pfa-royal-blue">{content.case1_title}</CardTitle>
                 <CardDescription className="text-pfa-royal-blue/60">{content.case1_desc}</CardDescription>
               </CardHeader>
             </Card>
             <Card className="border-pfa-champagne-gold/20 hover:shadow-lg transition-shadow bg-white">
               <CardHeader className="text-center">
                 <div className="text-3xl font-bold text-pfa-champagne-gold mb-2">{content.case2_number}</div>
-                <CardTitle className="font-serif text-pfa-royal-blue">{content.case2_title}</CardTitle>
+                <CardTitle className="text-pfa-royal-blue">{content.case2_title}</CardTitle>
                 <CardDescription className="text-pfa-royal-blue/60">{content.case2_desc}</CardDescription>
               </CardHeader>
             </Card>
             <Card className="border-pfa-champagne-gold/20 hover:shadow-lg transition-shadow bg-white">
               <CardHeader className="text-center">
                 <div className="text-3xl font-bold text-pfa-champagne-gold mb-2">{content.case3_number}</div>
-                <CardTitle className="font-serif text-pfa-royal-blue">{content.case3_title}</CardTitle>
+                <CardTitle className="text-pfa-royal-blue">{content.case3_title}</CardTitle>
                 <CardDescription className="text-pfa-royal-blue/60">{content.case3_desc}</CardDescription>
               </CardHeader>
             </Card>
@@ -242,7 +242,7 @@ export default function HomePage() {
       {/* CTA Section */}
       <section id="join" className="py-24 lg:py-40 xl:py-48 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-serif font-bold text-3xl md:text-4xl mb-6 text-pfa-royal-blue">{content.cta_title}</h2>
+          <h2 className="font-bold text-3xl md:text-4xl mb-6 text-pfa-royal-blue">{content.cta_title}</h2>
           <p className="text-xl mb-8 text-pfa-royal-blue/70 max-w-2xl mx-auto">
             {content.cta_description}
           </p>
