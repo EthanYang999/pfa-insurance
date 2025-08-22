@@ -21,23 +21,20 @@ export default function HomePage() {
               <a href="#ai-coach" className="text-white/80 hover:text-white transition-colors">
                 AI教练
               </a>
-              <Link href="/team" className="text-white/80 hover:text-white transition-colors">
+              <a href="#about" className="text-white/80 hover:text-white transition-colors">
                 关于我们
-              </Link>
-              <Link href="/cases" className="text-white/80 hover:text-white transition-colors">
+              </a>
+              <a href="#success-cases" className="text-white/80 hover:text-white transition-colors">
                 成功案例
-              </Link>
+              </a>
               <a href="#join" className="text-white/80 hover:text-white transition-colors">
                 加入我们
               </a>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white hover:text-pfa-royal-blue" asChild>
-                <Link href="/auth/login">会员登录</Link>
-              </Button>
               <Button size="sm" className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue" asChild>
-                <Link href="/ai-coach">
-                  开始体验
+                <Link href="/auth/login">
+                  登录
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -59,17 +56,11 @@ export default function HomePage() {
               AI实战教练为您提供24/7
               AI教练支持，助力保险经纪人快速成长，实现事业突破。专业培训，智能指导，共创辉煌未来。
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button size="lg" className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue text-lg px-8 py-4" asChild>
                 <Link href="/ai-coach">
                   <Bot className="mr-2 h-5 w-5" />
                   体验AI教练
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4 border-pfa-champagne-gold text-pfa-champagne-gold hover:bg-pfa-champagne-gold hover:text-pfa-royal-blue" asChild>
-                <Link href="/team">
-                  了解更多
-                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
             </div>
@@ -148,7 +139,7 @@ export default function HomePage() {
       </section>
 
       {/* Success Cases Preview */}
-      <section className="py-24 lg:py-40 xl:py-48 bg-pfa-light-gray">
+      <section id="success-cases" className="py-24 lg:py-40 xl:py-48 bg-pfa-light-gray">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-serif font-bold text-3xl md:text-4xl text-pfa-royal-blue mb-4">成功案例</h2>
@@ -177,14 +168,6 @@ export default function HomePage() {
               </CardHeader>
             </Card>
           </div>
-          <div className="text-center">
-            <Button variant="outline" className="border-pfa-champagne-gold text-pfa-champagne-gold hover:bg-pfa-champagne-gold hover:text-pfa-royal-blue" asChild>
-              <Link href="/cases">
-                查看更多案例
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -195,15 +178,7 @@ export default function HomePage() {
           <p className="text-xl mb-8 text-pfa-royal-blue/70 max-w-2xl mx-auto">
             加入 AI实战教练，与AI教练一起，实现您的职业目标
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-pfa-champagne-gold text-pfa-champagne-gold hover:bg-pfa-champagne-gold hover:text-pfa-royal-blue text-lg px-8 py-4"
-              asChild
-            >
-              <Link href="/auth/register">立即注册</Link>
-            </Button>
+          <div className="flex justify-center">
             <Button
               size="lg"
               className="bg-pfa-champagne-gold text-pfa-royal-blue hover:bg-pfa-accent-gold text-lg px-8 py-4"
