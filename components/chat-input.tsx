@@ -18,7 +18,7 @@ interface ChatInputProps {
 export function ChatInput({ 
   onSendMessage, 
   disabled = false, 
-  placeholder = "请输入您的问题，AI实战教练会为您提供专业指导...",
+  placeholder = "输入消息...",
   className,
   voiceButtonRef
 }: ChatInputProps) {

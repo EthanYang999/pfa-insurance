@@ -3,20 +3,37 @@
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Bot, Users, TrendingUp, Shield, CheckCircle } from "lucide-react"
+import { ArrowRight, Bot, Users, TrendingUp, Shield, CheckCircle, User } from "lucide-react"
 import Link from "next/link"
 import { HomepageContent } from "@/types/homepage"
+import { createClient } from "@/lib/supabase/client"
+import { User as SupabaseUser } from "@supabase/supabase-js"
 
 export default function HomePage() {
   const [content, setContent] = useState<HomepageContent | null>(null)
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
 
   useEffect(() => {
-    const fetchContent = async () => {
+    const initializePage = async () => {
       try {
+        // 同时获取用户状态和页面内容
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        setUser(session?.user || null)
+
+        // 监听认证状态变化
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            setUser(session?.user || null)
+          }
+        )
+
+        // 获取页面内容
         const response = await fetch('/api/homepage-content')
         const data = await response.json()
         setContent(data)
+
       } catch (error) {
         console.error('Error fetching content:', error)
         // 使用默认内容作为后备
@@ -63,7 +80,36 @@ export default function HomePage() {
       }
     }
 
-    fetchContent()
+    let subscription: any = null
+
+    const setupPage = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        setUser(session?.user || null)
+
+        // 监听认证状态变化
+        const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            setUser(session?.user || null)
+          }
+        )
+        subscription = authSubscription
+
+        await initializePage()
+      } catch (error) {
+        console.error('Setup error:', error)
+        setLoading(false)
+      }
+    }
+
+    setupPage()
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+    }
   }, [])
 
   if (loading || !content) {
@@ -101,12 +147,19 @@ export default function HomePage() {
               </a>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button size="sm" className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue" asChild>
-                <Link href="/auth/login">
-                  登录
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              {user ? (
+                <div className="flex items-center space-x-2 text-white">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm">已登录</span>
+                </div>
+              ) : (
+                <Button size="sm" className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue" asChild>
+                  <Link href="/auth/login">
+                    登录
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -126,7 +179,7 @@ export default function HomePage() {
             </p>
             <div className="flex justify-center">
               <Button size="lg" className="bg-pfa-champagne-gold hover:bg-pfa-accent-gold text-pfa-royal-blue text-lg px-8 py-4" asChild>
-                <Link href="/chat">
+                <Link href={user ? "/chat" : "/auth/login?redirectTo=/chat"}>
                   <Bot className="mr-2 h-5 w-5" />
                   {content.hero_button_text}
                 </Link>

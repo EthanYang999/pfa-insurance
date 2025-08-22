@@ -44,8 +44,16 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  
+  // 先尝试获取session，这通常更可靠
+  const { data: { session } } = await supabase.auth.getSession();
+  let user = session?.user;
+  
+  // 如果session检查失败，再尝试getClaims()
+  if (!user) {
+    const { data } = await supabase.auth.getClaims();
+    user = data?.claims;
+  }
 
   // 对于需要认证的页面进行检查
   const protectedPaths = ['/chat', '/dashboard', '/profile'];
@@ -57,19 +65,37 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth")
   ) {
-    // 如果是从主页跳转过来的，添加一个查询参数来标识
+    // 检查是否是从主页跳转过来的
     const referer = request.headers.get('referer');
-    const isFromMainPage = referer && referer.includes(request.nextUrl.origin);
+    const isFromMainPage = referer && (referer.includes(request.nextUrl.origin) || referer.endsWith('/'));
     
-    // no user, potentially respond by redirecting the user to the login page
+    // 如果是从主页跳转且没有重试标记，给一次重试机会
+    const hasRetryFlag = request.nextUrl.searchParams.has('auth_retry');
+    
+    if (isFromMainPage && !hasRetryFlag) {
+      // 添加重试标记并重新尝试当前路径，给认证状态一点时间同步
+      const url = request.nextUrl.clone();
+      url.searchParams.set('auth_retry', '1');
+      return NextResponse.redirect(url);
+    }
+    
+    // 重定向到登录页面
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    url.searchParams.delete('auth_retry'); // 清除重试标记
     
-    // 如果是从主页跳转过来的，添加回调URL
+    // 添加回调URL
     if (isFromMainPage) {
       url.searchParams.set('redirectTo', request.nextUrl.pathname);
     }
     
+    return NextResponse.redirect(url);
+  }
+
+  // 清除URL中的重试参数，让用户看不到这个技术细节
+  if (request.nextUrl.searchParams.has('auth_retry') && user) {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete('auth_retry');
     return NextResponse.redirect(url);
   }
 
