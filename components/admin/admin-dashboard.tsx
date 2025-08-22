@@ -16,7 +16,7 @@ export function AdminDashboard() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">PFA 后台管理</h1>
+                <h1 className="text-2xl font-bold text-gray-900">后台管理</h1>
                 <p className="text-sm text-gray-500">系统管理与监控中心</p>
               </div>
             </div>
