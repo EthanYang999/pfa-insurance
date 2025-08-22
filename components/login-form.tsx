@@ -7,9 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
-export function LoginForm({
+function LoginFormContent({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
@@ -117,5 +117,20 @@ export function LoginForm({
         </div>
       </form>
     </div>
+  );
+}
+
+export function LoginForm(props: React.ComponentPropsWithoutRef<"div">) {
+  return (
+    <Suspense fallback={
+      <div className="space-y-4">
+        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-11 bg-gray-200 rounded animate-pulse"></div>
+      </div>
+    }>
+      <LoginFormContent {...props} />
+    </Suspense>
   );
 }
