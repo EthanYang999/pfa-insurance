@@ -40,6 +40,8 @@ export class TTSAudioManager implements AudioManager {
   private currentSource: AudioBufferSourceNode | null = null;
   private gainNode: GainNode | null = null;
   private queue: AudioQueueItem[] = [];
+  // 🔒 用于防止并发启动播放导致的重叠播放
+  private isStarting: boolean = false;
   private state: AudioManagerState = {
     isPlaying: false,
     isPaused: false,
@@ -110,11 +112,11 @@ export class TTSAudioManager implements AudioManager {
 
     this.updateQueueState();
 
-    // 🔒 安全的播放检查，避免并发调用
-    if (!this.state.isPlaying && !this.state.isPaused && !this.state.currentItemId) {
+    // 🔒 安全的播放检查，避免并发调用/重入
+    if (!this.state.isPlaying && !this.state.isPaused && !this.state.currentItemId && !this.isStarting) {
       // 短暂延迟，让音频合成有时间完成
       setTimeout(() => {
-        if (!this.state.isPlaying && !this.state.isPaused) {
+        if (!this.state.isPlaying && !this.state.isPaused && !this.isStarting) {
           this.playNext();
         }
       }, 50);
@@ -176,6 +178,13 @@ export class TTSAudioManager implements AudioManager {
       return;
     }
 
+    // 🔒 启动锁，防止并发启动两个音频源
+    if (this.isStarting) {
+      console.warn('⚠️ 正在启动另一个音频源，跳过本次启动');
+      return;
+    }
+    this.isStarting = true;
+
     // 🔒 立即标记为播放状态，防止并发调用
     item.isPlaying = true;
     this.state.currentItemId = item.id;
@@ -210,7 +219,13 @@ export class TTSAudioManager implements AudioManager {
 
       // 停止当前播放
       if (this.currentSource) {
-        this.currentSource.stop();
+        try {
+          // 避免由于手动停止触发旧音源的 onended 回调导致重入
+          this.currentSource.onended = null;
+          this.currentSource.stop();
+        } catch (e) {
+          console.warn('停止旧音频源时发生警告:', e);
+        }
         this.currentSource = null;
       }
 
@@ -224,6 +239,9 @@ export class TTSAudioManager implements AudioManager {
         console.log(`音频播放完成: ${item.id}`);
         item.isPlaying = false;
         this.currentSource = null;
+        // 当前播放结束
+        this.state.isPlaying = false;
+        this.state.currentItemId = undefined;
         
         this.callbacks.onComplete?.(item);
         this.removeFromQueue(item.id);
@@ -256,11 +274,18 @@ export class TTSAudioManager implements AudioManager {
       
       // 跳过错误项目，播放下一个
       this.playNext();
+    } finally {
+      // 释放启动锁
+      this.isStarting = false;
     }
   }
 
   // 播放下一个项目
   private playNext(): void {
+    // 🔒 如果正在启动或已经在播放，避免重入
+    if (this.isStarting || this.state.isPlaying) {
+      return;
+    }
     // 🔍 查找未播放且不是当前项目的下一个项目
     const nextItem = this.queue.find(item => 
       !item.isPlaying && 
@@ -291,7 +316,13 @@ export class TTSAudioManager implements AudioManager {
     this.state.isPlaying = false;
     
     if (this.currentSource) {
-      this.currentSource.stop();
+      try {
+        // 手动停止时移除回调，避免触发 playNext
+        this.currentSource.onended = null;
+        this.currentSource.stop();
+      } catch (e) {
+        console.warn('暂停时停止音频源发生警告:', e);
+      }
       this.currentSource = null;
     }
 
@@ -303,7 +334,13 @@ export class TTSAudioManager implements AudioManager {
   // 停止播放
   stop(): void {
     if (this.currentSource) {
-      this.currentSource.stop();
+      try {
+        // 手动停止时移除回调，避免触发 playNext
+        this.currentSource.onended = null;
+        this.currentSource.stop();
+      } catch (e) {
+        console.warn('停止时停止音频源发生警告:', e);
+      }
       this.currentSource = null;
     }
 
